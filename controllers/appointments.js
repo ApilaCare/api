@@ -103,6 +103,7 @@ module.exports.appointmentsUpdateOne = function(req, res) {
 
     Appoint
         .findById(req.params.appointmentid)
+        .populate("residentGoing")
         .exec(
             function(err, appointment) {
                 if (!appointment) {
