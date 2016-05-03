@@ -177,16 +177,21 @@ module.exports.appointmentsUpdateOne = function(req, res) {
                     appointment.cancel = req.body.cancel;
                     appointment.updateInfo.push(updateInfo);
 
-                    var populatedAppoint = JSON.parse(JSON.stringify(appointment));
-
                     appointment.residentGoing = req.body.residentId;
 
-                appointment.save(function(err, appointment2) {
+                appointment.save(function(err, appointment) {
                     if (err) {
                         sendJSONresponse(res, 404, err);
                     } else {
 
-                        sendJSONresponse(res, 200, populatedAppoint);
+                        Appoint.
+                        populate(appointment, "residentGoing",
+                        function(err) {
+                          //console.log(appointment);
+                          sendJSONresponse(res, 200, appointment);
+                        });
+
+
                     }
                 });
             }
