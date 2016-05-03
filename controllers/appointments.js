@@ -45,6 +45,8 @@ module.exports.appointmentsCreate = function(req, res) {
 /* GET list of appointments */
 module.exports.appointmentsList = function(req, res) {
 
+    console.log(req);
+
     // change sensitivity to day rather than by minute
     var start = new Date();
     start.setHours(0, 0, 0, 0);
@@ -54,7 +56,43 @@ module.exports.appointmentsList = function(req, res) {
             $gte: start
         }*/
     }).populate("residentGoing").exec(function(err, appointments) {
-        console.log(appointments);
+      //  console.log(appointments);
+        console.log("In appointment list");
+        sendJSONresponse(res, 200, appointments)
+    });
+};
+
+/* GET list by month of appointments */
+module.exports.appointmentsListByMonth = function(req, res) {
+
+
+    // change sensitivity to day rather than by minute
+    var start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    var months = {
+      "January" : 0,
+      "February": 1,
+      "March" : 2,
+      "April": 3,
+      "May" : 4,
+      "June": 5,
+      "July" : 6,
+      "August": 7,
+      "September" : 8,
+      "October": 9,
+      "November" : 10,
+      "December": 11
+    };
+
+    console.log(months[req.params.month]);
+
+    var query = 'return this.time.getMonth() === ' + months[req.params.month];
+
+    Appoint.find({
+        $where : query
+    }).populate("residentGoing").exec(function(err, appointments) {
+      //  console.log(appointments);
         console.log("In appointment list");
         sendJSONresponse(res, 200, appointments)
     });
@@ -103,6 +141,7 @@ module.exports.appointmentsUpdateOne = function(req, res) {
 
     Appoint
         .findById(req.params.appointmentid)
+        .populate("residentGoing")
         .exec(
             function(err, appointment) {
                 if (!appointment) {
