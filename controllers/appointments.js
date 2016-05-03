@@ -167,21 +167,26 @@ module.exports.appointmentsUpdateOne = function(req, res) {
                     "updateDate": req.body.modifiedDate,
                     "updateField": req.body.updateField
                 };
-                console.log(updateInfo);
 
-                appointment.reason = req.body.reason,
-                    appointment.locationName = req.body.locationName,
-                    appointment.locationDoctor = req.body.locationDoctor,
-                    appointment.residentGoing = req.body.residentId,
-                    appointment.time = d,
-                    appointment.transportation = req.body.transportation,
-                    appointment.cancel = req.body.cancel,
+
+                appointment.reason = req.body.reason;
+                    appointment.locationName = req.body.locationName;
+                    appointment.locationDoctor = req.body.locationDoctor;
+                    appointment.time = d;
+                    appointment.transportation = req.body.transportation;
+                    appointment.cancel = req.body.cancel;
                     appointment.updateInfo.push(updateInfo);
-                appointment.save(function(err, appointment) {
+
+                    var populatedAppoint = JSON.parse(JSON.stringify(appointment));
+
+                    appointment.residentGoing = req.body.residentId;
+
+                appointment.save(function(err, appointment2) {
                     if (err) {
                         sendJSONresponse(res, 404, err);
                     } else {
-                        sendJSONresponse(res, 200, appointment);
+
+                        sendJSONresponse(res, 200, populatedAppoint);
                     }
                 });
             }
