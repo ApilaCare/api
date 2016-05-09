@@ -8,13 +8,26 @@ var auth = jwt({
     userProperty: 'payload'
 });
 
-var ctrlIssues = require('../controllers/issues');
-var ctrlResidents = require('../controllers/residents');
-var ctrlAppointments = require('../controllers/appointments');
-var ctrlIssueComments = require('../controllers/issueComments');
-var ctrlAppointmentComments = require('../controllers/appointmentComments');
+// control variables
+// issues
+var ctrlIssues = require('../controllers/issues/issues');
+var ctrlIssueComments = require('../controllers/issues/issueComments');
+var ctrlIssueChecklists = require('../controllers/issues/issueChecklists');
+var ctrlIssueLabels = require('../controllers/issues/issueLabels');
+var ctrlIssueAttachments = require('../controllers/issues/issueAttachments');
+
+// residents
+var ctrlResidents = require('../controllers/residents/residents');
+
+// appointments
+var ctrlAppointments = require('../controllers/appointments/appointments');
+var ctrlAppointmentComments = require('../controllers/appointments/appointmentComments');
+
+// users
 var ctrlAuth = require('../controllers/authentication');
 
+
+// routes
 // authentication
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);
@@ -32,6 +45,25 @@ router.get('/issues/:issueid/comments/:commentid', ctrlIssueComments.issueCommen
 router.put('/issues/:issueid/comments/:commentid', auth, ctrlIssueComments.issueCommentsUpdateOne);
 router.delete('/issues/:issueid/comments/:commentid', auth, ctrlIssueComments.issueCommentsDeleteOne);
 
+// issue checklists
+router.post('/issues/:issueid/checklists/new', auth, ctrlIssueChecklists.issueChecklistsCreate);
+router.get('/issues/:issueid/checklists/:checklistid', ctrlIssueChecklists.issueChecklistsReadOne);
+router.put('/issues/:issueid/checklists/:checklistid', auth, ctrlIssueChecklists.issueChecklistsUpdateOne);
+router.delete('/issues/:issueid/checklists/:checklistid', auth, ctrlIssueChecklists.issueChecklistsDeleteOne);
+
+// issue labels
+router.post('/issues/:issueid/labels/new', auth, ctrlIssueLabels.issueLabelsCreate);
+router.get('/issues/:issueid/labels/:labelid', ctrlIssueLabels.issueLabelsReadOne);
+router.put('/issues/:issueid/labels/:labelid', auth, ctrlIssueLabels.issueLabelsUpdateOne);
+router.delete('/issues/:issueid/labels/:labelid', auth, ctrlIssueLabels.issueLabelsDeleteOne);
+
+// issue attachments
+router.post('/issues/:issueid/attachments/new', auth, ctrlIssueAttachments.issueAttachmentsCreate);
+router.get('/issues/:issueid/attachments/:attachmentid', ctrlIssueAttachments.issueAttachmentsReadOne);
+router.put('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttachments.issueAttachmentsUpdateOne);
+router.delete('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttachments.issueAttachmentsDeleteOne);
+
+
 // appointments
 router.get('/appointments', ctrlAppointments.appointmentsList);
 router.get('/appointments/:month', ctrlAppointments.appointmentsListByMonth);
@@ -47,6 +79,7 @@ router.put('/appointments/:appointmentid/comments/:commentid', ctrlAppointmentCo
 router.delete('/appointments/:appointmentid/comments/:commentid', ctrlAppointmentComments.appointmentCommentsDeleteOne);
 
 router.get('/testCall', ctrlAppointments.testCall);
+
 
 // residents
 router.get('/residents', ctrlResidents.residentsList);
