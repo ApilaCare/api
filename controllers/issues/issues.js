@@ -38,6 +38,16 @@ module.exports.issuesList = function(req, res) {
     });
 };
 
+module.exports.issuesListbyUser = function(req, res) {
+
+  var username = req.params.username;
+
+  Iss.find({submitBy: username}, function(err, issues) {
+      console.log(issues);
+      sendJSONresponse(res, 200, issues)
+  });
+}
+
 module.exports.issuesReadOne = function(req, res) {
     console.log('Finding issue details', req.params);
     if (req.params && req.params.issueid) {

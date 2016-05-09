@@ -34,6 +34,7 @@ router.post('/login', ctrlAuth.login);
 
 // issues
 router.get('/issues', ctrlIssues.issuesList);
+router.get('/issues/:username', ctrlIssues.issuesListbyUser);
 router.post('/issues/new', auth, ctrlIssues.issuesCreate);
 router.get('/issues/:issueid', ctrlIssues.issuesReadOne);
 router.put('/issues/:issueid', ctrlIssues.issuesUpdateOne);
