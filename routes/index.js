@@ -64,7 +64,6 @@ router.get('/issues/:issueid/attachments/:attachmentid', ctrlIssueAttachments.is
 router.put('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttachments.issueAttachmentsUpdateOne);
 router.delete('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttachments.issueAttachmentsDeleteOne);
 
-
 // appointments
 router.get('/appointments', ctrlAppointments.appointmentsList);
 router.get('/appointments/:month', ctrlAppointments.appointmentsListByMonth);

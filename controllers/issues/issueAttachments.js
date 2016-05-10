@@ -89,7 +89,7 @@ var doAddAttachment = function(req, res, issue, username) {
 };
 
 
-module.exports.issueAttachmentUpdateOne = function(req, res) {
+module.exports.issueAttachmentsUpdateOne = function(req, res) {
     if (!req.params.issueid || !req.params.attachmentid) {
         sendJSONresponse(res, 404, {
             "message": "Not found, issueid and attachmentid are both required"
