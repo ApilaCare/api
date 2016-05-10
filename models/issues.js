@@ -35,6 +35,7 @@ var issueSchema = new mongoose.Schema({
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},
     description: {type: String, required: true},
+    status: {type: String, required: true, default: "Open"}, // choose from ["Open", "Shelved", "Closed"]
     checklists: [issueChecklistSchema],
     comments: [issueCommentSchema],
     labels: [issueLabelsSchema],
