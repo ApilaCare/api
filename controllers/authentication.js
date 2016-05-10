@@ -8,9 +8,9 @@ var sendJSONresponse = function(res, status, content) {
 };
 
 module.exports.register = function(req, res) {
-    
+
     console.log("usli u registar");
-    
+
     // respond with an error status if not al required fields are found
     if (!req.body.name || !req.body.email || !req.body.password) {
         sendJSONresponse(res, 400, {
@@ -55,7 +55,7 @@ module.exports.login = function(req, res) {
     }
 
     console.log(req.body);
-    
+
     // pass name of strategy and a callback to authenticate method
     passport.authenticate('local', function(err, user, info) {
         var token;

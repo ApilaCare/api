@@ -30,7 +30,7 @@ var issueAttachmentsSchema = new mongoose.Schema({
 
 var issueSchema = new mongoose.Schema({
     title: {type: String,required: true},
-    responsibleParty: {type: String, required: true},
+    responsibleParty: {type: String,required: true},
     resolutionTimeframe: {type: String, required: true},
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},

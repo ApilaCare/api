@@ -32,13 +32,30 @@ module.exports.issuesCreate = function(req, res) {
 
 /* GET list of issues */
 module.exports.issuesList = function(req, res) {
-    Iss.find({}, function(err, issues) {
+
+    console.log("list issue");
+
+    var issueTemplate = {
+                 "title" : "$title",
+                 "responsibleParty" : "$responsibleParty",
+                 "resolutionTimeframe" : "$resolutionTimeframe",
+                 "description" : "$description",
+                 "submitBy" : "$submitBy"
+               }
+
+    Iss.aggregate([{'$group' : {"_id": "$responsibleParty",
+                                count: {"$sum" : 1},
+                              issues: {$push : issueTemplate}}},
+                            {'$sort' : {"count" : -1}}],
+     function(err, issues) {
         console.log(issues);
         sendJSONresponse(res, 200, issues)
     });
 };
 
 module.exports.issuesListbyUser = function(req, res) {
+
+
 
   var username = req.params.username;
 
