@@ -40,7 +40,10 @@ module.exports.issuesList = function(req, res) {
                  "responsibleParty" : "$responsibleParty",
                  "resolutionTimeframe" : "$resolutionTimeframe",
                  "description" : "$description",
-                 "submitBy" : "$submitBy"
+                 "submitBy" : "$submitBy",
+                 "submitDate": "$submitDate",
+                 "comments" : "$comments",
+                 "_id" : "$_id"
                }
 
     Iss.aggregate([{'$group' : {"_id": "$responsibleParty",
