@@ -19,6 +19,9 @@ var ctrlIssueAttachments = require('../controllers/issues/issueAttachments');
 // residents
 var ctrlResidents = require('../controllers/residents/residents');
 
+// users
+var ctrlUsers = require('../controllers/users/users');
+
 // appointments
 var ctrlAppointments = require('../controllers/appointments/appointments');
 var ctrlAppointmentComments = require('../controllers/appointments/appointmentComments');
@@ -80,6 +83,8 @@ router.delete('/appointments/:appointmentid/comments/:commentid', ctrlAppointmen
 
 router.get('/testCall', ctrlAppointments.testCall);
 
+// users
+router.get('/users', ctrlUsers.usersList);
 
 // residents
 router.get('/residents', ctrlResidents.residentsList);

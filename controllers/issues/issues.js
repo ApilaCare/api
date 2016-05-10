@@ -55,11 +55,9 @@ module.exports.issuesList = function(req, res) {
 
 module.exports.issuesListbyUser = function(req, res) {
 
-
-
   var username = req.params.username;
 
-  Iss.find({submitBy: username}, function(err, issues) {
+  Iss.find({responsibleParty: username}, function(err, issues) {
       console.log(issues);
       sendJSONresponse(res, 200, issues)
   });
