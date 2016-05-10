@@ -43,6 +43,7 @@ module.exports.issuesList = function(req, res) {
                  "submitBy" : "$submitBy",
                  "submitDate": "$submitDate",
                  "comments" : "$comments",
+                 "updateInfo" : "$updateInfo",
                  "_id" : "$_id"
                }
 
