@@ -44,6 +44,13 @@ module.exports.issuesList = function(req, res) {
                  "submitDate": "$submitDate",
                  "comments" : "$comments",
                  "updateInfo" : "$updateInfo",
+                 "status"  : "$status",
+                 "idMembers": "$idMembers",
+                 "idLabels" : "$idLabels",
+                 "idAttachmentCover" : "$idAttachmentCover",
+                 "attachments" : "$attachments",
+                 "labels"    : "$labels",
+                 "checklists": "$checklists",
                  "_id" : "$_id"
                }
 
@@ -128,6 +135,7 @@ module.exports.issuesUpdateOne = function(req, res) {
                 issue.resolutionTimeframe = req.body.resolutionTimeframe;
                 issue.submitBy = req.body.submitBy;
                 issue.description = req.body.description;
+                issue.status = req.body.status;
                 issue.updateInfo.push(updateInfo);
                 issue.save(function(err, issue) {
                     if (err) {
