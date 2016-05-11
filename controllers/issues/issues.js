@@ -33,7 +33,7 @@ module.exports.issuesCreate = function(req, res) {
 /* GET list of issues */
 module.exports.issuesList = function(req, res) {
 
-    console.log("list issue");
+    console.log("list issue with STATUS: " + req.params.status);
 
     var issueTemplate = {
                  "title" : "$title",
@@ -54,10 +54,11 @@ module.exports.issuesList = function(req, res) {
                  "_id" : "$_id"
                }
 
-    Iss.aggregate([{'$group' : {"_id": "$responsibleParty",
-                                count: {"$sum" : 1},
-                              issues: {$push : issueTemplate}}},
-                            {'$sort' : {"count" : -1}}],
+    Iss.aggregate([{'$match' : {status : req.params.status}},
+      {'$group' : {"_id": "$responsibleParty",
+                  count: {"$sum" : 1},
+                  issues: {$push : issueTemplate}}},
+                  {'$sort' : {"count" : -1}}],
      function(err, issues) {
         console.log(issues);
         sendJSONresponse(res, 200, issues)
@@ -67,8 +68,9 @@ module.exports.issuesList = function(req, res) {
 module.exports.issuesListbyUser = function(req, res) {
 
   var username = req.params.username;
+  var s = req.params.status;
 
-  Iss.find({responsibleParty: username}, function(err, issues) {
+  Iss.find({responsibleParty: username, status: s}, function(err, issues) {
       console.log(issues);
       sendJSONresponse(res, 200, issues)
   });
