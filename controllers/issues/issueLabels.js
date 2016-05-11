@@ -71,7 +71,7 @@ var doAddLabel = function(req, res, issue, username) {
     } else {
         issue.labels.push({
             author: req.payload.name, // I dont think we need to track which users created a label
-            name: req.body.color,
+            name: req.body.name,
             color: req.body.color
         });
         issue.save(function(err, issue) {
@@ -187,6 +187,9 @@ module.exports.issueLabelsReadOne = function(req, res) {
 
 // app.delete('/api/issues/:issueid/labels/:labelid'
 module.exports.issueLabelsDeleteOne = function(req, res) {
+
+    console.log("deleting labels");
+
     if (!req.params.issueid || !req.params.labelid) {
         sendJSONresponse(res, 404, {
             "message": "Not found, issueid and labelid are both required"
@@ -194,7 +197,7 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
         return;
     }
     Iss
-        .findById(req.params.issueid)
+        .findByIdAndRemove(req.params.issueid)
         .select('labels')
         .exec(
             function(err, issue) {
@@ -218,7 +221,7 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
                             if (err) {
                                 sendJSONresponse(res, 404, err);
                             } else {
-                                sendJSONresponse(res, 204, null);
+                                sendJSONresponse(res, 204, {});
                             }
                         });
                     }
