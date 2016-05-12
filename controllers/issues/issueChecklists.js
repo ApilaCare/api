@@ -34,6 +34,20 @@ module.exports.issueChecklistsCreate = function(req, res) {
     });
 };
 
+
+module.exports.issueChecklistAddItem = function(req, res) {
+  console.log("Adding item to checklist");
+
+  Iss
+      .findById(req.params.issueid)
+      .select('title checklists')
+      .exec(
+          function(err, issue) {
+            doAddChecklistItem(req, res, issue);
+          });
+
+}
+
 var getAuthor = function(req, res, callback) {
     console.log("Finding author with email " + req.payload.email);
     if (req.payload.email) {
@@ -64,7 +78,14 @@ var getAuthor = function(req, res, callback) {
     }
 };
 
+var doAddChecklistItem = function(req, res, issue) {
+
+  //find the checklist by it's id and push new item
+}
+
 var doAddChecklist = function(req, res, issue, username) {
+
+  console.log("Adding checklist, max kek");
 
     if (!issue) {
         sendJSONresponse(res, 404, "issueid not found");
@@ -74,6 +95,8 @@ var doAddChecklist = function(req, res, issue, username) {
             checklistName: req.body.checklistName,
             // needs the checkItems as the mixed mongoose schema
         });
+
+        console.log(issue);
         issue.save(function(err, issue) {
             var thisChecklist;
             if (err) {
@@ -88,6 +111,9 @@ var doAddChecklist = function(req, res, issue, username) {
 
 
 module.exports.issueChecklistsUpdateOne = function(req, res) {
+
+//  console.log(req.body);
+
     if (!req.params.issueid || !req.params.checklistid) {
         sendJSONresponse(res, 404, {
             "message": "Not found, issueid and checklistid are both required"
@@ -99,6 +125,8 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
         .select('checklists')
         .exec(
             function(err, issue) {
+
+
                 var thisChecklist;
                 if (!issue) {
                     sendJSONresponse(res, 404, {
@@ -111,16 +139,21 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
                 }
                 if (issue.checklists && issue.checklists.length > 0) {
                     thisChecklist = issue.checklists.id(req.params.checklistid);
+
                     if (!thisChecklist) {
                         sendJSONresponse(res, 404, {
                             "message": "checklistid not found"
                         });
                     } else {
+
                         thisChecklist.author = req.body.author;
-                        thisChecklist.checklistName = req.body.checklistName;
+                        thisChecklist.checkItems = req.body.checkItems;
+                        thisChecklist.checkItemsChecked = req.body.checkItemsChecked;
+
                         // other update items
                         issue.save(function(err, issue) {
                             if (err) {
+                              console.log(err);
                                 sendJSONresponse(res, 404, err);
                             } else {
                                 sendJSONresponse(res, 200, thisChecklist);

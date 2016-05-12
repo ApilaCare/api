@@ -16,7 +16,7 @@ var routesApi = require('./routes/index');
 
 var app = express();
 
-//app.use(cors());
+app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -46,7 +46,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use(cors());
 app.use('/api', routesApi);
 
 app.set('port', process.env.PORT || 3300);

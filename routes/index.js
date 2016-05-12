@@ -52,6 +52,7 @@ router.delete('/issues/:issueid/comments/:commentid', auth, ctrlIssueComments.is
 // issue checklists
 router.post('/issues/:issueid/checklists/new', auth, ctrlIssueChecklists.issueChecklistsCreate);
 router.get('/issues/:issueid/checklists/:checklistid', ctrlIssueChecklists.issueChecklistsReadOne);
+router.put('/issues/:issueid/checklists/newitem/:listid', ctrlIssueChecklists.issueChecklistAddItem);
 router.put('/issues/:issueid/checklists/:checklistid', auth, ctrlIssueChecklists.issueChecklistsUpdateOne);
 router.delete('/issues/:issueid/checklists/:checklistid', auth, ctrlIssueChecklists.issueChecklistsDeleteOne);
 
