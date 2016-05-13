@@ -25,6 +25,7 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser());
 
 
+
 //so we can call our api from another server
 // Add headers
 app.use(function (req, res, next) {
@@ -47,6 +48,7 @@ app.use(function (req, res, next) {
 });
 
 app.use('/api', routesApi);
+app.use('/files', express.static(__dirname + 'upload_storage'));
 
 app.set('port', process.env.PORT || 3300);
 

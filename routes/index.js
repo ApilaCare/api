@@ -1,6 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var jwt = require('express-jwt');
+
+var multiparty = require('connect-multiparty');
+var multipartyMiddleware = multiparty({uploadDir: "./upload_storage"});
+
 var auth = jwt({
     // set secret using same environment variable as before
     secret: process.env.JWT_SECRET,
@@ -63,7 +67,8 @@ router.put('/issues/:issueid/labels/:labelid', auth, ctrlIssueLabels.issueLabels
 router.delete('/issues/:issueid/labels/:labelid', auth, ctrlIssueLabels.issueLabelsDeleteOne);
 
 // issue attachments
-router.post('/issues/:issueid/attachments/new', auth, ctrlIssueAttachments.issueAttachmentsCreate);
+//router.post('/issues/:issueid/attachments/upload', auth, multipartyMiddleware, ctrlIssueAttachments.issueAttachmentsUpload);
+router.post('/issues/:issueid/attachments/new', auth, multipartyMiddleware, ctrlIssueAttachments.issueAttachmentsCreate);
 router.get('/issues/:issueid/attachments/:attachmentid', ctrlIssueAttachments.issueAttachmentsReadOne);
 router.put('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttachments.issueAttachmentsUpdateOne);
 router.delete('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttachments.issueAttachmentsDeleteOne);

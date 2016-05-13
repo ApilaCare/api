@@ -33,6 +33,13 @@ module.exports.issueAttachmentsCreate = function(req, res) {
         }
     });
 };
+//testing method for file upload
+module.exports.issueAttachmentsUpload = function(req, res) {
+    var file = req.files.file;
+    console.log(file);
+
+
+}
 
 var getAuthor = function(req, res, callback) {
     console.log("Finding author with email " + req.payload.email);
@@ -66,15 +73,21 @@ var getAuthor = function(req, res, callback) {
 
 var doAddAttachment = function(req, res, issue, username) {
 
+    var file = req.files.file;
+
     if (!issue) {
         sendJSONresponse(res, 404, "issueid not found");
     } else {
+
+      var fullUrl = "http://localhost:3300/files/" + file.path;
+    //   var fullUrl = file.path;
+
         issue.attachments.push({
             uploader: req.payload.name,
-            name: req.body.name,
-            source: req.body.source,
-            url: req.body.url,
-            type: req.body.type,
+            name: file.originalFilename,
+            source: file.path,
+            url: fullUrl,
+            type: file.type,
         });
         issue.save(function(err, issue) {
             var thisAttachment;
