@@ -140,9 +140,15 @@ module.exports.issuesUpdateOne = function(req, res) {
                 issue.description = req.body.description;
                 issue.status = req.body.status;
 
-                console.log(req.body.idMembers);
+                console.log(req.body);
+                if(req.body.deletedMember !== undefined) {
+                  issue.idMembers.splice(issue.idMembers.map
+                    (function(d){return d.name;}).indexOf(req.body.deletedMember), 1);
+                } else {
+                    issue.idMembers = req.body.idMembers;
+                }
 
-                issue.idMembers = req.body.idMembers;
+
 
                 console.log(issue.idMembers);
 
