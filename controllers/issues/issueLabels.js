@@ -185,6 +185,8 @@ module.exports.issueLabelsReadOne = function(req, res) {
     }
 };
 
+module.exports.issueLabelsList = function(req, res) {}
+
 // app.delete('/api/issues/:issueid/labels/:labelid'
 module.exports.issueLabelsDeleteOne = function(req, res) {
 
@@ -197,7 +199,7 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
         return;
     }
     Iss
-        .findByIdAndRemove(req.params.issueid)
+        .findById(req.params.issueid)
         .select('labels')
         .exec(
             function(err, issue) {
@@ -212,13 +214,17 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
                 }
                 if (issue.labels && issue.labels.length > 0) {
                     if (!issue.labels.id(req.params.labelid)) {
+
                         sendJSONresponse(res, 404, {
                             "message": "labelid not found"
                         });
                     } else {
+                        console.log(issue.labels.id(req.params.labelid));
                         issue.labels.id(req.params.labelid).remove();
+                        console.log(issue);
                         issue.save(function(err) {
                             if (err) {
+                               console.log(err);
                                 sendJSONresponse(res, 404, err);
                             } else {
                                 sendJSONresponse(res, 204, {});
