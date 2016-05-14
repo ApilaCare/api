@@ -132,12 +132,20 @@ module.exports.issuesUpdateOne = function(req, res) {
                     sendJSONresponse(res, 400, err);
                     return;
                 }
+
                 issue.title = req.body.title;
                 issue.responsibleParty = req.body.responsibleParty;
                 issue.resolutionTimeframe = req.body.resolutionTimeframe;
                 issue.submitBy = req.body.submitBy;
                 issue.description = req.body.description;
                 issue.status = req.body.status;
+
+                console.log(req.body.idMembers);
+
+                issue.idMembers = req.body.idMembers;
+
+                console.log(issue.idMembers);
+
                 issue.updateInfo.push(updateInfo);
                 issue.save(function(err, issue) {
                     if (err) {

@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 var jwt = require('express-jwt');
 
-var multiparty = require('connect-multiparty');
-var multipartyMiddleware = multiparty({uploadDir: "./upload_storage"});
+ var multiparty = require('connect-multiparty');
+ var multipartyMiddleware = multiparty({uploadDir: "./upload_storage"});
 
 var auth = jwt({
     // set secret using same environment variable as before

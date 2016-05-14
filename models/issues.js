@@ -19,6 +19,10 @@ var issueLabelsSchema = new mongoose.Schema({
     color: {type: String, required: true},
 });
 
+var issueMembersSchema = new mongoose.Schema({
+  name: {type: String, required: true}
+});
+
 var issueAttachmentsSchema = new mongoose.Schema({
     name: {type: String, required: true},
     source: {type: String, required: true},
@@ -41,7 +45,7 @@ var issueSchema = new mongoose.Schema({
     labels: [issueLabelsSchema],
     attachments: [issueAttachmentsSchema],
     idAttachmentCover: {type: String},
-    idMembers: [String],
+    idMembers: [issueMembersSchema],
     idLabels: [String],
     updateInfo: [mongoose.Schema.Types.Mixed]
 });
