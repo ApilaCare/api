@@ -41,7 +41,7 @@ router.post('/login', ctrlAuth.login);
 
 // issues
 router.get('/issues/list/:status', ctrlIssues.issuesList);
-router.get('/issues/:username/s/:status', ctrlIssues.issuesListbyUser);
+router.get('/issues/:username/s/:status', ctrlIssues.issuesListByUsername);
 router.post('/issues/new', auth, ctrlIssues.issuesCreate);
 router.get('/issues/:issueid', ctrlIssues.issuesReadOne);
 router.put('/issues/:issueid', ctrlIssues.issuesUpdateOne);

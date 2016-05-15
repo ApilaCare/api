@@ -65,12 +65,12 @@ module.exports.issuesList = function(req, res) {
     });
 };
 
-module.exports.issuesListbyUser = function(req, res) {
+module.exports.issuesListByUsername = function(req, res) {
 
-  var username = req.params.username;
+  //var username = req.params.username;
   var s = req.params.status;
 
-  Iss.find({responsibleParty: username, status: s}, function(err, issues) {
+  Iss.find({status: s}, function(err, issues) {
       console.log(issues);
       sendJSONresponse(res, 200, issues)
   });

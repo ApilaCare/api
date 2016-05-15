@@ -100,6 +100,9 @@ module.exports.issueLabelsUpdateOne = function(req, res) {
         .exec(
             function(err, issue) {
                 var thisLabel;
+
+                console.log(issue);
+
                 if (!issue) {
                     sendJSONresponse(res, 404, {
                         "message": "issueid not found"
@@ -121,6 +124,7 @@ module.exports.issueLabelsUpdateOne = function(req, res) {
                         thisLabel.color = req.body.color;
                         issue.save(function(err, issue) {
                             if (err) {
+                                console.log(err);
                                 sendJSONresponse(res, 404, err);
                             } else {
                                 sendJSONresponse(res, 200, thisLabel);
