@@ -15,7 +15,6 @@ module.exports.issueLabelsCreate = function(req, res) {
         if (req.params.issueid) {
             Iss
                 .findById(req.params.issueid)
-                .select('labels')
                 .exec(
                     function(err, issue) {
                         if (err) {
@@ -74,6 +73,11 @@ var doAddLabel = function(req, res, issue, username) {
             name: req.body.name,
             color: req.body.color
         });
+
+        console.log(req.body.updateInfo);
+
+        issue.updateInfo.push(req.body.updateInfo);
+
         issue.save(function(err, issue) {
             var thisLabel;
             if (err) {
@@ -204,7 +208,7 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
     }
     Iss
         .findById(req.params.issueid)
-        .select('labels')
+        .select('labels updateInfo')
         .exec(
             function(err, issue) {
                 if (!issue) {
@@ -223,9 +227,26 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
                             "message": "labelid not found"
                         });
                     } else {
-                        console.log(issue.labels.id(req.params.labelid));
-                        issue.labels.id(req.params.labelid).remove();
+                        var label = issue.labels.id(req.params.labelid);
+
+                        var updateInfo = {};
+
+                        updateInfo.updateBy = req.payload.name;
+                        updateInfo.updateDate = new Date();
+                        updateInfo.updateField = [];
+                        updateInfo.updateField.push({
+                          "field": "labels",
+                          "new": "",
+                          "old": label.name
+                        });
+
                         console.log(issue);
+                        console.log(updateInfo);
+
+                        issue.updateInfo.push(updateInfo);
+
+                        issue.labels.id(req.params.labelid).remove();
+
                         issue.save(function(err) {
                             if (err) {
                                console.log(err);

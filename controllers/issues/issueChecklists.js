@@ -15,7 +15,7 @@ module.exports.issueChecklistsCreate = function(req, res) {
         if (req.params.issueid) {
             Iss
                 .findById(req.params.issueid)
-                .select('checklists')
+                .select('checklists updateInfo')
                 .exec(
                     function(err, issue) {
                         if (err) {
@@ -96,7 +96,8 @@ var doAddChecklist = function(req, res, issue, username) {
             // needs the checkItems as the mixed mongoose schema
         });
 
-        console.log(issue);
+        issue.updateInfo.push(req.body.updateInfo);
+
         issue.save(function(err, issue) {
             var thisChecklist;
             if (err) {
@@ -149,6 +150,8 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
                         thisChecklist.author = req.body.author;
                         thisChecklist.checkItems = req.body.checkItems;
                         thisChecklist.checkItemsChecked = req.body.checkItemsChecked;
+
+                        console.log(req.body);
 
                         // other update items
                         issue.save(function(err, issue) {
@@ -228,7 +231,7 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
     }
     Iss
         .findById(req.params.issueid)
-        .select('checklists')
+        .select('checklists updateInfo')
         .exec(
             function(err, issue) {
                 if (!issue) {
@@ -246,6 +249,21 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
                             "message": "checklistid not found"
                         });
                     } else {
+
+                      var updateInfo = {};
+
+                      updateInfo.updateBy = req.payload.name;
+                      updateInfo.updateDate = new Date();
+                      updateInfo.updateField = [];
+                      updateInfo.updateField.push({
+                        "field": "checkitem",
+                        "new": "",
+                        "old": issue.checklists.id(req.params.checklistid).checklistName
+                      });
+
+                      issue.updateInfo.push(updateInfo);
+
+
                         issue.checklists.id(req.params.checklistid).remove();
                         issue.save(function(err) {
                             if (err) {
