@@ -15,7 +15,6 @@ module.exports.issueAttachmentsCreate = function(req, res) {
         if (req.params.issueid) {
             Iss
                 .findById(req.params.issueid)
-                .select('attachments')
                 .exec(
                     function(err, issue) {
                         if (err) {
@@ -81,7 +80,6 @@ var doAddAttachment = function(req, res, issue, username) {
 
       var fullUrl = "http://localhost:3300/files/" + file.path;
     //   var fullUrl = file.path;
-
         issue.attachments.push({
             uploader: req.payload.name,
             name: file.originalFilename,
@@ -89,6 +87,10 @@ var doAddAttachment = function(req, res, issue, username) {
             url: fullUrl,
             type: file.type,
         });
+
+        console.log(issue);
+        issue.updateInfo.push(req.body.updateInfo);
+
         issue.save(function(err, issue) {
             var thisAttachment;
             if (err) {
@@ -212,7 +214,6 @@ module.exports.issueAttachmentsDeleteOne = function(req, res) {
     }
     Iss
         .findById(req.params.issueid)
-        .select('attachments')
         .exec(
             function(err, issue) {
                 if (!issue) {
@@ -230,7 +231,24 @@ module.exports.issueAttachmentsDeleteOne = function(req, res) {
                             "message": "attachmentid not found"
                         });
                     } else {
+
+                        var updateInfo = {};
+
+                        var attch = issue.attachments.id(req.params.attachmentid);
+
+                        updateInfo.updateBy = req.payload.name;
+                        updateInfo.updateDate = new Date();
+                        updateInfo.updateField = [];
+                        updateInfo.updateField.push({
+                          "field": "attachments",
+                          "new": "",
+                          "old": attch.name
+                        });
+
+                        issue.updateInfo.push(updateInfo);
+
                         issue.attachments.id(req.params.attachmentid).remove();
+
                         issue.save(function(err) {
                             if (err) {
                                 sendJSONresponse(res, 404, err);
