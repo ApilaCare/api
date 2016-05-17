@@ -30,6 +30,16 @@ module.exports.issuesCreate = function(req, res) {
     });
 };
 
+module.exports.issuesOpenCount = function(req, res) {
+
+  var username = req.params.username;
+
+  Iss.find({status: "Open", responsibleParty: username}, function(err, issues) {
+      console.log(issues.length);
+      sendJSONresponse(res, 200, issues.length)
+  });
+}
+
 /* GET list of issues */
 module.exports.issuesList = function(req, res) {
 
