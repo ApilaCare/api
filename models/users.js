@@ -13,8 +13,7 @@ var userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    // _id of a community
-    // community: {type: String}
+    community: {type: String} // _id of community that user is part of
     hash: String,
     salt: String
 });

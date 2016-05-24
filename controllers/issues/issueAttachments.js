@@ -78,7 +78,13 @@ var doAddAttachment = function(req, res, issue, username) {
         sendJSONresponse(res, 404, "issueid not found");
     } else {
 
-      var fullUrl = "http://localhost:3300/files/" + file.path;
+      var apiUrl = "http://localhost:3300/files/";
+
+      if (process.env.NODE_ENV === 'production') {
+        apiUrl = process.env.API_URL;
+      }
+
+      var fullUrl = apiUrl + file.path;
     //   var fullUrl = file.path;
         issue.attachments.push({
             uploader: req.payload.name,

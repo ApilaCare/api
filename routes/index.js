@@ -25,19 +25,21 @@ var ctrlResidents = require('../controllers/residents/residents');
 
 // users
 var ctrlUsers = require('../controllers/users/users');
+var ctrlAuth = require('../controllers/users/authentication');
 
 // appointments
 var ctrlAppointments = require('../controllers/appointments/appointments');
 var ctrlAppointmentComments = require('../controllers/appointments/appointmentComments');
 
-// users
-var ctrlAuth = require('../controllers/authentication');
+// communities
+var ctrlCommunities = require('../controllers/communities/communities');
 
 
-// routes
-// authentication
-router.post('/register', ctrlAuth.register);
-router.post('/login', ctrlAuth.login);
+// communities
+router.post('/communities/:communityid/new', ctrlCommunities.communitiesCreate);
+router.get('/communities/:communityid/????', ctrlCommunities.communitiesUnknown1);
+router.put('/communities/:communityid/????', ctrlCommunities.communitiesUnknown2);
+router.delete('/communities/:communityid/????', ctrlCommunities.communitiesUnknown3);
 
 // issues
 router.get('/issues/list/:status', ctrlIssues.issuesList);
@@ -92,6 +94,8 @@ router.get('/testCall', ctrlAppointments.testCall);
 
 // users
 router.get('/users', ctrlUsers.usersList);
+router.post('/register', ctrlAuth.register);
+router.post('/login', ctrlAuth.login);
 
 // residents
 router.get('/residents', ctrlResidents.residentsList);

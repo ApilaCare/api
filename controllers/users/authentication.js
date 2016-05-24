@@ -9,7 +9,7 @@ var sendJSONresponse = function(res, status, content) {
 
 module.exports.register = function(req, res) {
 
-    console.log("usli u registar");
+    console.log("IN APP REGITER METHOD");
 
     // respond with an error status if not al required fields are found
     if (!req.body.name || !req.body.email || !req.body.password) {
@@ -28,8 +28,11 @@ module.exports.register = function(req, res) {
     // use setPassword method to set salt and hash
     user.setPassword(req.body.password);
 
+    console.log("CREATED AND SET NEW USER INSTANCE");
+
     // save new user to MongoDB
     user.save(function(err) {
+      console.log("SAVED USER INSANCE");
         var token;
         if (err) {
             console.log("Neuspesno sacuvali");
