@@ -36,7 +36,7 @@ module.exports.residentsCreate = function(req, res) {
 module.exports.residentsList = function(req, res) {
     Resid.find({}, function(err, residents) {
         console.log(residents);
-        sendJSONresponse(res, 200, residents)
+        sendJSONresponse(res, 200, residents);
     });
 };
 
@@ -102,9 +102,9 @@ function addToArray(arr, value) {
             console.log(value);
             arr.push(value);
         }
-       
+
     }
-    
+
 
 }
 

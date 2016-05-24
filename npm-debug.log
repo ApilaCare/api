@@ -8,7 +8,7 @@
 7 silly lifecycle apila@0.0.1~prestart: no script for prestart, continuing
 8 info lifecycle apila@0.0.1~start: apila@0.0.1
 9 verbose lifecycle apila@0.0.1~start: unsafe-perm in lifecycle true
-10 verbose lifecycle apila@0.0.1~start: PATH: /usr/local/lib/node_modules/npm/bin/node-gyp-bin:/home/nenad/Desktop/web/nodejs/apilaCare/api/node_modules/.bin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin
+10 verbose lifecycle apila@0.0.1~start: PATH: /usr/local/lib/node_modules/npm/bin/node-gyp-bin:/home/nenad/Desktop/web/nodejs/apilaCare/api/node_modules/.bin:/usr/bin:/usr/local/heroku/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin
 11 verbose lifecycle apila@0.0.1~start: CWD: /home/nenad/Desktop/web/nodejs/apilaCare/api
 12 silly lifecycle apila@0.0.1~start: Args: [ '-c', 'node ./apila.js' ]
 13 silly lifecycle apila@0.0.1~start: Returned: code: 8  signal: null
