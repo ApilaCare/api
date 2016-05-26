@@ -48,6 +48,16 @@ module.exports.issuesOpenCount = function(req, res) {
   });
 }
 
+module.exports.issuesCount = function(req, res) {
+
+  console.log("issuesCount");
+
+  Iss.find({status: "Open"}, function(err, issues) {
+      console.log(issues.length);
+      sendJSONresponse(res, 200, issues.length)
+  });
+}
+
 /* GET list of issues */
 module.exports.issuesList = function(req, res) {
 

@@ -40,6 +40,17 @@ module.exports.residentsList = function(req, res) {
     });
 };
 
+
+module.exports.residentsCount = function(req, res) {
+
+  console.log("residentsCount");
+
+    Resid.count({}, function(err, c) {
+        console.log(c);
+        sendJSONresponse(res, 200, c);
+    });
+};
+
 // GET /api/residents/:residentid
 module.exports.residentsReadOne = function(req, res) {
     console.log('Finding resident details', req.params);

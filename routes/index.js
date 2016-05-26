@@ -45,6 +45,7 @@ router.delete('/communities/:communityid/', auth, ctrlCommunities.communitiesDel
 router.get('/issues/list/:status', auth, ctrlIssues.issuesList);
 router.get('/issues/:username/s/:status', auth, ctrlIssues.issuesListByUsername);
 router.get('/issues/count/:username', auth, ctrlIssues.issuesOpenCount);
+router.get('/issues/issuescount/:count', auth, ctrlIssues.issuesCount);
 router.post('/issues/new', auth, ctrlIssues.issuesCreate);
 router.get('/issues/:issueid', auth, ctrlIssues.issuesReadOne);
 router.put('/issues/:issueid', auth, ctrlIssues.issuesUpdateOne);
@@ -79,6 +80,7 @@ router.delete('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttac
 // appointments
 router.get('/appointments', auth, ctrlAppointments.appointmentsList);
 router.get('/appointments/:month', auth,  ctrlAppointments.appointmentsListByMonth);
+router.get('/appointments/today/:today', auth,  ctrlAppointments.appointmentsToday);
 router.get('/appointments/:appointmentid', auth, ctrlAppointments.appointmentsReadOne);
 router.put('/appointments/update/:appointmentid', auth, ctrlAppointments.appointmentsUpdateOne);
 router.delete('/appointments/:appointmentid', auth, ctrlAppointments.appointmentsDeleteOne);
@@ -98,6 +100,7 @@ router.post('/login', ctrlAuth.login);
 // residents
 router.get('/residents', auth, ctrlResidents.residentsList);
 router.get('/residents/:residentid', auth, ctrlResidents.residentById);
+router.get('/residents/count/:count', auth, ctrlResidents.residentsCount);
 router.put('/residents/update/:residentid', auth, ctrlResidents.residentsUpdateOne);
 router.delete('/residents/:residentid', auth, ctrlResidents.residentsDeleteOne);
 router.post('/residents/new', auth, ctrlResidents.residentsCreate);

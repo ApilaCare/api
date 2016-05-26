@@ -63,6 +63,8 @@ module.exports.appointmentsList = function(req, res) {
 module.exports.appointmentsListByMonth = function(req, res) {
 
 
+    console.log("appoint by month");
+
     // change sensitivity to day rather than by minute
     var start = new Date();
     start.setHours(0, 0, 0, 0);
@@ -90,8 +92,30 @@ module.exports.appointmentsListByMonth = function(req, res) {
         $where : query
     }).populate("residentGoing").exec(function(err, appointments) {
       //  console.log(appointments);
-        console.log("In appointment list");
+        console.log("In appointment list")
         sendJSONresponse(res, 200, appointments)
+    });
+};
+
+module.exports.appointmentsToday = function(req, res) {
+
+   var today = new Date();
+
+   console.log(today);
+
+   var query = 'return this.time.getDate() === ' + today.getDate();
+
+    Appoint.find({
+      $where : query
+    }).exec(function(err, appointments) {
+
+        var num = 0;
+
+        if(appointments !== undefined) {
+          num = appointments.length;
+        }
+
+        sendJSONresponse(res, 200, num)
     });
 };
 
