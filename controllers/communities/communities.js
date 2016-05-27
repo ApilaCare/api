@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Community = mongoose.model('Community');
+var User = mongoose.model('User');
 
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
@@ -7,7 +8,10 @@ var sendJSONresponse = function(res, status, content) {
 };
 
 module.exports.communitiesCreate = function(req, res) {
-    console.log(req.body);
+
+    var username = req.body.username;
+
+    console.log(username);
 
     Community.create({
         name : req.body.name,
@@ -15,12 +19,32 @@ module.exports.communitiesCreate = function(req, res) {
         pendingMembers : req.body.pendingMembers
 
     }, function(err, community) {
+
+      //console.log(community);
+
         if (err) {
             console.log(err);
             sendJSONresponse(res, 400, err);
         } else {
-            console.log(community);
-            sendJSONresponse(res, 200, community);
+
+          User
+          .findOne({"name":username})
+          .exec(function(err, u) {
+            u.community = community;
+
+            console.log(u);
+
+            u.save(function(err, user) {
+              if(err) {
+                sendJSONresponse(res, 400, err);
+              } else {
+                console.log("User added to community");
+                sendJSONresponse(res, 200, community);
+              }
+            });
+
+          });
+
         }
     });
 };
@@ -31,6 +55,58 @@ module.exports.communitiesList = function(req, res) {
         sendJSONresponse(res, 200, communities);
     });
 };
+
+//add a new initation/pending member to a community
+module.exports.addPendingMember = function(req, res) {
+  if (!req.params.communityid) {
+      sendJSONresponse(res, 404, {
+          "message": "Not found,  communityid"
+      });
+      return;
+  }
+
+  Community
+      .findById(req.params.communityid)
+      .exec(function(err, community) {
+          community.pendingMembers.push(req.body.pendingMember);
+
+          community.save(function(err, community) {
+            if(err) {
+              sendJSONresponse(res, 404, err);
+            } else {
+              sendJSONresponse(res, 200, community);
+            }
+          });
+
+          });
+
+}
+
+//accept member to a community
+module.exports.acceptMember = function(req, res) {
+  if (!req.params.communityid) {
+      sendJSONresponse(res, 404, {
+          "message": "Not found,  communityid"
+      });
+      return;
+  }
+
+  Community
+      .findById(req.params.communityid)
+      .exec(function(err, community) {
+          community.communityMembers.push(req.body.member);
+
+          community.save(function(err, community) {
+            if(err) {
+              sendJSONresponse(res, 404, err);
+            } else {
+              sendJSONresponse(res, 200, community);
+            }
+          });
+
+          });
+
+}
 
 module.exports.communitiesUpdateOne = function(req, res) {
     if (!req.params.communityid) {
@@ -123,3 +199,23 @@ module.exports.communitiesDeleteOne = function(req, res) {
         });
     }
 };
+
+
+function addUserToCommunity(req, res, community) {
+  var username = req.body.username;
+
+  User
+  .findById(username)
+  .exec(function(err, user) {
+    user.community = community;
+
+    user.save(function(err, user) {
+      if(err) {
+        sendJSONresponse(res, 400, err);
+      } else {
+        console.log("User added to community");
+      }
+    });
+
+  });
+}

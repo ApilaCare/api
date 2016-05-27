@@ -2,8 +2,8 @@ var mongoose = require('mongoose');
 
 var communitySchema = new mongoose.Schema({
     name: {type: String, required: true},
-    communityMembers: [String], // _id of members that are part of the community
-    pendingMembers: [String], // _id of users that have asked to be part of the community
+    communityMembers: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+    pendingMembers: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}], 
 
     /* not used yet fields
 

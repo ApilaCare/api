@@ -38,6 +38,7 @@ var ctrlCommunities = require('../controllers/communities/communities');
 // communities
 router.post('/communities/new', ctrlCommunities.communitiesCreate);
 router.get('/communities/', auth, ctrlCommunities.communitiesList);
+router.put('/communities/accept/:communityid/', auth, ctrlCommunities.acceptMember);
 router.put('/communities/update/:communityid/', auth, ctrlCommunities.communitiesUpdateOne);
 router.delete('/communities/:communityid/', auth, ctrlCommunities.communitiesDeleteOne);
 
