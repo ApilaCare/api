@@ -39,6 +39,8 @@ var ctrlCommunities = require('../controllers/communities/communities');
 router.post('/communities/new', ctrlCommunities.communitiesCreate);
 router.get('/communities/', auth, ctrlCommunities.communitiesList);
 router.put('/communities/accept/:communityid/', auth, ctrlCommunities.acceptMember);
+router.put('/communities/decline/:communityid/', auth, ctrlCommunities.declineMember);
+router.put('/communities/pending/:communityid/', auth, ctrlCommunities.addPendingMember);
 router.put('/communities/update/:communityid/', auth, ctrlCommunities.communitiesUpdateOne);
 router.delete('/communities/:communityid/', auth, ctrlCommunities.communitiesDeleteOne);
 
@@ -95,6 +97,7 @@ router.delete('/appointments/:appointmentid/comments/:commentid', auth, ctrlAppo
 
 // users
 router.get('/users', auth, ctrlUsers.usersList);
+router.get('/users/community/:username', auth, ctrlUsers.userCommunity);
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);
 

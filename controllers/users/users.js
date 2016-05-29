@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
 var User = mongoose.model('User');
+var Community = mongoose.model('Community');
 
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
@@ -16,3 +17,26 @@ module.exports.usersList = function(req, res) {
   });
 
 }
+
+module.exports.userCommunity = function(req, res) {
+
+  console.log("userCommunity");
+
+  var username = req.params.username;
+
+  User.findOne({"name" : username})
+      .exec(function(err, user) {
+
+        Community.findById(user.community)
+        .populate("communityMembers pendingMembers")
+        .exec( function(err, community) {
+          if(err) {
+            sendJSONresponse(res, 400, {});
+          } else {
+            console.log(user);
+            sendJSONresponse(res, 200, community);
+          }
+        });
+
+      });
+    }
