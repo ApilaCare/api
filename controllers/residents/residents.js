@@ -21,6 +21,7 @@ module.exports.residentsCreate = function(req, res) {
         buildingStatus: req.body.buildingStatus,
         sex: req.body.sex,
         submitBy: req.payload.name,
+        community: req.body.community._id
     }, function(err, resident) {
         if (err) {
             console.log(err);
@@ -34,7 +35,7 @@ module.exports.residentsCreate = function(req, res) {
 
 // GET list of residents
 module.exports.residentsList = function(req, res) {
-    Resid.find({}, function(err, residents) {
+    Resid.find({"community" : req.params.communityid}, function(err, residents) {
         console.log(residents);
         sendJSONresponse(res, 200, residents);
     });
@@ -43,11 +44,11 @@ module.exports.residentsList = function(req, res) {
 
 module.exports.residentsCount = function(req, res) {
 
-  console.log("residentsCount");
+  console.log("residentsCount: " + req.params.communityid);
 
-    Resid.count({}, function(err, c) {
-        console.log(c);
-        sendJSONresponse(res, 200, c);
+    Resid.find({"community" : req.params.communityid}, function(err, c) {
+        console.log(c.length);
+        sendJSONresponse(res, 200, c.length);
     });
 };
 

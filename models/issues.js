@@ -47,7 +47,11 @@ var issueSchema = new mongoose.Schema({
     idAttachmentCover: {type: String},
     idMembers: [issueMembersSchema],
     idLabels: [String],
-    updateInfo: [mongoose.Schema.Types.Mixed]
+    updateInfo: [mongoose.Schema.Types.Mixed],
+    community: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Community'
+    }
 });
 
 mongoose.model('Issue', issueSchema);

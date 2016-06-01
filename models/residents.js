@@ -14,6 +14,10 @@ var residentSchema = new mongoose.Schema({
     updateInfo: [mongoose.Schema.Types.Mixed],
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String,required: true},
+    community: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Community'
+    },
 
     // bathing information
     typeOfBathing: {type: String}, // shower, tub, spit bath

@@ -29,6 +29,7 @@ module.exports.appointmentsCreate = function(req, res) {
         time: d,
         submitBy: req.payload.name,
         transportation: req.body.transportation,
+        community : req.body.community._id
     }, function(err, appointment) {
         if (err) {
             console.log(err);
@@ -49,9 +50,7 @@ module.exports.appointmentsList = function(req, res) {
     start.setHours(0, 0, 0, 0);
 
     Appoint.find({
-      /*  time: {
-            $gte: start
-        }*/
+      "community" : req.params.communityid
     }).populate("residentGoing").exec(function(err, appointments) {
       //  console.log(appointments);
         console.log("In appointment list");
@@ -101,11 +100,12 @@ module.exports.appointmentsToday = function(req, res) {
 
    var today = new Date();
 
-   console.log(today);
+   console.log(req.params);
 
    var query = 'return this.time.getDate() === ' + today.getDate();
 
     Appoint.find({
+      "community" : req.params.communityid,
       $where : query
     }).exec(function(err, appointments) {
 
@@ -259,7 +259,7 @@ var getFullAppointment = function(req, res, appointId) {
                     sendJSONresponse(res, 404, err);
                     return;
                 }
-                console.log(appointment);
+              //  console.log(appointment);
                 sendJSONresponse(res, 200, appointment);
             });
 }

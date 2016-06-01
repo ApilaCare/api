@@ -20,9 +20,9 @@ module.exports.usersList = function(req, res) {
 
 module.exports.userCommunity = function(req, res) {
 
-  console.log("userCommunity");
-
   var username = req.params.username;
+
+  console.log("userCommunity " + username);
 
   User.findOne({"name" : username})
       .exec(function(err, user) {

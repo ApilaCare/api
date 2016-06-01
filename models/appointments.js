@@ -55,6 +55,10 @@ var appointmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    community: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Community'
+    },
     updateInfo: [mongoose.Schema.Types.Mixed],
 });
 
