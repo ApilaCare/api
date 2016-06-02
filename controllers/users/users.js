@@ -27,16 +27,20 @@ module.exports.userCommunity = function(req, res) {
   User.findOne({"name" : username})
       .exec(function(err, user) {
 
-        Community.findById(user.community)
-        .populate("communityMembers pendingMembers")
-        .exec( function(err, community) {
-          if(err) {
-            sendJSONresponse(res, 400, {});
-          } else {
-            console.log(user);
-            sendJSONresponse(res, 200, community);
-          }
-        });
+        if(user.community)
+        {
+          Community.findById(user.community)
+          .populate("communityMembers pendingMembers")
+          .exec( function(err, community) {
+            if(err) {
+              sendJSONresponse(res, 400, {});
+            } else {
+              console.log(user);
+              sendJSONresponse(res, 200, community);
+            }
+          });
+        }
+
 
       });
     }

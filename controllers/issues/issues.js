@@ -44,6 +44,10 @@ module.exports.issuesOpenCount = function(req, res) {
   var username = req.params.username;
   var community =  req.params.communityid;
 
+  if(community == undefined){
+    sendJSONresponse(res, 404, {});
+  }
+
   Iss.find({status: "Open", responsibleParty: username, community: community}, function(err, issues) {
       console.log(issues.length);
       sendJSONresponse(res, 200, issues.length)
