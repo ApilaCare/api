@@ -45,7 +45,7 @@ module.exports.issuesOpenCount = function(req, res) {
   var community =  req.params.communityid;
 
   if(community == undefined){
-    sendJSONresponse(res, 404, {});
+    sendJSONresponse(res, 404, 0);
   }
 
   Iss.find({status: "Open", responsibleParty: username, community: community}, function(err, issues) {
@@ -58,6 +58,10 @@ module.exports.issuesCount = function(req, res) {
 
   console.log("issuesCount");
   var c =  req.params.communityid;
+
+  if(c== undefined){
+    sendJSONresponse(res, 404, 0);
+  }
 
   Iss.find({status: "Open", community: c}, function(err, issues) {
       console.log(issues.length);
