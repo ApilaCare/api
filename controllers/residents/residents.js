@@ -111,8 +111,10 @@ function addToArray(arr, value) {
 
     if (value != undefined) {
         if(value != "") {
-            console.log(value);
-            arr.push(value);
+            var info = {};
+            info.data = value;
+            info.date = new Date();
+            arr.push(info);
         }
 
     }
@@ -146,13 +148,13 @@ module.exports.residentsUpdateOne = function(req, res) {
         sendJSONresponse(res, 404, err);
     }
 
-    addToArray(req.body.respiration, req.body.newrespiration);
-    addToArray(req.body.vitalsPain, req.body.newvitalsPain);
-    addToArray(req.body.pulse, req.body.newpulse);
-    addToArray(req.body.oxygenSaturation, req.body.newoxygenSaturation);
-    addToArray(req.body.bloodPressureDiastolic, req.body.newbloodPressureDiastolic);
-    addToArray(req.body.bloodPressureSystolic, req.body.newbloodPressureSystolic);
-    addToArray(req.body.temperature, req.body.newtemperature);
+    addToArray(req.body.respiration, req.body.newrespiration.data);
+    addToArray(req.body.vitalsPain, req.body.newvitalsPain.data);
+    addToArray(req.body.pulse, req.body.newpulse.data);
+    addToArray(req.body.oxygenSaturation, req.body.newoxygenSaturation.data);
+    addToArray(req.body.bloodPressureDiastolic, req.body.newbloodPressureDiastolic.data);
+    addToArray(req.body.bloodPressureSystolic, req.body.newbloodPressureSystolic.data);
+    addToArray(req.body.temperature, req.body.newtemperature.data);
 
     addToArray(req.body.foodAllergies, req.body.newfoodAllergies);
     addToArray(req.body.medicationAllergies, req.body.newmedicationAllergies);
