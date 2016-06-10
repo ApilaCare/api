@@ -46,7 +46,8 @@ module.exports.residentsCount = function(req, res) {
 
   console.log("residentsCount: " + req.params.communityid);
 
-    Resid.find({"community" : req.params.communityid}, function(err, c) {
+    Resid.find({"community" : req.params.communityid, "buildingStatus": "In Building"},
+    function(err, c) {
         console.log(c.length);
         sendJSONresponse(res, 200, c.length);
     });
