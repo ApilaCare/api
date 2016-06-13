@@ -9,8 +9,10 @@ var residentSchema = new mongoose.Schema({
     maidenName: {type: String},
     birthDate: {type: Date,required: true},
     admissionDate: {type: Date},
-    sex: {type: String,required: true},
-    buildingStatus: {type: String,required: true}, // in the building, hospital, rehad, dead
+    sex: {type: String,required: true}, // male, female, other
+    buildingStatus: {type: String,required: true}, // in the building, hospital, rehad, dead, moved out
+      MovedOutDescribe: {type: String}, // conditional if moved out selected | open field
+      movedOutTo: {type: String}, // conditional if moved out is selected | Nursing Home, Home, Another AL
     updateInfo: [mongoose.Schema.Types.Mixed],
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String,required: true},
@@ -22,104 +24,118 @@ var residentSchema = new mongoose.Schema({
     // bathing information
     typeOfBathing: {type: String}, // shower, tub, spit bath
     timeOfBathing: {type: String}, // morning, evening, before breakfast, after breakfast, after supper, before supper?
-    frequencyOfBathing: {type: String}, // 1 per week, twice a week, everyday,
+    frequencyOfBathing: {type: String}, // 1 per week, twice a week, everyday, outside agency
     acceptanceOfBathing: {type: String}, // likes, dislikes
+      dislikesBathingDescribe: {type: String}, // if dislikes is selected | open field
 
     // mobility information
     insideApartment: {
-        useOfAssistiveDevice: {type: String}, // walker, cane, wheelchair
+        useOfAssistiveDevice: {type: String}, // walker, cane, wheelchair, electric wheelchair, no device
         assitanceWithDevice: {type: String},
         specialAmbulationNeeds: {type: String},
     },
     outsideApartment: {
-        useOfAssistiveDevice: {type: String}, // walker, cane, wheelchair
+        useOfAssistiveDevice: {type: String}, // walker, cane, wheelchair, electric wheelchair, no device
         assitanceWithDevice: {type: String},
         specialAmbulationNeeds: {type: String},
     },
-    transfers: {type: String}, // standby, independent, full assist, transfer pole
-    fallRisk: {type: String},
+    transfers: {type: String}, // standby, independent, full assist, transfer pole, gait belt
+    fallRisk: {type: Boolean},
+      fallRiskDescribe: {type: String}, // if yes is selected | physical limitations, modication challenges, cognition, choice
     bedReposition: {type: Boolean},
 
     // allergy information
-    foodAllergies: [String],
-    medicationAllergies: [String],
+    hasFoodAllergies {type: Boolean},
+      foodAllergies: [String], // if yes is selected
+    hasMedicationAllergies: {type: String},
+      medicationAllergies: [String], // if yes is selected
 
     // sleep information
-    usualBedtime: {type: String},
-    usualArisingTime: {type: String},
+    usualBedtime: {type: String}, // early evening, late evening, other
+    usualArisingTime: {type: String}, // early morning, mid morning, late morning, other
     nap: {type: Boolean},
+      napDescribe: {type: String} // if yes | open field
     assistanceToBed: {type: String}, // medication, positioning, pillows, drink, alcohol, hot tea, warm milk
     sleepsThroughNight: {type: Boolean},
-    sleepDisturbance: {type: String},
+      canCallForAssistance: {type: Boolean}, // if no | pop up for regular checks
+
 
     // continent information
-    bowelContinent: {type: String}, // always, sometimes, never
+    bowelContinent: {type: String}, // always, sometimes, never, colostomy
     constipated: {type: String}, // always, sometimes, never
     laxative: {type: String}, // always, sometimes, never
-    bladderContinent: {type: String}, // always, sometimes, never
+    bladderContinent: {type: String}, // always, sometimes, never, colostomy
     dribbles: {type: String}, // always, sometimes, never
     catheter: {type: Boolean}, // always, sometimes, never
-    toiletingDevice: {type: String}, // urnal, seat riser, bedside comod,
+      catheterDescribe: {type: String}, // if yes | open field
+    toiletingDevice: {type: String}, // urnal, seat riser, bedside comod, none
 
     // nutrition information
     overallNutrition: {type: String}, // good, poor
-    poorNutritionIntervention: {type: String}, // shake,
+      poorNutritionDescribe: {type: String}, // if poor | shake, bedtime snack, resident choice
     diabetic: {type: Boolean},
-    diabeticType: {type: String}, // diet controlled, medication controlled
-    regularBloodSugarMonitoring: {type: Boolean},
+      diabeticType: {type: String}, // if yes | diet controlled, medication controlled, insulin controlled
+      bloodSugarMonitoring: {type: Boolean}, // if yes | regular, sometimes, daily
     bedtimeSnack: {type: Boolean},
-    adaptiveEquipment: {type: String}, // plate guard, silverware
+    adaptiveEquipment: {type: String}, // plate guard, built up silverware, special cups, none
     needsFoodInSmallPeices: {type: Boolean},
-    typeOfDiet: {type: String}, // puried, ground, regular
+    typeOfDiet: {type: String}, // pureed, ground, regular, soft
     foodLikes: [String],
     foodDislikes: [String],
+    fingerFoods: {type: Boolean},
 
     // physical condition information
-    height: {type: Number},
-    skinCondition: {type: String},
-    wearsHearingAid: {type: String}, // yes, no, never
-    hearing: {
-        rightEar: {type: String}, // adequate, adequate with aid, poor
-        leftEar: {type: String}, // adequate, adequate with aid, poor
-    },
-    vision: {
-        rightEye: {type: String}, // adequate, adequate with aid, poor
-        leftEye: {type: String}, // adequate, adequate with aid, poor
-    },
-    teeth: {
-        upperDentureFit: {type: Boolean},
-        upperTeeth: {type: String}, // Has own, Has dentures, neither, has partial
-        lowerDentureFit: {type: Boolean},
-        lowerTeeth: {type: String}, // Has own, Has dentures, neither, has partial
-    },
+    skinCondition: {type: String}, // hydrated, dry
+    hasWound: {type: Boolean},
+      hasWoundDescribe: {type: String}, // if yes | open field
+      woundAmount: {type: Number}, // if yes | number of wounds
+    rightEar: {type: String}, // adequate, adequate with aid, poor
+    leftEar: {type: String}, // adequate, adequate with aid, poor
+    hearingNotes: {type: String},
+    wearsHearingAid: {type: Boolean},
+    helpWithHearingAid: {type: Boolean},
+      helpWithHearingAidDescribe: {type: String}, // if yes | open field
+    rightEye: {type: String}, // adequate, adequate with aid, poor
+    leftEye: {type: String}, // adequate, adequate with aid, poor
+    visionNotes: {type: String},
+    dentistName: {type: String},
+    upperDentureFit: {type: Boolean},
+      upperDentureFitDescribe: {type: String}, // if no | open field
+    upperTeeth: {type: String}, // Has own, Has dentures, has partial
+    lowerDentureFit: {type: Boolean},
+      lowerDentureFitDescribe: {type: String}, // if no | open field
+    lowerTeeth: {type: String}, // Has own, Has dentures, has partial
     teethCondition: {type: String}, // poor, fair, good, excellent
 
     // psychosocial information
-    psychosocialStatus: [String], // alert, friendly
-    psychosocialResponsiveness: {type: String},
-    mood: {type: String}, //
+    psychosocialStatus: [String], // check all that apply: alert, friendly, disoriented, withdrawn, lonely, happy, confused, uncooperative
+    psychosocialStatusDescribe: {type: String},
     comprehension: {type: String}, // slow, moderate, quick
-    personalHabits: {
-        smokes: {type: Boolean},
-        alcohol: {type: Boolean},
-        other: {type: String},
-    },
+    smokes: {type: Boolean},
+      smokesDescribe: {type: String}, // if yes | open field
+    alcohol: {type: Boolean},
+      alcoholDescribes: {type: String}, // if yes | open field
+    sexualActive: {type: Boolean},
+      sexualActiveDescribe: {type: String} // if yes | open field
+    otherHabits: {type: String},
     generalActivityParticipation: {type: String},
-    diningRoomParticipation: {type: String}, // scale that is from: alone > minor > major > amazing
-    busRideParticipation: {type: String},
-    fitnessClassParticipation: {type: String},
-    timeInRoom: {type: String}, // recliner, bed, wheelchair
+    diningRoomParticipation: {type: String}, // none, minor, amazing
+    busRideParticipation: {type: String}, // none, minor, amazing
+    fitnessClassParticipation: {type: String}, // none, minor, amazing
+    bingoParticipation: {type: String}, // none, minor, amazing
+    timeInRoom: {type: String}, // Reading, TV, Game, hobby, computer, radio
     preferedActivites: {type: String}, // walks,
     useFitnessEquipmentIndependently: {type: Boolean},
     familyInvolvement: {type: String}, // none, some, frequent
+    highMaintenance: {type: String}
 
     // pain information
     havePain: {type: Boolean},
-    painLocation: {type: String},
-    painDescription: {type: String},
-    maxPainTime: {type: String},
-    painIncreasedBy: {type: String},
-    painDecreasedBy: {type: String},
+      painLocation: {type: String}, // if yes |
+      painDescription: {type: String}, // if yes |
+      maxPainTime: {type: String}, // if yes |
+      painIncreasedBy: {type: String}, // if yes |
+      painDecreasedBy: {type: String}, // if yes |
 
     // vitals information
     temperature: [vitalsInfoSchema],
