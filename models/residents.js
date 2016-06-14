@@ -47,7 +47,7 @@ var residentSchema = new mongoose.Schema({
     // allergy information
     hasFoodAllergies: {type: Boolean},
       foodAllergies: [String], // if yes is selected
-    hasMedicationAllergies: {type: String},
+    hasMedicationAllergies: {type: Boolean},
       medicationAllergies: [String], // if yes is selected
 
     // sleep information
@@ -135,7 +135,7 @@ var residentSchema = new mongoose.Schema({
     highMaintenance: {type: Boolean},
 
     // pain information
-    havePain: {type: Boolean},
+    hasPain: {type: Boolean},
       painLocation: {type: String}, // if yes |
       painDescription: {type: String}, // if yes |
       maxPainTime: {type: String}, // if yes |
