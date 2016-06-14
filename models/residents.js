@@ -7,15 +7,15 @@ var residentSchema = new mongoose.Schema({
     middleName: {type: String},
     lastName: {type: String, required: true},
     maidenName: {type: String},
-    birthDate: {type: Date,required: true},
+    birthDate: {type: Date, required: true},
     admissionDate: {type: Date},
-    sex: {type: String,required: true}, // male, female, other
-    buildingStatus: {type: String,required: true}, // in the building, hospital, rehad, dead, moved out
-      MovedOutDescribe: {type: String}, // conditional if moved out selected | open field
+    sex: {type: String, required: true}, // male, female, other
+    buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out
+      movedOutDescribe: {type: String}, // conditional if moved out selected | open field
       movedOutTo: {type: String}, // conditional if moved out is selected | Nursing Home, Home, Another AL
     updateInfo: [mongoose.Schema.Types.Mixed],
     submitDate: {type: Date, default: Date.now},
-    submitBy: {type: String,required: true},
+    submitBy: {type: String, required: true},
     community: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Community'
@@ -93,8 +93,8 @@ var residentSchema = new mongoose.Schema({
     leftEar: {type: String}, // adequate, adequate with aid, poor
     hearingNotes: {type: String},
     wearsHearingAid: {type: Boolean},
-    helpWithHearingAid: {type: Boolean},
-      helpWithHearingAidDescribe: {type: String}, // if yes | open field
+      helpWithHearingAid: {type: Boolean}, // if yes | yes/no
+        helpWithHearingAidDescribe: {type: String}, // if yes | open field
     rightEye: {type: String}, // adequate, adequate with aid, poor
     leftEye: {type: String}, // adequate, adequate with aid, poor
     visionNotes: {type: String},
