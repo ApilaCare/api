@@ -108,14 +108,24 @@ function isNumber(obj) {
 }
 
 //when pushing to array make sure we aren't adding invalid data
-function addToArray(arr, value) {
+function addToArray(arr, value, type) {
 
     if (value != undefined) {
+
+      if(type === "Vitals") {
+        value = value.data;
+      }
+
         if(value != "") {
+          if(type === "Vitals") {
             var info = {};
             info.data = value;
             info.date = new Date();
             arr.push(info);
+          } else {
+            arr.push(value);
+          }
+
         }
 
     }
@@ -149,21 +159,21 @@ module.exports.residentsUpdateOne = function(req, res) {
         sendJSONresponse(res, 404, err);
     }
 
-    addToArray(req.body.respiration, req.body.newrespiration.data);
-    addToArray(req.body.vitalsPain, req.body.newvitalsPain.data);
-    addToArray(req.body.pulse, req.body.newpulse.data);
-    addToArray(req.body.oxygenSaturation, req.body.newoxygenSaturation.data);
-    addToArray(req.body.bloodPressureDiastolic, req.body.newbloodPressureDiastolic.data);
-    addToArray(req.body.bloodPressureSystolic, req.body.newbloodPressureSystolic.data);
-    addToArray(req.body.temperature, req.body.newtemperature.data);
+    addToArray(req.body.respiration, req.body.newrespiration, "Vitals");
+    addToArray(req.body.vitalsPain, req.body.newvitalsPain, "Vitals");
+    addToArray(req.body.pulse, req.body.newpulse, "Vitals");
+    addToArray(req.body.oxygenSaturation, req.body.newoxygenSaturation, "Vitals");
+    addToArray(req.body.bloodPressureDiastolic, req.body.newbloodPressureDiastolic, "Vitals");
+    addToArray(req.body.bloodPressureSystolic, req.body.newbloodPressureSystolic, "Vitals");
+    addToArray(req.body.temperature, req.body.newtemperature, "Vitals");
 
-    addToArray(req.body.foodAllergies, req.body.newfoodAllergies);
-    addToArray(req.body.medicationAllergies, req.body.newmedicationAllergies);
+    addToArray(req.body.foodAllergies, req.body.newfoodAllergies, "");
+    addToArray(req.body.medicationAllergies, req.body.newmedicationAllergies, "");
 
-    addToArray(req.body.psychosocialStatus, req.body.newpsychosocialStatus);
+    addToArray(req.body.psychosocialStatus, req.body.newpsychosocialStatus, "");
 
-    addToArray(req.body.foodLikes, req.body.newfoodLikes);
-    addToArray(req.body.foodDislikes, req.body.newfoodDislikes);
+    addToArray(req.body.foodLikes, req.body.newfoodLikes, "");
+    addToArray(req.body.foodDislikes, req.body.newfoodDislikes, "");
 
 
     console.log(req.body);
