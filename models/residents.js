@@ -45,7 +45,7 @@ var residentSchema = new mongoose.Schema({
     bedReposition: {type: Boolean},
 
     // allergy information
-    hasFoodAllergies {type: Boolean},
+    hasFoodAllergies: {type: Boolean},
       foodAllergies: [String], // if yes is selected
     hasMedicationAllergies: {type: String},
       medicationAllergies: [String], // if yes is selected
@@ -54,7 +54,7 @@ var residentSchema = new mongoose.Schema({
     usualBedtime: {type: String}, // early evening, late evening, other
     usualArisingTime: {type: String}, // early morning, mid morning, late morning, other
     nap: {type: Boolean},
-      napDescribe: {type: String} // if yes | open field
+      napDescribe: {type: String}, // if yes | open field
     assistanceToBed: {type: String}, // medication, positioning, pillows, drink, alcohol, hot tea, warm milk
     sleepsThroughNight: {type: Boolean},
       canCallForAssistance: {type: Boolean}, // if no | pop up for regular checks
@@ -116,18 +116,23 @@ var residentSchema = new mongoose.Schema({
     alcohol: {type: Boolean},
       alcoholDescribes: {type: String}, // if yes | open field
     sexualActive: {type: Boolean},
-      sexualActiveDescribe: {type: String} // if yes | open field
+      sexualActiveDescribe: {type: String}, // if yes | open field
     otherHabits: {type: String},
     generalActivityParticipation: {type: String},
     diningRoomParticipation: {type: String}, // none, minor, amazing
     busRideParticipation: {type: String}, // none, minor, amazing
     fitnessClassParticipation: {type: String}, // none, minor, amazing
     bingoParticipation: {type: String}, // none, minor, amazing
+    communityParticipation: {type: String}, // none, minor, amazing
     timeInRoom: {type: String}, // Reading, TV, Game, hobby, computer, radio
+    drivesCar: {type: Boolean},
+      licensePlateNumber: {type: Number}, // if yes | numberic field
+      spareKeyLocation: {type: String}, // if yes | open field
+      drivingNeeds: {type: String}, // if yes | open field
     preferedActivites: {type: String}, // walks,
     useFitnessEquipmentIndependently: {type: Boolean},
     familyInvolvement: {type: String}, // none, some, frequent
-    highMaintenance: {type: String}
+    highMaintenance: {type: Boolean},
 
     // pain information
     havePain: {type: Boolean},
@@ -136,6 +141,8 @@ var residentSchema = new mongoose.Schema({
       maxPainTime: {type: String}, // if yes |
       painIncreasedBy: {type: String}, // if yes |
       painDecreasedBy: {type: String}, // if yes |
+      painManagedBy: {type: String}, // medication, hot pack, cold pack, positioning, topicals
+      painLength: {type: String}, // new onset, chronic
 
     // vitals information
     temperature: [vitalsInfoSchema],
@@ -145,6 +152,10 @@ var residentSchema = new mongoose.Schema({
     pulse: [vitalsInfoSchema],
     vitalsPain: [vitalsInfoSchema],
     respiration: [vitalsInfoSchema],
+    tracksINR: {type: Boolean},
+      howOftenINR: {type: String}, // if yes | daily, weekly, monthly, yearly
+      byWhomINR: {type: String}, // if yes | self, clinic, outside agency
+      internationalNormalizedRatio: [vitalsInfoSchema], // if yes | array of values
 });
 
 var vitalsInfoSchema = new mongoose.Schema({
