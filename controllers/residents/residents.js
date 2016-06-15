@@ -171,7 +171,8 @@ module.exports.residentsUpdateOne = function(req, res) {
     addToArray(req.body.foodAllergies, req.body.newfoodAllergies, "");
     addToArray(req.body.medicationAllergies, req.body.newmedicationAllergies, "");
 
-    addToArray(req.body.psychosocialStatus, req.body.newpsychosocialStatus, "");
+    //addToArray(req.body.psychosocialStatus, req.body.newpsychosocialStatus, "");
+    req.body.psychosocialStatus = req.body.newpsychosocialStatus;
 
     addToArray(req.body.foodLikes, req.body.newfoodLikes, "");
     addToArray(req.body.foodDislikes, req.body.newfoodDislikes, "");
