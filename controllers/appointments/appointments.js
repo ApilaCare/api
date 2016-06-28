@@ -18,7 +18,7 @@ module.exports.appointmentsCreate = function(req, res) {
     d.setMinutes(t.getMinutes());
 
     console.log("DATE:    ");
-    console.log(d);
+    console.log(req.body.appointmentDate);
 
     //create appointment from the inputed data
     Appoint.create({
@@ -27,6 +27,11 @@ module.exports.appointmentsCreate = function(req, res) {
         locationDoctor: req.body.locationDoctor,
         residentGoing: req.body.residentId,
         time: d,
+        appointmentDate: req.body.appointmentDate,
+        hours: req.body.hours,
+        minutes: req.body.minutes,
+        timezone: req.body.timezone,
+        isAm: req.body.isAm,
         submitBy: req.payload.name,
         transportation: req.body.transportation,
         community : req.body.community._id
@@ -53,7 +58,7 @@ module.exports.appointmentsList = function(req, res) {
       "community" : req.params.communityid
     }).populate("residentGoing").exec(function(err, appointments) {
       //  console.log(appointments);
-        console.log("In appointment list");
+        console.log(appointments);
         sendJSONresponse(res, 200, appointments)
     });
 };
@@ -197,6 +202,10 @@ module.exports.appointmentsUpdateOne = function(req, res) {
                     appointment.transportation = req.body.transportation;
                     appointment.cancel = req.body.cancel;
                     appointment.updateInfo.push(updateInfo);
+                    appointment.hours = req.body.hours;
+                    appointment.minutes = req.body.minutes;
+                    appointment.isAm = req.body.isAm;
+                    appointment.appointmentDate = req.body.appointmentDate;
 
                     appointment.residentGoing = req.body.residentId;
 

@@ -37,6 +37,21 @@ var appointmentSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    appointmentDate : {
+      type: Date
+    },
+    hours: {
+      type: Number
+    },
+    minutes: {
+      type: Number
+    },
+    timezone: {
+      type: Number
+    },
+    isAm: {
+      type: Boolean
+    },
     transportation: {
         type: String,
         default: 'We are Transporting'
