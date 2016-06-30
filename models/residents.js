@@ -4,12 +4,13 @@ var residentSchema = new mongoose.Schema({
 
     // administrative information
     firstName: {type: String, required: true},
+    aliasName: {type: String},
     middleName: {type: String},
     lastName: {type: String, required: true},
-    maidenName: {type: String},
     birthDate: {type: Date, required: true},
     admissionDate: {type: Date},
     sex: {type: String, required: true}, // male, female, other
+      maidenName: {type: String}, // if female | open field
     buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out
       movedOutDescribe: {type: String}, // conditional if moved out selected | open field
       movedOutTo: {type: String}, // conditional if moved out is selected | Nursing Home, Home, Another AL
@@ -20,6 +21,11 @@ var residentSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Community'
     },
+
+    // life information
+    religion: {type: String},
+    education: {type: String},
+    occupation: {type: String},
 
     // bathing information
     typeOfBathing: {type: String}, // shower, tub, spit bath
@@ -89,15 +95,19 @@ var residentSchema = new mongoose.Schema({
     hasWound: {type: Boolean, default: false},
       hasWoundDescribe: {type: String}, // if yes | open field
       woundAmount: {type: Number}, // if yes | number of wounds
+
     rightEar: {type: String}, // adequate, adequate with aid, poor
     leftEar: {type: String}, // adequate, adequate with aid, poor
     hearingNotes: {type: String},
     wearsHearingAid: {type: Boolean, default: false},
       helpWithHearingAid: {type: Boolean, default: false}, // if yes | yes/no
         helpWithHearingAidDescribe: {type: String}, // if yes | open field
+
+    visionAssistance: {type: String}, // glasses, contacts, none
     rightEye: {type: String}, // adequate, adequate with aid, poor
     leftEye: {type: String}, // adequate, adequate with aid, poor
     visionNotes: {type: String},
+
     dentistName: {type: String},
     upperDentureFit: {type: Boolean, default: false},
       upperDentureFitDescribe: {type: String}, // if no | open field
@@ -146,6 +156,7 @@ var residentSchema = new mongoose.Schema({
 
     // vitals information
     temperature: [vitalsInfoSchema],
+    weight: [vitalsInfoSchema],
     bloodPressureSystolic: [vitalsInfoSchema],
     bloodPressureDiastolic: [vitalsInfoSchema],
     oxygenSaturation: [vitalsInfoSchema],

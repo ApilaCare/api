@@ -3,19 +3,21 @@ var Iss = mongoose.model('Issue');
 var User = mongoose.model('User');
 
 var fs = require('fs');
-
 var AWS = require('aws-sdk');
 
-AWS.config.update(
- {
-  accessKeyId: process.env.ACCESS_KEY_ID,
-  secretAccessKey: process.env.SECRET_ACCESS_KEY
+AWS.config.update({
+    accessKeyId: process.env.ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY
 });
 
 var region = "s3-us-west-2";
 var bucket = "apilatest2";
 
-var s3bucket = new AWS.S3({params: {Bucket: bucket}});
+var s3bucket = new AWS.S3({
+    params: {
+        Bucket: bucket
+    }
+});
 
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
@@ -25,7 +27,6 @@ var sendJSONresponse = function(res, status, content) {
 /* POST a new attachment, providing a issueid */
 /* /api/issues/:issueid/attachments/new */
 module.exports.issueAttachmentsCreate = function(req, res) {
-    console.log("Commenting max kek, or some attachments lol");
     getAuthor(req, res, function(req, res, userName) {
         if (req.params.issueid) {
             Iss
@@ -47,12 +48,11 @@ module.exports.issueAttachmentsCreate = function(req, res) {
         }
     });
 };
+
 //testing method for file upload
 module.exports.issueAttachmentsUpload = function(req, res) {
     var file = req.files.file;
     console.log(file);
-
-
 }
 
 var getAuthor = function(req, res, callback) {
@@ -91,48 +91,49 @@ var doAddAttachment = function(req, res, issue, username) {
 
     var stream = fs.createReadStream(file.path);
 
-    var params = {Key: file.originalFilename, Body: stream};
-     s3bucket.upload(params, function(err, data) {
-       fs.unlinkSync(file.path);
-       if (err) {
-         console.log("Error uploading data: ", err);
-       } else {
-         console.log("Successfully uploaded data aws");
+    var params = {
+        Key: file.originalFilename,
+        Body: stream
+    };
+    s3bucket.upload(params, function(err, data) {
+        fs.unlinkSync(file.path);
+        if (err) {
+            console.log("Error uploading data: ", err);
+        } else {
+            console.log("Successfully uploaded data aws");
 
-         if (!issue) {
-             sendJSONresponse(res, 404, "issueid not found");
-         } else {
-
-
-           var fullUrl = "https://" + region + ".amazonaws.com/" + bucket + "/"
-                                                + escape(file.originalFilename);
-
-           console.log(fullUrl);
-
-             issue.attachments.push({
-                 uploader: req.payload.name,
-                 name: file.originalFilename,
-                 source: file.path,
-                 url: fullUrl,
-                 type: file.type,
-             });
-
-             issue.updateInfo.push(req.body.updateInfo);
-
-             issue.save(function(err, issue) {
-                 var thisAttachment;
-                 if (err) {
-                     sendJSONresponse(res, 400, err);
-                 } else {
-                     thisAttachment = issue.attachments[issue.attachments.length - 1];
-                     sendJSONresponse(res, 201, thisAttachment);
-                 }
-             });
-         }
-       }
-     });
+            if (!issue) {
+                sendJSONresponse(res, 404, "issueid not found");
+            } else {
 
 
+                var fullUrl = "https://" + region + ".amazonaws.com/" + bucket + "/" +
+                    escape(file.originalFilename);
+
+                console.log(fullUrl);
+
+                issue.attachments.push({
+                    uploader: req.payload.name,
+                    name: file.originalFilename,
+                    source: file.path,
+                    url: fullUrl,
+                    type: file.type,
+                });
+
+                issue.updateInfo.push(req.body.updateInfo);
+
+                issue.save(function(err, issue) {
+                    var thisAttachment;
+                    if (err) {
+                        sendJSONresponse(res, 400, err);
+                    } else {
+                        thisAttachment = issue.attachments[issue.attachments.length - 1];
+                        sendJSONresponse(res, 201, thisAttachment);
+                    }
+                });
+            }
+        }
+    });
 };
 
 
@@ -272,9 +273,9 @@ module.exports.issueAttachmentsDeleteOne = function(req, res) {
                         updateInfo.updateDate = new Date();
                         updateInfo.updateField = [];
                         updateInfo.updateField.push({
-                          "field": "attachments",
-                          "new": "",
-                          "old": attch.name
+                            "field": "attachments",
+                            "new": "",
+                            "old": attch.name
                         });
 
                         issue.updateInfo.push(updateInfo);
