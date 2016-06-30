@@ -185,6 +185,10 @@ module.exports.issuesUpdateOne = function(req, res) {
                 issue.description = req.body.description;
                 issue.status = req.body.status;
 
+                console.log("FAAAAAAAAAAAAAAACK: ");
+                console.log(req.body.checklists[0]);
+                issue.checklists = req.body.checklists;
+
                 console.log(req.body);
                 if(req.body.deletedMember !== undefined) {
                   issue.idMembers.splice(issue.idMembers.map
