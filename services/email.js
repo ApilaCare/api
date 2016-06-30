@@ -13,26 +13,33 @@
 
 
   var mailOptions = {
-    from: '"Fred Foo 👥" <foo@blurdybloop.com>', // sender address
-    to: 'nesa993@gmail.com', // list of receivers
-    subject: 'Hello', // Subject line
-    text: '', // plaintext body
-    html: '<b>Hello world</b>' // html body
+    from: '',
+    to: '',
+    subject: '',
+    text: '',
+    html: ''
 };
 
-  module.exports.sendMail = function(from, to, subject, text) {
+  module.exports.sendMail = function(from, to, subject, text, callback) {
 
     mailOptions.from = from;
     mailOptions.to = to;
     mailOptions.subject = subject;
     mailOptions.html = text;
 
-    transporter.sendMail(mailOptions, function(error, info){
-          if(error){
-              return console.log(error);
-          }
-          console.log('Message sent: ' + info.response);
-      });
+    transporter.sendMail(mailOptions, callback);
+  }
+
+  module.exports.sendForgotPassword = function(from, to, callback) {
+    mailOptions.from = from;
+    mailOptions.to = to;
+    mailOptions.subject = "Password reset for ApilaCare";
+    mailOptions.text = 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+          'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+          'http://someresetpasswordlink' +
+          'If you did not request this, please ignore this email and your password will remain unchanged.\n';
+
+    transporter.sendMail(mailOptions, callback);
   }
 
 })();

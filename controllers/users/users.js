@@ -10,7 +10,17 @@ var sendJSONresponse = function(res, status, content) {
     res.json(content);
 };
 
-//emailService.sendMail("nesa993@gmail.com", "nesa993@gmail.com", "talking to myself", "Hi");
+module.exports.forgotPassword = function(req, res) {
+  emailService.sendForgotPassword("supprot@apila.com", req.params.email,
+  function(error, info) {
+    if(error){
+        return console.log(error);
+    }
+    console.log('Message sent: ' + info.response);
+ 
+    sendJSONresponse(res, 200, null);
+  });
+}
 
 module.exports.usersList = function(req, res) {
   console.log("In usersList");
