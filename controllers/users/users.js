@@ -19,26 +19,51 @@ module.exports.forgotPassword = function(req, res) {
 
         User.findOne({"email": req.params.email}, function(err, user) {
 
-          user.resetPasswordToken = token;
-          user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+          if(user) {
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
-          user.save(function(err) {
-            doSendPasswordForget(req, res, token);
-          });
+            user.save(function(err) {
+              doSendPasswordForget(req, res, token);
+            });
+          } else {
+            sendJSONresponse(res, 404, null);
+          }
+
 
         });
 
         });
 
+}
 
+module.exports.resetPassword = function(req, res) {
 
+  console.log(req.params.token);
+
+  User.findOne({"resetPasswordToken": req.params.token, "resetPasswordExpires": {$gt: Date.now()}},
+       function(err, user) {
+
+         if(user) {
+           user.setPassword(req.body.password);
+           user.resetPasswordToken = undefined;
+           user.resetPasswordExpires = undefined;
+
+           user.save(function(err) {
+             sendJSONresponse(res, 200, null);
+           });
+         } else {
+           sendJSONresponse(res, 404, null);
+         }
+
+  });
 }
 
 function doSendPasswordForget(req, res, token) {
   emailService.sendForgotPassword("supprot@apila.com", req.params.email, token, req.headers.host,
   function(error, info) {
     if(error){
-        return console.log(error);
+        sendJSONresponse(res, 404, null);
     }
     console.log('Message sent: ' + info.response);
     sendJSONresponse(res, 200, null);

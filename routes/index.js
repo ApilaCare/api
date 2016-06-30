@@ -99,6 +99,7 @@ router.delete('/appointments/:appointmentid/comments/:commentid', auth, ctrlAppo
 // users
 router.get('/users', auth, ctrlUsers.usersList);
 router.post('/users/forgotpassowrd/:email', ctrlUsers.forgotPassword);
+router.post('/users/reset/:token', ctrlUsers.resetPassword);
 router.get('/users/community/:username', auth, ctrlUsers.userCommunity);
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);
