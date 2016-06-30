@@ -167,6 +167,7 @@ module.exports.residentsUpdateOne = function(req, res) {
     addToArray(req.body.bloodPressureSystolic, req.body.newbloodPressureSystolic, "Vitals");
     addToArray(req.body.temperature, req.body.newtemperature, "Vitals");
     addToArray(req.body.internationalNormalizedRatio, req.body.newinternationalNormalizedRatio, "Vitals");
+    addToArray(req.body.weight, req.body.newweight, "Vitals");
 
     addToArray(req.body.foodAllergies, req.body.newfoodAllergies, "");
     addToArray(req.body.medicationAllergies, req.body.newmedicationAllergies, "");
