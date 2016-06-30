@@ -10,6 +10,7 @@
     "npm": "~2.14.12"
   },
   "dependencies": {
+    "async": "^2.0.0-rc.6",
     "aws-sdk": "^2.4.3",
     "body-parser": "~1.8.1",
     "connect-multiparty": "^2.0.0",

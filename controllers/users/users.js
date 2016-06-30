@@ -4,6 +4,8 @@ var User = mongoose.model('User');
 var Community = mongoose.model('Community');
 
 var emailService = require('../../services/email');
+var async = require('async');
+var crypto = require('crypto');
 
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
@@ -11,13 +13,34 @@ var sendJSONresponse = function(res, status, content) {
 };
 
 module.exports.forgotPassword = function(req, res) {
-  emailService.sendForgotPassword("supprot@apila.com", req.params.email,
+
+      crypto.randomBytes(20, function(err, buf) {
+        var token = buf.toString('hex');
+
+        User.findOne({"email": req.params.email}, function(err, user) {
+
+          user.resetPasswordToken = token;
+          user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+          user.save(function(err) {
+            doSendPasswordForget(req, res, token);
+          });
+
+        });
+
+        });
+
+
+
+}
+
+function doSendPasswordForget(req, res, token) {
+  emailService.sendForgotPassword("supprot@apila.com", req.params.email, token, req.headers.host,
   function(error, info) {
     if(error){
         return console.log(error);
     }
     console.log('Message sent: ' + info.response);
- 
     sendJSONresponse(res, 200, null);
   });
 }
