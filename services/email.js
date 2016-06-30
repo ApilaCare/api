@@ -16,11 +16,17 @@
     from: '"Fred Foo 👥" <foo@blurdybloop.com>', // sender address
     to: 'nesa993@gmail.com', // list of receivers
     subject: 'Hello', // Subject line
-    text: 'Hello world', // plaintext body
+    text: '', // plaintext body
     html: '<b>Hello world</b>' // html body
 };
 
-  module.exports.sendMail = function() {
+  module.exports.sendMail = function(from, to, subject, text) {
+
+    mailOptions.from = from;
+    mailOptions.to = to;
+    mailOptions.subject = subject;
+    mailOptions.html = text;
+
     transporter.sendMail(mailOptions, function(error, info){
           if(error){
               return console.log(error);

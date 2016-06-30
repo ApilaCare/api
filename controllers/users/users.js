@@ -10,7 +10,7 @@ var sendJSONresponse = function(res, status, content) {
     res.json(content);
 };
 
-//emailService.sendMail();
+//emailService.sendMail("nesa993@gmail.com", "nesa993@gmail.com", "talking to myself", "Hi");
 
 module.exports.usersList = function(req, res) {
   console.log("In usersList");
