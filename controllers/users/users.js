@@ -3,10 +3,14 @@ var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var Community = mongoose.model('Community');
 
+var emailService = require('../../services/email');
+
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
     res.json(content);
 };
+
+//emailService.sendMail();
 
 module.exports.usersList = function(req, res) {
   console.log("In usersList");

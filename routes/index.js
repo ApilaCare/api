@@ -15,6 +15,7 @@ var auth = jwt({
 // control variables
 // issues
 var ctrlIssues = require('../controllers/issues/issues');
+var nodemailer = require('../services/email');
 var ctrlIssueComments = require('../controllers/issues/issueComments');
 var ctrlIssueChecklists = require('../controllers/issues/issueChecklists');
 var ctrlIssueLabels = require('../controllers/issues/issueLabels');
