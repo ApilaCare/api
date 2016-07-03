@@ -46,6 +46,7 @@ var issueSchema = new mongoose.Schema({
     attachments: [issueAttachmentsSchema],
     idAttachmentCover: {type: String},
     idMembers: [issueMembersSchema],
+    due: {type: Date},
     idLabels: [String],
     updateInfo: [mongoose.Schema.Types.Mixed],
     community: {

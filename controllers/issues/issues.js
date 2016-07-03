@@ -93,7 +93,8 @@ module.exports.issuesList = function(req, res) {
                  "labels"    : "$labels",
                  "checklists": "$checklists",
                  "_id" : "$_id",
-                 "community" : "$community"
+                 "community" : "$community",
+                 "due" : "$due"
                }
 
     Iss.aggregate([{'$match' : {community : new mongoose.Types.ObjectId(id),
@@ -184,6 +185,7 @@ module.exports.issuesUpdateOne = function(req, res) {
                 issue.submitBy = req.body.submitBy;
                 issue.description = req.body.description;
                 issue.status = req.body.status;
+                issue.due = req.body.due;
 
                 console.log("FAAAAAAAAAAAAAAACK: ");
                 console.log(req.body.checklists[0]);

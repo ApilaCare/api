@@ -53,7 +53,7 @@ module.exports.resetPassword = function(req, res) {
              sendJSONresponse(res, 200, null);
            });
          } else {
-           sendJSONresponse(res, 404, null);
+           sendJSONresponse(res, 403, null);
          }
 
   });
