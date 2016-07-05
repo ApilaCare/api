@@ -80,6 +80,15 @@ module.exports.usersList = function(req, res) {
 
 }
 
+module.exports.usersInCommunity = function(req, res) {
+
+  User.find({community: req.params.communityid}, 'name',  function(err, users) {
+      console.log(users);
+      sendJSONresponse(res, 200, users);
+  });
+
+}
+
 module.exports.userCommunity = function(req, res) {
 
   var username = req.params.username;
