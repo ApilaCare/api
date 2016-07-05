@@ -122,6 +122,19 @@ module.exports.issuesListByUsername = function(req, res) {
   });
 }
 
+module.exports.dueIssuesList = function(req, res) {
+  Iss.find({"due" : {$exists: true}, community: req.params.communityid},
+  function(err, issues) {
+    if(issues) {
+      sendJSONresponse(res, 200, issues);
+    } else {
+      sendJSONresponse(res, 404, {
+        "message": "Issues with due date not found"
+      });
+    }
+  });
+}
+
 module.exports.issuesReadOne = function(req, res) {
     console.log('Finding issue details', req.params);
     if (req.params && req.params.issueid) {
@@ -187,9 +200,8 @@ module.exports.issuesUpdateOne = function(req, res) {
                 issue.status = req.body.status;
                 issue.due = req.body.due;
 
-                console.log("FAAAAAAAAAAAAAAACK: ");
-                console.log(req.body.checklists[0]);
                 issue.checklists = req.body.checklists;
+                issue.labels = req.body.labels;
 
                 console.log(req.body);
                 if(req.body.deletedMember !== undefined) {

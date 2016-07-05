@@ -50,6 +50,7 @@ router.get('/issues/list/:status/id/:communityid', auth, ctrlIssues.issuesList);
 router.get('/issues/:username/s/:status/id/:communityid', auth, ctrlIssues.issuesListByUsername);
 router.get('/issues/count/:username/id/:communityid', auth, ctrlIssues.issuesOpenCount);
 router.get('/issues/issuescount/:communityid', auth, ctrlIssues.issuesCount);
+router.get('/issues/due/:communityid', auth, ctrlIssues.dueIssuesList);
 router.post('/issues/new', auth, ctrlIssues.issuesCreate);
 router.get('/issues/:issueid', auth, ctrlIssues.issuesReadOne);
 router.put('/issues/:issueid', auth, ctrlIssues.issuesUpdateOne);
