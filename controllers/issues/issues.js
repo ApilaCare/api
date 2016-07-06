@@ -7,6 +7,7 @@ var sendJSONresponse = function(res, status, content) {
     res.json(content);
 };
 
+
 // api/issues/new
 module.exports.issuesCreate = function(req, res) {
 
@@ -202,6 +203,7 @@ module.exports.issuesUpdateOne = function(req, res) {
 
                 issue.checklists = req.body.checklists;
                 issue.labels = req.body.labels;
+                issue.updateInfo = req.body.updateInfo;
 
                 console.log(req.body);
                 if(req.body.deletedMember !== undefined) {
@@ -215,7 +217,13 @@ module.exports.issuesUpdateOne = function(req, res) {
 
                 console.log(issue.idMembers);
 
-                issue.updateInfo.push(updateInfo);
+                if(updateInfo.updateField !== undefined) {
+                  if(updateInfo.updateField.length > 0) {
+                    issue.updateInfo.push(updateInfo);
+                  }
+
+                }
+
                 issue.save(function(err, issue) {
                     if (err) {
                         sendJSONresponse(res, 404, err);
