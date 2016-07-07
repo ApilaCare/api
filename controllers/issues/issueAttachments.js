@@ -89,6 +89,8 @@ var doAddAttachment = function(req, res, issue, username) {
 
     var file = req.files.file;
 
+    console.log(file.path);
+
     var stream = fs.createReadStream(file.path);
 
     var params = {
