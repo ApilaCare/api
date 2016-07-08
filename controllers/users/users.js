@@ -89,6 +89,27 @@ module.exports.usersInCommunity = function(req, res) {
 
 }
 
+module.exports.updateUsername = function(req, res) {
+  console.log("updejt username " + req.params.username + " " + req.body.username);
+
+  User.findOne({name: req.params.username}, function(err, user) {
+    if(user) {
+      user.name = req.body.username;
+
+      user.save(function(err, u) {
+        if(err) {
+          sendJSONresponse(res, 200, u);
+        } else {
+          sendJSONresponse(res, 404, null);
+          console.log(err);
+        }
+      })
+    } else {
+      sendJSONresponse(res, 404, null);
+    }
+  });
+}
+
 module.exports.userCommunity = function(req, res) {
 
   var username = req.params.username;
