@@ -109,6 +109,7 @@ router.post('/login', ctrlAuth.login);
 
 // residents
 router.get('/residents/list/:communityid', auth, ctrlResidents.residentsList);
+router.get('/residents/birthday/:communityid', auth, ctrlResidents.residentBirthday);
 router.get('/residents/:residentid', auth, ctrlResidents.residentById);
 router.get('/residents/count/:communityid', auth, ctrlResidents.residentsCount);
 router.put('/residents/update/:residentid', auth, ctrlResidents.residentsUpdateOne);

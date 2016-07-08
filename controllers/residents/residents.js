@@ -101,6 +101,18 @@ module.exports.residentById = function(req, res) {
             });
 };
 
+module.exports.residentBirthday = function(req, res) {
+
+    Resid.find({"community" : req.params.communityid})
+    .exec(function(err, residents) {
+      if(res) {
+        sendJSONresponse(res, 200, residents);
+      } else {
+        sendJSONresponse(res, 404, null);
+      }
+
+    });
+}
 
 //small heplper functio to check if the fields is a number
 function isNumber(obj) {
