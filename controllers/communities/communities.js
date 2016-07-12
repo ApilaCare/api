@@ -115,20 +115,25 @@ module.exports.acceptMember = function(req, res) {
             community.pendingMembers.splice(index, 1);
           }
 
+          console.log(req.body.member);
+
           //set the data in the user also
           User.findById(req.body.member, function(err, user) {
-            user.community = community._id;
 
-            user.save();
+              user.community = community._id;
+              user.save();
+
+              community.save(function(err, community) {
+                if(err) {
+                  sendJSONresponse(res, 404, err);
+                } else {
+                  sendJSONresponse(res, 200, community);
+                }
+              });
+
           });
 
-          community.save(function(err, community) {
-            if(err) {
-              sendJSONresponse(res, 404, err);
-            } else {
-              sendJSONresponse(res, 200, community);
-            }
-          });
+
 
           });
 
@@ -267,6 +272,7 @@ function addUserToCommunity(req, res, community) {
     u.community = community._id;
 
     community.communityMembers.push(u._id);
+    community.creator = u;
 
     console.log(u);
 

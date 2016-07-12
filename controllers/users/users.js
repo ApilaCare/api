@@ -122,7 +122,7 @@ module.exports.userCommunity = function(req, res) {
         if(user.community)
         {
           Community.findById(user.community)
-          .populate("communityMembers pendingMembers")
+          .populate("communityMembers pendingMembers creator", "-salt -hash")
           .exec( function(err, community) {
             if(err) {
               sendJSONresponse(res, 400, {});
