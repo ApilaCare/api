@@ -3,21 +3,7 @@ var Iss = mongoose.model('Issue');
 var User = mongoose.model('User');
 
 var fs = require('fs');
-var AWS = require('aws-sdk');
-
-AWS.config.update({
-    accessKeyId: process.env.ACCESS_KEY_ID,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY
-});
-
-var region = "s3-us-west-2";
-var bucket = "apilatest2";
-
-var s3bucket = new AWS.S3({
-    params: {
-        Bucket: bucket
-    }
-});
+var imageUploadService = require('../../services/imageUpload');
 
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
@@ -89,53 +75,41 @@ var doAddAttachment = function(req, res, issue, username) {
 
     var file = req.files.file;
 
-    console.log(file.path);
-
     var stream = fs.createReadStream(file.path);
 
     var params = {
         Key: file.originalFilename,
         Body: stream
     };
-    s3bucket.upload(params, function(err, data) {
+
+    imageUploadService.upload(params, file.path, function() {
+        var fullUrl = "https://" + imageUploadService.getRegion()
+        + ".amazonaws.com/" + imageUploadService.getBucket() + "/" +
+            escape(file.originalFilename);
+
+        issue.attachments.push({
+            uploader: req.payload.name,
+            name: file.originalFilename,
+            source: file.path,
+            url: fullUrl,
+            type: file.type,
+        });
+
+        issue.updateInfo.push(req.body.updateInfo);
+
         fs.unlinkSync(file.path);
-        if (err) {
-            console.log("Error uploading data: ", err);
-        } else {
-            console.log("Successfully uploaded data aws");
 
-            if (!issue) {
-                sendJSONresponse(res, 404, "issueid not found");
+        issue.save(function(err, issue) {
+            var thisAttachment;
+            if (err) {
+                sendJSONresponse(res, 400, err);
             } else {
-
-
-                var fullUrl = "https://" + region + ".amazonaws.com/" + bucket + "/" +
-                    escape(file.originalFilename);
-
-                console.log(fullUrl);
-
-                issue.attachments.push({
-                    uploader: req.payload.name,
-                    name: file.originalFilename,
-                    source: file.path,
-                    url: fullUrl,
-                    type: file.type,
-                });
-
-                issue.updateInfo.push(req.body.updateInfo);
-
-                issue.save(function(err, issue) {
-                    var thisAttachment;
-                    if (err) {
-                        sendJSONresponse(res, 400, err);
-                    } else {
-                        thisAttachment = issue.attachments[issue.attachments.length - 1];
-                        sendJSONresponse(res, 201, thisAttachment);
-                    }
-                });
+                thisAttachment = issue.attachments[issue.attachments.length - 1];
+                sendJSONresponse(res, 201, thisAttachment);
             }
-        }
+        });
     });
+
 };
 
 

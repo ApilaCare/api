@@ -7,6 +7,9 @@ var emailService = require('../../services/email');
 var async = require('async');
 var crypto = require('crypto');
 
+var fs = require('fs');
+var imageUploadService = require('../../services/imageUpload');
+
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
     res.json(content);
@@ -89,8 +92,55 @@ module.exports.usersInCommunity = function(req, res) {
 
 }
 
+module.exports.uploadImage = function(req, res) {
+
+  var file = req.files.file;
+
+  var stream = fs.createReadStream(file.path);
+
+  var params = {
+      Key: file.originalFilename,
+      Body: stream
+  };
+
+  imageUploadService.upload(params, file.path, function() {
+      var fullUrl = "https://" + imageUploadService.getRegion()
+      + ".amazonaws.com/" + imageUploadService.getBucket() + "/" +
+          escape(file.originalFilename);
+
+      fs.unlinkSync(file.path);
+
+      User.findOne({name: req.params.username}, function(err, user) {
+        if(user) {
+          user.userImage = fullUrl;
+          user.save(function(err) {
+            if(err) {
+              sendJSONresponse(res, 404, {message: "Unable to save user"});
+            } else {
+              sendJSONresponse(res, 200, fullUrl);
+            }
+          });
+        } else {
+          sendJSONresponse(res, 404, {message: "Unable to find user"});
+        }
+      });
+
+
+  });
+}
+
+module.exports.userImage = function(req, res) {
+
+  User.findOne({name: req.params.username}, function(err, user) {
+    if(user) {
+      sendJSONresponse(res, 200, user.userImage);
+    } else {
+      sendJSONresponse(res, 404, null);
+    }
+  });
+}
+
 module.exports.updateUsername = function(req, res) {
-  console.log("updejt username " + req.params.username + " " + req.body.username);
 
   User.findOne({name: req.params.username}, function(err, user) {
     if(user) {

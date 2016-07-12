@@ -7,17 +7,8 @@ var sendJSONresponse = function(res, status, content) {
     res.json(content);
 };
 
-
 // api/issues/new
 module.exports.issuesCreate = function(req, res) {
-
-    console.log("IN ISSUE CREATE");
-
-    console.log(req);
-
-    if(req.payload === undefined) {
-      console.log("fuk");
-    }
 
     console.log(req.payload.name);
 

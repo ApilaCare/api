@@ -13,6 +13,7 @@ var userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    userImage: {type: String},
     community: {type: mongoose.Schema.Types.ObjectId, ref: 'Community'}, // _id of community that user is part of
     hash: String,
     salt: String,
