@@ -31,6 +31,34 @@ module.exports.communitiesCreate = function(req, res) {
     });
 };
 
+module.exports.addRole = function(req, res) {
+
+  Community.findOne({_id: req.params.communityid}, function(err, communites) {
+    if(communites) {
+
+      if(req.body.type === "boss") {
+        communites.boss = req.params.userid;
+      } else if(req.body.type === "directors") {
+        communites.directors.push(req.params.userid);
+      } else if(req.body.type === "minions") {
+        communites.minions.push(req.params.userid);
+      }
+
+      communites.save(function(err) {
+        if(err) {
+          sendJSONresponse(res, 404, {message: "Community not saved"});
+        } else {
+          sendJSONresponse(res, 200, null);
+        }
+      });
+
+
+    } else {
+      sendJSONresponse(res, 404, {message: "Community not found"})
+    }
+  });
+}
+
 module.exports.communitiesList = function(req, res) {
     Community.find({}, function(err, communities) {
         console.log(communities);

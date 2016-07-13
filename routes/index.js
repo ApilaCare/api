@@ -39,6 +39,7 @@ var ctrlCommunities = require('../controllers/communities/communities');
 // communities
 router.post('/communities/new', ctrlCommunities.communitiesCreate);
 router.get('/communities/', auth, ctrlCommunities.communitiesList);
+router.post('/communites/:communityid/role/:userid', auth, ctrlCommunities.addRole);
 router.put('/communities/accept/:communityid/', auth, ctrlCommunities.acceptMember);
 router.put('/communities/decline/:communityid/', auth, ctrlCommunities.declineMember);
 router.put('/communities/pending/:communityid/', auth, ctrlCommunities.addPendingMember);
