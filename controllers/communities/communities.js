@@ -36,8 +36,11 @@ module.exports.addRole = function(req, res) {
   Community.findOne({_id: req.params.communityid}, function(err, communites) {
     if(communites) {
 
+      console.log(req.body.type);
+
       if(req.body.type === "boss") {
         communites.boss = req.params.userid;
+        console.log(communites.boss);
       } else if(req.body.type === "directors") {
         communites.directors.push(req.params.userid);
       } else if(req.body.type === "minions") {
