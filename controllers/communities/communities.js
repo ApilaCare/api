@@ -273,6 +273,7 @@ function addUserToCommunity(req, res, community) {
 
     community.communityMembers.push(u._id);
     community.creator = u;
+    community.boss = u;
 
     console.log(u);
 
