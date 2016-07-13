@@ -239,6 +239,27 @@ module.exports.communitiesReadOne = function(req, res) {
     }
 };
 
+module.exports.removeMember = function(req, res) {
+
+  console.log(req.params.communityid);
+
+  Community.findOne({"_id" : req.params.communityid}, function(err, community) {
+    if(community) {
+      community.communityMembers.pull(req.params.userid);
+
+      community.save(function(err) {
+        if(err) {
+          sendJSONresponse(res, 404, {message: "Error updating community"});
+        } else {
+          sendJSONresponse(res, 200, {message: "user removed"});
+        }
+      });
+    } else {
+      sendJSONresponse(res, 404, {message: "Error finding community"});
+    }
+  });
+}
+
 module.exports.communitiesDeleteOne = function(req, res) {
     var communityid = req.params.communityid;
     if (communityid) {

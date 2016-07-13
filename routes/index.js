@@ -44,6 +44,7 @@ router.put('/communities/accept/:communityid/', auth, ctrlCommunities.acceptMemb
 router.put('/communities/decline/:communityid/', auth, ctrlCommunities.declineMember);
 router.put('/communities/pending/:communityid/', auth, ctrlCommunities.addPendingMember);
 router.put('/communities/update/:communityid/', auth, ctrlCommunities.communitiesUpdateOne);
+router.delete('/communites/:communityid/user/:userid', auth, ctrlCommunities.removeMember);
 router.delete('/communities/:communityid/', auth, ctrlCommunities.communitiesDeleteOne);
 
 // issues
