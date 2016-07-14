@@ -43,8 +43,10 @@ module.exports.addRole = function(req, res) {
         console.log(communites.boss);
       } else if(req.body.type === "directors") {
         communites.directors.push(req.params.userid);
+        communites.minions.pull(req.params.userid);
       } else if(req.body.type === "minions") {
         communites.minions.push(req.params.userid);
+        communites.directors.pull(req.params.userid);
       }
 
       communites.save(function(err) {
@@ -145,6 +147,8 @@ module.exports.acceptMember = function(req, res) {
           if(index != -1) {
             community.pendingMembers.splice(index, 1);
           }
+
+          community.minions.push(req.body.member);
 
           console.log(req.body.member);
 
