@@ -250,6 +250,8 @@ module.exports.removeMember = function(req, res) {
   Community.findOne({"_id" : req.params.communityid}, function(err, community) {
     if(community) {
       community.communityMembers.pull(req.params.userid);
+      community.directors.pull(req.params.userid);
+      community.minions.pull(req.params.userid);
 
       community.save(function(err) {
         if(err) {

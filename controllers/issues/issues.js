@@ -10,14 +10,13 @@ var sendJSONresponse = function(res, status, content) {
 // api/issues/new
 module.exports.issuesCreate = function(req, res) {
 
-    console.log(req.payload.name);
-
     //create issue from the inputed data
     Iss.create({
         title: req.body.title,
         responsibleParty: req.body.responsibleParty,
         resolutionTimeframe: req.body.resolutionTimeframe,
         description: req.body.description,
+        confidential: req.body.confidential,
         submitBy: req.payload.name,
         community : req.body.community._id
     }, function(err, issue) {
@@ -41,8 +40,12 @@ module.exports.issuesOpenCount = function(req, res) {
   }
 
   Iss.find({status: "Open", responsibleParty: username, community: community}, function(err, issues) {
-      console.log(issues.length);
-      sendJSONresponse(res, 200, issues.length)
+      if(issues){
+        sendJSONresponse(res, 200, issues.length)
+      } else {
+        sendJSONresponse(res, 404, 0);
+      }
+
   });
 }
 
@@ -86,7 +89,8 @@ module.exports.issuesList = function(req, res) {
                  "checklists": "$checklists",
                  "_id" : "$_id",
                  "community" : "$community",
-                 "due" : "$due"
+                 "due" : "$due",
+                 "confidential" : "$confidential"
                }
 
     Iss.aggregate([{'$match' : {community : new mongoose.Types.ObjectId(id),
