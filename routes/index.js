@@ -119,5 +119,6 @@ router.get('/residents/count/:communityid', auth, ctrlResidents.residentsCount);
 router.put('/residents/update/:residentid', auth, ctrlResidents.residentsUpdateOne);
 router.delete('/residents/:residentid', auth, ctrlResidents.residentsDeleteOne);
 router.post('/residents/new', auth, ctrlResidents.residentsCreate);
+router.get('/residents/average_age/:communityid', auth, ctrlResidents.getAverageAge);
 
 module.exports = router;
