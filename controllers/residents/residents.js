@@ -21,7 +21,8 @@ module.exports.residentsCreate = function(req, res) {
         buildingStatus: req.body.buildingStatus,
         sex: req.body.sex,
         submitBy: req.payload.name,
-        community: req.body.community._id
+        community: req.body.community._id,
+        movedFrom: req.body.movedFrom
     }, function(err, resident) {
         if (err) {
             console.log(err);
