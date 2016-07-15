@@ -37,6 +37,7 @@ var issueSchema = new mongoose.Schema({
     responsibleParty: {type: String,required: true},
     resolutionTimeframe: {type: String, required: true},
     submitDate: {type: Date, default: Date.now},
+    shelvedDate: {type: Date},
     submitBy: {type: String, required: true},
     description: {type: String, required: true},
     status: {type: String, required: true, default: "Open"}, // choose from ["Open", "Shelved", "Closed"]
