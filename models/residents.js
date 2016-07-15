@@ -14,6 +14,7 @@ var residentSchema = new mongoose.Schema({
     buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out
       movedOutDescribe: {type: String}, // conditional if moved out selected | open field
       movedOutTo: {type: String}, // conditional if moved out is selected | Nursing Home, Home, Another AL
+    movedFrom: {type: Number}, // storing Zip Codes
     updateInfo: [mongoose.Schema.Types.Mixed],
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},
