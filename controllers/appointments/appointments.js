@@ -107,7 +107,7 @@ module.exports.appointmentsToday = function(req, res) {
 
    console.log(req.params);
 
-   var query = 'return this.time.getDate() === ' + today.getDate();
+   var query = 'return this.appointmentDate.getDate() === ' + today.getDate();
 
     Appoint.find({
       "community" : req.params.communityid,
