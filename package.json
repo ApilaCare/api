@@ -1,6 +1,9 @@
 {
   "name": "apila",
   "version": "0.0.1",
+  "description": "Apila's development of the API code",
+  "license": "MIT",
+  "homepage": "http://apila.care",
   "private": true,
   "scripts": {
     "start": "node ./apila.js"

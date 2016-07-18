@@ -1,7 +1,5 @@
 # Dependency directory
 node_modules
 
-upload_storage
-
 # Secret Stuff lol!
 .env

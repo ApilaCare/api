@@ -1,3 +1,3 @@
-# api
+# API
 
 readme info
