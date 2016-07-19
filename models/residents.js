@@ -14,7 +14,11 @@ var residentSchema = new mongoose.Schema({
     buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out
       movedOutDescribe: {type: String}, // conditional if moved out selected | open field
       movedOutTo: {type: String}, // conditional if moved out is selected | Nursing Home, Home, Another AL
-    movedFrom: {type: Number}, // storing Zip Codes
+    movedFrom: {
+      name: {type: String},
+      longitude: {type: Number},
+      latitude: {type: Number}
+    },
     updateInfo: [mongoose.Schema.Types.Mixed],
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},
@@ -169,6 +173,7 @@ var residentSchema = new mongoose.Schema({
       byWhomINR: {type: String}, // if yes | self, clinic, outside agency
       internationalNormalizedRatio: [vitalsInfoSchema], // if yes | array of values
 });
+
 
 var vitalsInfoSchema = new mongoose.Schema({
     data: {type: Number, required: true},
