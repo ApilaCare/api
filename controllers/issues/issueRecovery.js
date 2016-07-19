@@ -18,7 +18,7 @@ module.exports.createMemberRecovery = function(req, res) {
   selectRandomUser(req.body.boss, function(chosenMember) {
 
     if(chosenMember === null) {
-      sendJSONresponse(res, 404, {message: {"Random member could not be selected"}});
+      sendJSONresponse(res, 404, {"message": "Random member could not be selected"});
     }
 
     IssRecovery.create({
@@ -29,7 +29,7 @@ module.exports.createMemberRecovery = function(req, res) {
       if(issueRecovery) {
         sendJSONresponse(res, 200, IssRecovery);
       } else {
-        sendJSONresponse(res, 404, {message: {"Error while creating issue recovery"}});
+        sendJSONresponse(res, 404, {"message": "Error while creating issue recovery"});
       }
     });
   });
@@ -58,7 +58,7 @@ function selectRandomUser(boss, callback) {
 module.exports.confirmPassword = function(req, res) {
 
   if(req.body.password) {
-    sendJSONresponse(res, 404, {message: "No password sent"});
+    sendJSONresponse(res, 404, {"message": "No password sent"});
   }
 
   var password = req.body.password;
