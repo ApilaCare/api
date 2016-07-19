@@ -4,6 +4,10 @@
   "description": "Apila's development of the API code",
   "license": "MIT",
   "homepage": "http://apila.care",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ApilaCare/api.git"
+  },
   "private": true,
   "scripts": {
     "start": "node ./apila.js"
