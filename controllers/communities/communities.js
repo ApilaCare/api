@@ -253,6 +253,19 @@ module.exports.removeMember = function(req, res) {
       community.directors.pull(req.params.userid);
       community.minions.pull(req.params.userid);
 
+      console.log(req.params.username);
+
+      //if the user we are removing is the creator, set the one who removed him the creator
+      if(req.params.userid === community.creator) {
+        User.findOne({name: req.params.username}, function(err, user) {
+          if(user) {
+            community.creator = user._id;
+          } else {
+            sendJSONresponse(res, 404, {message: "Error finding user"});
+          }
+        });
+      }
+
       community.save(function(err) {
         if(err) {
           sendJSONresponse(res, 404, {message: "Error updating community"});

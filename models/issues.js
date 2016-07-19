@@ -32,6 +32,15 @@ var issueAttachmentsSchema = new mongoose.Schema({
     type: {type: String, required: true}
 });
 
+var memberRecoverSchema =  new mongoose.Schema({
+    boss: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}, // the one who started the recvery
+    chosenMember: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}, // random chosen member who needs to type the password to recover
+    recoveredMember: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}, // the member we are recovering
+    bossPasswordConfirmed: {type: Boolean}, // is the boss password submited and matching
+    chosenMemberPasswordConfirmed: {type: Boolean}, // is the random member password submited and matching
+    submitDate: {type: Date, default: Date.now} // the date when the recovery started
+});
+
 var issueSchema = new mongoose.Schema({
     title: {type: String,required: true},
     responsibleParty: {type: String,required: true},
@@ -58,6 +67,7 @@ var issueSchema = new mongoose.Schema({
 });
 
 mongoose.model('Issue', issueSchema);
+mongoose.model('MemberRecover', memberRecoverSchema)
 
 /* adding documents to mongodb
 db.issues.save({
