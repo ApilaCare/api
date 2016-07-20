@@ -88,7 +88,7 @@ router.put('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttachme
 router.delete('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttachments.issueAttachmentsDeleteOne);
 
 // issues recovery
-router.post('/issues/recovery', auth, ctrlIssueRecovery.createMemberRecovery);
+router.post('/issues/recovery/:communityid', auth, ctrlIssueRecovery.createMemberRecovery);
 
 // appointments
 router.get('/appointments/:communityid', auth, ctrlAppointments.appointmentsList);
