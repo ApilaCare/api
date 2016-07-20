@@ -3,31 +3,32 @@ var mongoose = require('mongoose');
 var IssRecovery = mongoose.model('MemberRecover');
 var User = mongoose.model('User');
 var passport = require('passport');
+var _ = require('lodash');
 
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
     res.json(content);
 };
 
-// can the user creator be selected?
-// what if we have only 2 users in a community?
-// username's must be unique
-
 module.exports.createMemberRecovery = function(req, res) {
 
-  selectRandomUser(req.body.boss, function(chosenMember) {
+  var recoveredMember = req.body.recoveredMember;
+  var boss = req.body.boss;
+
+  selectRandomUser(boss, recoveredMember,  function(chosenMember) {
 
     if(chosenMember === null) {
       sendJSONresponse(res, 404, {"message": "Random member could not be selected"});
     }
 
     IssRecovery.create({
-      boss: req.body.boss,
+      boss: boss,
       chosenMember: chosenMember,
-      recoveredMember: req.body.recoveredMember
+      recoveredMember: recoveredMember
+
     }, function(err, issueRecovery) {
       if(issueRecovery) {
-        sendJSONresponse(res, 200, IssRecovery);
+        sendJSONresponse(res, 200, chosenMember.name);
       } else {
         sendJSONresponse(res, 404, {"message": "Error while creating issue recovery"});
       }
@@ -36,15 +37,18 @@ module.exports.createMemberRecovery = function(req, res) {
 }
 
 // this will select a random user except the one who submited the request
-function selectRandomUser(boss, callback) {
+function selectRandomUser(boss, recoveredMember, callback) {
   User.find({}, function(err, users) {
     if(users) {
 
       var randomUser = null;
 
-      while(randomUser === null || randomUser._id === boss) {
-        randomUser = users[Math.floor(Math.random() * users.length)];
-      }
+      // filtering out the user we are recovering and the user who started it, so we don't pick them
+      users = _.filter(users, function(o) {
+        return o._id != boss && o._id != recoveredMember;
+      });
+
+      randomUser = _.sample(users);
 
       callback(randomUser);
 
