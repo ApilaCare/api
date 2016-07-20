@@ -89,6 +89,7 @@ router.delete('/issues/:issueid/attachments/:attachmentid', auth, ctrlIssueAttac
 
 // issues recovery
 router.post('/issues/recovery/:communityid', auth, ctrlIssueRecovery.createMemberRecovery);
+router.post('/issues/recovery/verify/:userid', auth, ctrlIssueRecovery.confirmPassword);
 
 // appointments
 router.get('/appointments/:communityid', auth, ctrlAppointments.appointmentsList);

@@ -21,18 +21,32 @@ module.exports.createMemberRecovery = function(req, res) {
       sendJSONresponse(res, 404, {"message": "Random member could not be selected"});
     }
 
-    IssRecovery.create({
-      boss: boss,
-      chosenMember: chosenMember,
-      recoveredMember: recoveredMember
-
-    }, function(err, issueRecovery) {
-      if(issueRecovery) {
-        sendJSONresponse(res, 200, chosenMember.name);
+    //before creating check if the recovery for this user is already started
+    IssRecovery.findOne({"recoveredMember" : recoveredMember}, function(err, recovery) {
+      if(recovery) {
+        sendJSONresponse(res, 404, {message: "Already in recovery process"});
       } else {
-        sendJSONresponse(res, 404, {"message": "Error while creating issue recovery"});
+
+        IssRecovery.create({
+          boss: boss,
+          chosenMember: chosenMember,
+          recoveredMember: recoveredMember
+
+        }, function(err, issueRecovery) {
+          if(issueRecovery) {
+
+            var data = {};
+            data.chosenMemberName = chosenMember.name;
+            data.recoveryid = issueRecovery._id;
+
+            sendJSONresponse(res, 200, data);
+          } else {
+            sendJSONresponse(res, 404, {"message": "Error while creating issue recovery"});
+          }
+        });
       }
     });
+
   });
 }
 
@@ -75,14 +89,42 @@ function selectRandomUser(res, boss, recoveredMember, communityid, callback) {
 
 module.exports.confirmPassword = function(req, res) {
 
-  if(req.body.password) {
+  if(!req.body.password) {
     sendJSONresponse(res, 404, {"message": "No password sent"});
+    return;
   }
 
   var password = req.body.password;
 
   //find the user and chek to see if the password matches
-  //User.fineOne({})
+  User.findOne({"_id" : req.params.userid}, function(err, user) {
+    if(user) {
+      if(user.validPassword(password)) {
+
+        IssRecovery.findOne({"_id" : req.body.recoveryid}, function(err, recovery) {
+          if(recovery) {
+            if(req.body.type === "boss") {
+              recovery.bossPasswordConfirmed = true;
+
+              recovery.save(function() {
+                sendJSONresponse(res, 200, {"message" : true});
+              });
+            } else {
+
+            }
+          } else {
+            sendJSONresponse(res, 404, {"message" : false});
+          }
+        });
+
+
+      } else {
+        sendJSONresponse(res, 404, {"message" : false});
+      }
+    } else {
+      sendJSONresponse(res, 404, {"message" : "User not found for password verification"});
+    }
+  });
 
 }
 
