@@ -35,11 +35,15 @@ module.exports.createMemberRecovery = function(req, res) {
         }, function(err, issueRecovery) {
           if(issueRecovery) {
 
-            var data = {};
-            data.chosenMemberName = chosenMember.name;
-            data.recoveryid = issueRecovery._id;
+            setRecoveryToUser(res, recoveredMember, issueRecovery._id, function() {
+              var data = {};
+              data.chosenMemberName = chosenMember.name;
+              data.recoveryid = issueRecovery._id;
 
-            sendJSONresponse(res, 200, data);
+              sendJSONresponse(res, 200, data);
+            });
+
+
           } else {
             sendJSONresponse(res, 404, {"message": "Error while creating issue recovery"});
           }
@@ -131,4 +135,23 @@ module.exports.confirmPassword = function(req, res) {
 //transfer confidential issues from 1 user to another, when the user is recovered
 function switchOverIssues() {
 
+}
+
+// given a user id and the recovery object, it set's the user with a reference to it's recovery info
+function setRecoveryToUser(res, userid, recoveryid, callback) {
+  User.findOne({"_id" : userid}, function(err, user) {
+    if(user) {
+      user.recovery = recoveryid;
+
+      user.save(function(err) {
+        if(err) {
+          sendJSONresponse(res, 404, {message: "Unable to save user"});
+        } else {
+          callback();
+        }
+      })
+    } else {
+      sendJSONresponse(res, 404, {message: "Unable to find the user"});
+    }
+  })
 }

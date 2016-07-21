@@ -15,6 +15,7 @@ var userSchema = new mongoose.Schema({
     },
     userImage: {type: String},
     community: {type: mongoose.Schema.Types.ObjectId, ref: 'Community'}, // _id of community that user is part of
+    recovery: {type: mongoose.Schema.Types.ObjectId, ref: 'MemberRecover'},
     hash: String,
     salt: String,
     resetPasswordToken: String,
