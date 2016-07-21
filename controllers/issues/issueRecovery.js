@@ -35,7 +35,7 @@ module.exports.createMemberRecovery = function(req, res) {
         }, function(err, issueRecovery) {
           if(issueRecovery) {
 
-            setRecoveryToUser(res, recoveredMember, issueRecovery._id, function() {
+            setRecoveryToUser(res, recoveredMember, chosenMember, function() {
               var data = {};
               data.chosenMemberName = chosenMember.name;
               data.recoveryid = issueRecovery._id;
@@ -137,11 +137,11 @@ function switchOverIssues() {
 
 }
 
-// given a user id and the recovery object, it set's the user with a reference to it's recovery info
-function setRecoveryToUser(res, userid, recoveryid, callback) {
+// given a user id and the chosenUser, it set's the user with a reference to it's chosenUser
+function setRecoveryToUser(res, userid, chosenMember, callback) {
   User.findOne({"_id" : userid}, function(err, user) {
     if(user) {
-      user.recovery = recoveryid;
+      user.recovery = chosenMember._id;
 
       user.save(function(err) {
         if(err) {

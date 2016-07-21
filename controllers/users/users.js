@@ -85,10 +85,15 @@ module.exports.usersList = function(req, res) {
 
 module.exports.usersInCommunity = function(req, res) {
 
-  User.find({community: req.params.communityid}, 'name',  function(err, users) {
-      console.log(users);
-      sendJSONresponse(res, 200, users);
-  });
+  console.log(req.params.community);
+  console.log("IN Community");
+
+  User.find({community: req.params.community})
+      .populate("recovery", "-salt -hash")
+      .exec( function(err, users) {
+          console.log(users);
+          sendJSONresponse(res, 200, users);
+      });
 
 }
 
@@ -172,7 +177,7 @@ module.exports.userCommunity = function(req, res) {
         if(user.community)
         {
           Community.findById(user.community)
-          .populate("communityMembers pendingMembers directors minions creator boss recovery", "-salt -hash")
+          .populate("communityMembers pendingMembers directors minions creator boss communityMembers.recovery", "-salt -hash")
           .exec( function(err, community) {
             if(err) {
               sendJSONresponse(res, 400, {});

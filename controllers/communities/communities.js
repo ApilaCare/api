@@ -266,6 +266,8 @@ module.exports.removeMember = function(req, res) {
         });
       }
 
+      //TODO: remove community from user
+
       community.save(function(err) {
         if(err) {
           sendJSONresponse(res, 404, {message: "Error updating community"});
