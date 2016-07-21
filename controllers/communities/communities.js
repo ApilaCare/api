@@ -266,17 +266,38 @@ module.exports.removeMember = function(req, res) {
         });
       }
 
-      //TODO: remove community from user
-
-      community.save(function(err) {
-        if(err) {
-          sendJSONresponse(res, 404, {message: "Error updating community"});
-        } else {
-          sendJSONresponse(res, 200, {message: "user removed"});
-        }
+      removeCommunityFromUser(res, req.params.userid, function() {
+        community.save(function(err) {
+          if(err) {
+            sendJSONresponse(res, 404, {message: "Error updating community"});
+          } else {
+            sendJSONresponse(res, 200, {message: "user removed"});
+          }
+        });
       });
+
+
     } else {
       sendJSONresponse(res, 404, {message: "Error finding community"});
+    }
+  });
+}
+
+function removeCommunityFromUser(res, userid, callback) {
+  User.findById(userid)
+  .exec(function(err, user) {
+    if(user) {
+      user.community = null;
+
+      user.save(function(err) {
+        if(err) {
+          sendJSONresponse(res, 500, {message: "Error while saving the user"});
+        } else {
+          callback();
+        }
+      })
+    } else {
+      sendJSONresponse(res, 404, {message: "User not found"});
     }
   });
 }
