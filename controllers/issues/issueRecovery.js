@@ -114,7 +114,11 @@ module.exports.confirmPassword = function(req, res) {
                 sendJSONresponse(res, 200, {"message" : true});
               });
             } else {
+              recovery.chosenMemberPasswordConfirmed = true;
 
+              recovery.save(function() {
+                sendJSONresponse(res, 200, {"message" : true});
+              });
             }
           } else {
             sendJSONresponse(res, 404, {"message" : false});
