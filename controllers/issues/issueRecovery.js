@@ -105,25 +105,36 @@ module.exports.confirmPassword = function(req, res) {
     if(user) {
       if(user.validPassword(password)) {
 
-        IssRecovery.findOne({"_id" : req.body.recoveryid}, function(err, recovery) {
-          if(recovery) {
-            if(req.body.type === "boss") {
-              recovery.bossPasswordConfirmed = true;
+        if(req.body.type === "boss") {
+          IssRecovery.findOne({"_id" : req.body.recoveryid}, function(err, recovery) {
+            if(recovery) {
 
-              recovery.save(function() {
-                sendJSONresponse(res, 200, {"message" : true});
-              });
+                recovery.bossPasswordConfirmed = true;
+                recovery.save(function() {
+                  sendJSONresponse(res, 200, {"message" : true});
+                });
+
+
             } else {
-              recovery.chosenMemberPasswordConfirmed = true;
-
-              recovery.save(function() {
-                sendJSONresponse(res, 200, {"message" : true});
-              });
+              sendJSONresponse(res, 404, {"message" : false});
             }
-          } else {
-            sendJSONresponse(res, 404, {"message" : false});
-          }
-        });
+          });
+        } else {
+
+          findRecoveryByUser(res, req.params.userid, function(recovery) {
+            recovery.chosenMemberPasswordConfirmed = true;
+            recovery.save(function() {
+
+              // both of the users have verified password
+              if(recovery.bossPasswordConfirmed === true) {
+                unlockCondifentialIssues(recovery);
+              }
+
+
+              sendJSONresponse(res, 200, {"message" : true});
+            });
+          });
+        }
 
 
       } else {
@@ -136,8 +147,18 @@ module.exports.confirmPassword = function(req, res) {
 
 }
 
-//transfer confidential issues from 1 user to another, when the user is recovered
-function switchOverIssues() {
+function findRecoveryByUser(res, userid, callback) {
+  IssRecovery.findOne({"chosenMember" : userid}, function(err, recovery) {
+    if(recovery) {
+      callback(recovery);
+    } else {
+      sendJSONresponse(res, 404, {message: "Recovery not found"});
+    }
+  });
+}
+
+// getting confidentials issues from the recovoredUser and convert it to pdf and send with email to boss
+function unlockCondifentialIssues(recovery) {
 
 }
 
