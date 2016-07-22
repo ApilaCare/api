@@ -2,6 +2,7 @@
   'use strict';
 
   var nodemailer = require('nodemailer');
+  var fs = require('fs');
 
   var config = {
     "email": process.env.EMAIL,
@@ -45,9 +46,14 @@
   module.exports.sendConfidentialIssues = function(from, to, recoveredUser, issues, callback) {
     mailOptions.from = from;
     mailOptions.to = to;
+    mailOptions.attachments = [
+      {
+            path: "confidential.pdf"
+        },
+    ];
     mailOptions.subject = "Recovered confidetial issues for " + recoveredUser;
     mailOptions.text = 'You have recovored condifential issues for member' + recoveredUser + "\n"
-                       + issues;
+                       + "In the attachment confidential.pdf you can see all the confidential issues from the user";
 
     transporter.sendMail(mailOptions, callback);
   }
