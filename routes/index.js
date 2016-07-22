@@ -115,8 +115,11 @@ router.post('/users/forgotpassowrd/:email', ctrlUsers.forgotPassword);
 router.post('/users/reset/:token', ctrlUsers.resetPassword);
 router.get('/users/community/:username', auth, ctrlUsers.userCommunity);
 router.get('/users/list/:community', auth, ctrlUsers.usersInCommunity);
+router.get('/users/getuser/:username', auth, ctrlUsers.getUser);
+
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);
+
 
 // residents
 router.get('/residents/list/:communityid', auth, ctrlResidents.residentsList);

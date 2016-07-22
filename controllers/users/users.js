@@ -165,6 +165,18 @@ module.exports.updateUsername = function(req, res) {
   });
 }
 
+module.exports.getUser = function(req, res) {
+  User.findOne({"name" : req.params.username})
+      .populate("", "-salt -hash")
+      .exec(function(err, user) {
+        if(user) {
+          sendJSONresponse(res, 200, user);
+        } else {
+          sendJSONresponse(res, 404, {message: "user not found!"});
+        }
+      });
+}
+
 module.exports.userCommunity = function(req, res) {
 
   var username = req.params.username;
