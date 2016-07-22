@@ -2,6 +2,8 @@ var mongoose = require('mongoose');
 
 var IssRecovery = mongoose.model('MemberRecover');
 var User = mongoose.model('User');
+var emailService = require('../../services/email');
+var Iss = mongoose.model('Issue');
 var Community = mongoose.model('Community');
 var _ = require('lodash');
 
@@ -148,7 +150,9 @@ module.exports.confirmPassword = function(req, res) {
 }
 
 function findRecoveryByUser(res, userid, callback) {
-  IssRecovery.findOne({"chosenMember" : userid}, function(err, recovery) {
+  IssRecovery.findOne({"chosenMember" : userid})
+   .populate("recoveredMember")
+   .exec(function(err, recovery) {
     if(recovery) {
       callback(recovery);
     } else {
@@ -159,7 +163,38 @@ function findRecoveryByUser(res, userid, callback) {
 
 // getting confidentials issues from the recovoredUser and convert it to pdf and send with email to boss
 function unlockCondifentialIssues(recovery) {
+  console.log("In unlocking process");
 
+  //getting issues
+  getConfidentialIssues(recovery.recoveredMember, function(issues) {
+
+    emailService.sendConfidentialIssues("supprot@apila.com", recovery.recoveredMember.email,
+    recovery.recoveredMember.name, issues, function(err, info) {
+
+      if(err) {
+        console.log("Unable to send confidential issue recovery email");
+      }
+
+      console.log("email sent");
+
+    });
+
+  });
+}
+
+function getConfidentialIssues(recoveredMember, callback) {
+
+ console.log(recoveredMember.name);
+
+  Iss.find({"confidential" : true, "submitBy" : recoveredMember.name},
+      function(err, issues) {
+        if(issues) {
+          callback(issues);
+        } else {
+          console.log("Error while finding issues");
+        }
+
+      });
 }
 
 // given a user id and the chosenUser, it set's the user with a reference to it's chosenUser

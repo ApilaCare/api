@@ -42,4 +42,14 @@
     transporter.sendMail(mailOptions, callback);
   }
 
+  module.exports.sendConfidentialIssues = function(from, to, recoveredUser, issues, callback) {
+    mailOptions.from = from;
+    mailOptions.to = to;
+    mailOptions.subject = "Recovered confidetial issues for " + recoveredUser;
+    mailOptions.text = 'You have recovored condifential issues for member' + recoveredUser + "\n"
+                       + issues;
+
+    transporter.sendMail(mailOptions, callback);
+  }
+
 })();
