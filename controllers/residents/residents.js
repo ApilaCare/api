@@ -62,7 +62,6 @@ module.exports.getAverageAge = function(req, res) {
     } else {
       sendJSONresponse(res, 404, {message: "Residents not found"});
     }
-
   });
 }
 

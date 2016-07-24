@@ -190,7 +190,8 @@ function unlockCondifentialIssues(recovery) {
 
     var attachement = createPdf(issues);
 
-    emailService.sendConfidentialIssues("supprot@apila.com", recovery.recoveredMember.email,
+    /*
+    emailService.sendConfidentialIssues("support@apila.care", recovery.recoveredMember.email,
     recovery.recoveredMember.name, issues, function(err, info) {
 
       if(err) {
@@ -200,6 +201,7 @@ function unlockCondifentialIssues(recovery) {
       console.log("email sent");
 
     });
+    */
 
   });
 }
