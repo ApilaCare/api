@@ -40,5 +40,21 @@
     });
   }
 
+  exports.subscribeToPlan = function(userid) {
+
+  }
+
+  exports.createPlan = function() {
+    stripe.plans.create({
+      amount: constants.MONTHLY_CHARGE,
+      interval: "month",
+      name: "standard",
+      currency: "usd",
+      id: "gold"
+    }, function(err, plan) {
+      console.log(plan);
+    });
+  }
+
 
 })();
