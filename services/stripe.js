@@ -3,6 +3,8 @@
 
   var stripe = require('stripe')(process.env.STRIPE_KEY);
 
+  var constants = require('./constants');
+
   //save credit card info
   exports.saveCreditCard = function(stripeToken, email, callback) {
 
