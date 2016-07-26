@@ -20,7 +20,8 @@ var userSchema = new mongoose.Schema({
     hash: String,
     salt: String,
     resetPasswordToken: String,
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
+    stripeCustomer: {type: String}
 });
 
 userSchema.methods.setPassword = function(password) {

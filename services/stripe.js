@@ -1,19 +1,21 @@
 (function() {
   'use strict';
 
-  var stripe = require('stripe')('pk_test_PDxs7SyxPARytJkKUeS6NOS8');
+  var stripe = require('stripe')(process.env.STRIPE_KEY);
 
   //save credit card info
   exports.saveCreditCard = function(stripeToken, email, callback) {
-    stripe.customer.create({
+
+    stripe.customers.create({
       source: stripeToken,
       description: email
     }).then(function(customer) {
       console.log(customer);
-      callback(true);
+      callback(true, customer.id);
 
     }).catch(function(customer) {
       console.log("Error while saving the credit card");
+      console.log(customer);
       callback(false);
     });
 
