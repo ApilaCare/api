@@ -229,6 +229,8 @@ module.exports.issuesUpdateOne = function(req, res) {
         return;
     }
 
+    console.log("UPDATE");
+
     var updateInfo = {
         "updateBy": req.body.modifiedBy,
         "updateDate": req.body.modifiedDate,

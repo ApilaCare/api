@@ -113,7 +113,7 @@ var doAddChecklist = function(req, res, issue, username) {
 
 module.exports.issueChecklistsUpdateOne = function(req, res) {
 
-//  console.log(req.body);
+  console.log("1");
 
     if (!req.params.issueid || !req.params.checklistid) {
         sendJSONresponse(res, 404, {
@@ -123,7 +123,6 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
     }
     Iss
         .findById(req.params.issueid)
-        .select('checklists')
         .exec(
             function(err, issue) {
 
@@ -151,7 +150,10 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
                         thisChecklist.checkItems = req.body.checkItems;
                         thisChecklist.checkItemsChecked = req.body.checkItemsChecked;
 
-                        console.log(req.body);
+
+                        if(req.body.updateInfo) {
+                          issue.updateInfo.push(req.body.updateInfo);
+                        }
 
                         // other update items
                         issue.save(function(err, issue) {
