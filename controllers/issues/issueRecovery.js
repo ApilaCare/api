@@ -27,7 +27,7 @@ module.exports.createMemberRecovery = function(req, res) {
     }
 
     //before creating check if the recovery for this user is already started
-    IssRecovery.findOne({"recoveredMember" : recoveredMember}, function(err, recovery) {
+    IssRecovery.findOne({"recoveredMember" : recoveredMember, active : true}, function(err, recovery) {
       if(recovery) {
         sendJSONresponse(res, 404, {message: "Already in recovery process"});
       } else {
@@ -115,6 +115,7 @@ module.exports.confirmPassword = function(req, res) {
             if(recovery) {
 
                 recovery.bossPasswordConfirmed = true;
+                recovery.active = true;
                 recovery.save(function() {
                   sendJSONresponse(res, 200, {"message" : true});
                 });

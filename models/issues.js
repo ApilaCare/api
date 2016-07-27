@@ -38,7 +38,8 @@ var memberRecoverSchema =  new mongoose.Schema({
     recoveredMember: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}, // the member we are recovering
     bossPasswordConfirmed: {type: Boolean}, // is the boss password submited and matching
     chosenMemberPasswordConfirmed: {type: Boolean}, // is the random member password submited and matching
-    submitDate: {type: Date, default: Date.now} // the date when the recovery started
+    submitDate: {type: Date, default: Date.now}, // the date when the recovery started
+    active: {type: Boolean, default: false} // recovery is active when the boss confirms the password
 });
 
 var issueSchema = new mongoose.Schema({
