@@ -40,20 +40,61 @@
     });
   }
 
-  exports.subscribeToPlan = function(userid) {
-
+  // gets customers stripe id and subscrips him to out standard plan
+  exports.subscribeToPlan = function(customerid, callback) {
+    stripe.subscriptions.create({
+      customer: customerid,
+      plan: constants.STANDARD_PLAN_ID
+    }, function(err, subscription) {
+        if(err) {
+          callback(null);
+        } else {
+          callback(subscription);
+        }
+      }
+    );
   }
 
-  exports.createPlan = function() {
-    stripe.plans.create({
-      amount: constants.MONTHLY_CHARGE,
-      interval: "month",
-      name: "standard",
-      currency: "usd",
-      id: "gold"
-    }, function(err, plan) {
-      console.log(plan);
-    });
+  // returns standard plan information
+  exports.getStandardPlan = function(callback) {
+    stripe.plans.retrieve(
+      constants.STANDARD_PLAN_ID,
+      function(err, plan) {
+        if(!err) {
+          callback(plan);
+        } else {
+          callback(null);
+        }
+      }
+    );
+  }
+
+  // returns subscription information
+  exports.getSubscription = function(subscription, callback) {
+    stripe.subscriptions.retrieve(
+      subscription,
+      function(err, subscription) {
+        if(!err) {
+          callback(subscription);
+        } else {
+          callback(null);
+        }
+      }
+    );
+  }
+
+  // cancels the description
+  exports.calncelSubscription = function(subscription, callback) {
+    stripe.subscriptions.del(
+      subscription,
+      function(err, confirmation) {
+        if(!err) {
+          callback(confirmation);
+        } else {
+          callback(null);
+        }
+      }
+    );
   }
 
 
