@@ -356,6 +356,48 @@ var getAuthor = function(req, res, callback) {
     }
 };
 
+
+module.exports.doCreateCommunity = function(communityInfo, callback) {
+
+  var members = [];
+  members.push(communityInfo.creator);
+
+  Community.create({
+      name : communityInfo.name,
+      communityMembers : members,
+      pendingMembers : [],
+      creator : communityInfo.creator,
+      boss : communityInfo.creator,
+      testCommunity : true
+
+  }, function(err, community) {
+
+      if (err) {
+          console.log(err);
+          callback(false);
+      } else {
+
+        User.findById(communityInfo.creator)
+        .exec(function(err, user) {
+          if(user) {
+            user.community = community._id;
+
+            user.save(function(err) {
+              if(err) {
+                callback(false);
+              } else {
+                callback(true);
+              }
+            })
+          } else {
+            callback(false);
+          }
+        });
+
+      }
+  });
+}
+
 function addUserToCommunity(req, res, community) {
   var username = req.body.username;
 
