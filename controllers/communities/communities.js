@@ -65,7 +65,7 @@ module.exports.addRole = function(req, res) {
 }
 
 module.exports.communitiesList = function(req, res) {
-    Community.find({}, function(err, communities) {
+    Community.find({"testCommunity" : false}, function(err, communities) {
         console.log(communities);
         sendJSONresponse(res, 200, communities);
     });
