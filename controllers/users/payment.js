@@ -75,6 +75,24 @@ module.exports.getCustomer = function(req, res) {
   });
 }
 
+module.exports.cancelSubscription = function(req, res) {
+  var userid = req.params.userid;
+
+  User.findById(userid).exec(function(err, user) {
+    if(user) {
+      stripeService.cancelSubscription(user.stripeSubscription, function(confirmation) {
+        if(confirmation) {
+          sendJSONresponse(res, 200, confirmation);
+        } else {
+          sendJSONresponse(res, 404, {message: "Error while canceling stripe subscription"});
+        }
+      })
+    } else {
+      sendJSONresponse(res, 404, {message: "Error while finding user"});
+    }
+  });
+}
+
 // get's full plans info for the default standard plan
 module.exports.standardPlan = function(req, res) {
   stripeService.getStandardPlan(function(plan) {

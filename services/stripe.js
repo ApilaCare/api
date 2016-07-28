@@ -98,7 +98,7 @@
   }
 
   // cancels the description
-  exports.calncelSubscription = function(subscription, callback) {
+  exports.cancelSubscription = function(subscription, callback) {
     stripe.subscriptions.del(
       subscription,
       function(err, confirmation) {
