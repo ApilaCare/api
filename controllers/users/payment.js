@@ -23,7 +23,7 @@ module.exports.saveCreditCard = function(req, res) {
 
           stripeService.subscribeToPlan(id, function(subscription) {
             if(subscription) {
-              
+
               user.stripeSubscription = subscription.id;
 
               user.save(function(err) {
@@ -48,6 +48,30 @@ module.exports.saveCreditCard = function(req, res) {
     } else {
       sendJSONresponse(res, 404, {message: "Couldn't find the user"});
     }
+  });
+}
+
+module.exports.getCustomer = function(req, res) {
+  var user = req.params.userid;
+
+  User.findById(user).exec(function(err, user) {
+    if(user) {
+      if(user.stripeCustomer) {
+        stripeService.getCustomer(user.stripeCustomer, function(status, customer) {
+          if(status) {
+            sendJSONresponse(res, 200, {status: true, "customer" : customer});
+          } else {
+            sendJSONresponse(res, 404, {status: false});
+          }
+        });
+      } else {
+
+      }
+
+    } else {
+      sendJSONresponse(res, 404, {message: "Error while finding user"});
+    }
+
   });
 }
 

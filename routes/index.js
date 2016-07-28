@@ -119,6 +119,7 @@ router.get('/users/list/:community', auth, ctrlUsers.usersInCommunity);
 router.get('/users/getuser/:username', auth, ctrlUsers.getUser);
 
 router.post('/users/:userid/savecard', auth, ctrlPayment.saveCreditCard);
+router.get('/users/:userid/customer', auth, ctrlPayment.getCustomer);
 
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);

@@ -23,6 +23,20 @@
 
   }
 
+  exports.getCustomer = function(customer, callback) {
+    stripe.customers.retrieve(
+      customer,
+      function(err, customer) {
+        if(err) {
+          callback(false, customer);
+        } else {
+          callback(true, customer);
+        }
+      }
+    );
+  }
+
+
   //given the stripes customerId, charge the user, specify amout in cents
   exports.chargeUser = function(customerId, amount, callback) {
     stripe.charges.create({
