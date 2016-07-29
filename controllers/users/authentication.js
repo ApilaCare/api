@@ -23,7 +23,7 @@ module.exports.register = function(req, res) {
     var user = new User();
 
     user.name = req.body.name;
-    user.email = req.body.email;
+    user.email = req.body.email.toLowerCase();
 
     // use setPassword method to set salt and hash
     user.setPassword(req.body.password);
@@ -69,6 +69,8 @@ module.exports.login = function(req, res) {
     }
 
     console.log(req.body);
+
+    req.body.email = req.body.email.toLowerCase();
 
     // pass name of strategy and a callback to authenticate method
     passport.authenticate('local', function(err, user, info) {

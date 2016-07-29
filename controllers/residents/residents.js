@@ -50,11 +50,8 @@ module.exports.getAverageAge = function(req, res) {
     if(residents) {
       var averageAge = 0;
 
-      console.log("residents: " + residents.length);
-
       for(var i = 0; i < residents.length; ++i) {
         var age = moment().diff(residents[i].birthDate, "years");
-        console.log("Age: " + age);
         averageAge += age;
       }
 
