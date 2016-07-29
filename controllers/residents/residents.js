@@ -44,11 +44,13 @@ module.exports.residentsList = function(req, res) {
 };
 
 module.exports.getAverageAge = function(req, res) {
-  Resid.find({"buildingStatus" : "In the Building",
+  Resid.find({"buildingStatus" : "In Building",
               "community" : req.params.communityid},
   function(err, residents) {
     if(residents) {
       var averageAge = 0;
+
+      console.log("residents: " + residents.length);
 
       for(var i = 0; i < residents.length; ++i) {
         var age = moment().diff(residents[i].birthDate, "years");
