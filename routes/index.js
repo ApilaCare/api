@@ -135,5 +135,6 @@ router.put('/residents/update/:residentid', auth, ctrlResidents.residentsUpdateO
 router.delete('/residents/:residentid', auth, ctrlResidents.residentsDeleteOne);
 router.post('/residents/new', auth, ctrlResidents.residentsCreate);
 router.get('/residents/average_age/:communityid', auth, ctrlResidents.getAverageAge);
+router.get('/residents/average_stay/:communityid', auth, ctrlResidents.averageStayTime);
 
 module.exports = router;

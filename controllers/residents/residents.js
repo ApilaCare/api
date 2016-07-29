@@ -64,6 +64,27 @@ module.exports.getAverageAge = function(req, res) {
   });
 }
 
+module.exports.averageStayTime = function(req, res) {
+  Resid.find({"buildingStatus" : "In Building",
+              "community" : req.params.communityid},
+  function(err, residents) {
+    if(residents) {
+      var averageStay = 0;
+
+      for(var i = 0; i < residents.length; ++i) {
+        var stay = moment().diff(residents[i].admissionDate, "days");
+        averageStay += stay;
+      }
+
+      averageStay = averageStay / residents.length;
+
+      sendJSONresponse(res, 200, averageStay);
+    } else {
+      sendJSONresponse(res, 404, {message: "Residents not found"});
+    }
+  });
+}
+
 
 module.exports.residentsCount = function(req, res) {
 
