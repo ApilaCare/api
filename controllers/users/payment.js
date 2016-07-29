@@ -51,6 +51,25 @@ module.exports.saveCreditCard = function(req, res) {
   });
 }
 
+module.exports.updateCustomer = function(req, res) {
+  var userid = req.params.userid;
+  var token = req.body.id;
+
+  User.findById(userid).exec(function(err, user) {
+    if(user) {
+      stripeService.updateCustomer(user.stripeCustomer, token, function(customer) {
+        if(customer) {
+          sendJSONresponse(res, 200, {"status" : true, "customer" : customer});
+        } else {
+          sendJSONresponse(res, 404, {"status" : false});
+        }
+      });
+    } else {
+      sendJSONresponse(res, 404, {message: "Couldn't find the user"});
+    }
+  });
+}
+
 module.exports.getCustomer = function(req, res) {
   var user = req.params.userid;
 

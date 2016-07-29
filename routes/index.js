@@ -121,6 +121,7 @@ router.get('/users/getuser/:username', auth, ctrlUsers.getUser);
 router.post('/users/:userid/savecard', auth, ctrlPayment.saveCreditCard);
 router.get('/users/:userid/customer', auth, ctrlPayment.getCustomer);
 router.delete('/users/:userid/subscription', auth, ctrlPayment.cancelSubscription);
+router.put('/users/:userid/update', auth, ctrlPayment.updateCustomer);
 
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);

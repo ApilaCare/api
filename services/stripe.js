@@ -111,5 +111,17 @@
     );
   }
 
+  exports.updateCustomer = function(customerid, token, callback) {
+    stripe.customers.update(customerid, {
+      "source" : token
+    }, function(err, customer) {
+        if(err) {
+          callback(null);
+        } else {
+          callback(customer);
+        }
+    });
+  }
+
 
 })();
