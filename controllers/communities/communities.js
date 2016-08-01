@@ -155,6 +155,8 @@ module.exports.acceptMember = function(req, res) {
           //set the data in the user also
           User.findById(req.body.member, function(err, user) {
 
+              // set the old community as a previous community before we change it
+              user.prevCommunity = user.community;
               user.community = community._id;
               user.save();
 
@@ -405,6 +407,7 @@ function addUserToCommunity(req, res, community) {
   User
   .findOne({"name":username})
   .exec(function(err, u) {
+    u.prevCommunity = u.community;
     u.community = community._id;
 
     community.communityMembers.push(u._id);

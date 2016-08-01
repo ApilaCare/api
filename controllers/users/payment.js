@@ -1,8 +1,11 @@
 var mongoose = require('mongoose');
 
 var User = mongoose.model('User');
+var Community = mongoose.model('Community');
+var async = require('async');
 
 var stripeService = require('../../services/stripe');
+
 
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
@@ -99,13 +102,22 @@ module.exports.cancelSubscription = function(req, res) {
 
   User.findById(userid).exec(function(err, user) {
     if(user) {
-      stripeService.cancelSubscription(user.stripeSubscription, function(confirmation) {
-        if(confirmation) {
-          sendJSONresponse(res, 200, confirmation);
-        } else {
-          sendJSONresponse(res, 404, {message: "Error while canceling stripe subscription"});
-        }
-      })
+      // stripeService.cancelSubscription(user.stripeSubscription, function(confirmation) {
+      //   if(confirmation) {
+
+          //revert all the members of the users community to their test community
+          revertToTestCommunity(res, user.community, function(status) {
+            if(status) {
+              sendJSONresponse(res, 200, status);
+            } else {
+              sendJSONresponse(res, 404, {message: "Unable to revert users to test community"});
+            }
+          });
+
+      //   } else {
+      //     sendJSONresponse(res, 404, {message: "Error while canceling stripe subscription"});
+      //   }
+      // })
     } else {
       sendJSONresponse(res, 404, {message: "Error while finding user"});
     }
@@ -120,6 +132,42 @@ module.exports.standardPlan = function(req, res) {
       sendJSONresponse(res, 200, plan);
     } else {
       sendJSONresponse(res, 404, {message : "Standard plan not found"});
+    }
+  });
+}
+
+// HELPER FUNCTIONS
+
+function revertToTestCommunity(res, communityid, callback) {
+
+  console.log(communityid);
+
+  User.find({"community" : communityid})
+  .exec(function(err, users) {
+    if(users) {
+
+      console.log(users);
+      async.each(users, function(user, cont) {
+        user.community = user.prevCommunity;
+        user.prevCommunity = communityid;
+
+        console.log("In async for each");
+
+        user.save(function(err) {
+          if(err) {
+            cont(false);
+          } else {
+              console.log('Saving users');
+            cont();
+
+          }
+        });
+      }, function(err) {
+        console.log("we are finished" + err);
+        callback(true);
+      });
+    } else {
+      sendJSONresponse(res, 404, {message: "Error while finding users in community"});
     }
   });
 }
