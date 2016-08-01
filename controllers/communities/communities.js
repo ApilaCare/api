@@ -273,7 +273,7 @@ module.exports.removeMember = function(req, res) {
           if(err) {
             sendJSONresponse(res, 404, {message: "Error updating community"});
           } else {
-            sendJSONresponse(res, 200, {message: "user removed"});
+            sendJSONresponse(res, 200, {message: "User removed"});
           }
         });
       });
@@ -281,6 +281,19 @@ module.exports.removeMember = function(req, res) {
 
     } else {
       sendJSONresponse(res, 404, {message: "Error finding community"});
+    }
+  });
+}
+
+// we are counting that their will be only one community to restore
+module.exports.hasCanceledCommunity = function(req, res) {
+  Community.findOne({"testCommunity" : false, "creator" : req.params.userid})
+  .exec(function(err, community) {
+    if(community) {
+      console.log(community);
+      sendJSONresponse(res, 200, community);
+    } else {
+      sendJSONresponse(res, 404, {message: "Error while finding user"});
     }
   });
 }
