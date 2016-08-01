@@ -102,8 +102,8 @@ module.exports.cancelSubscription = function(req, res) {
 
   User.findById(userid).exec(function(err, user) {
     if(user) {
-      // stripeService.cancelSubscription(user.stripeSubscription, function(confirmation) {
-      //   if(confirmation) {
+      stripeService.cancelSubscription(user.stripeSubscription, function(confirmation) {
+        if(confirmation) {
 
           //revert all the members of the users community to their test community
           revertToTestCommunity(res, user.community, function(status) {
@@ -114,10 +114,10 @@ module.exports.cancelSubscription = function(req, res) {
             }
           });
 
-      //   } else {
-      //     sendJSONresponse(res, 404, {message: "Error while canceling stripe subscription"});
-      //   }
-      // })
+        } else {
+          sendJSONresponse(res, 404, {message: "Error while canceling stripe subscription"});
+        }
+      });
     } else {
       sendJSONresponse(res, 404, {message: "Error while finding user"});
     }

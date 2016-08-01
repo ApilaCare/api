@@ -2,6 +2,8 @@ var mongoose = require('mongoose');
 var Community = mongoose.model('Community');
 var User = mongoose.model('User');
 
+var async = require('async');
+
 var sendJSONresponse = function(res, status, content) {
     res.status(status);
     res.json(content);
@@ -371,6 +373,36 @@ var getAuthor = function(req, res, callback) {
     }
 };
 
+
+module.exports.restoreCommunity = function(req, res) {
+
+ var communityid = req.params.communityid;
+
+  User.find({"community" : communityid})
+  .exec(function(err, users) {
+    if(users) {
+
+      console.log(users);
+      async.each(users, function(user, cont) {
+        user.community = user.prevCommunity;
+        user.prevCommunity = communityid;
+
+        user.save(function(err) {
+          if(err) {
+            cont(false);
+          } else {
+            cont();
+
+          }
+        });
+      }, function(err) {
+        sendJSONresponse(res, 200, {"status" : true});
+      });
+    } else {
+      sendJSONresponse(res, 404, {message: "Error while finding users in community"});
+    }
+  });
+}
 
 module.exports.doCreateCommunity = function(communityInfo, callback) {
 

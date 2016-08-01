@@ -45,6 +45,7 @@ router.get('/communities/', auth, ctrlCommunities.communitiesList);
 router.get('/communites/canceled/:userid', auth, ctrlCommunities.hasCanceledCommunity);
 router.post('/communities/new', ctrlCommunities.communitiesCreate);
 router.post('/communites/:communityid/role/:userid', auth, ctrlCommunities.addRole);
+router.post('/communites/:communityid/restore/:userid', auth, ctrlCommunities.restoreCommunity);
 router.put('/communities/accept/:communityid/', auth, ctrlCommunities.acceptMember);
 router.put('/communities/decline/:communityid/', auth, ctrlCommunities.declineMember);
 router.put('/communities/pending/:communityid/', auth, ctrlCommunities.addPendingMember);
