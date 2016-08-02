@@ -1,0 +1,11 @@
+[
+{
+  "_id"       : "57a07403645d72411989a4424",
+  "email"     : "test1@gmail.com",
+  "name"      : "Test1",
+  "hash"      : "4a30f377a01e03882d8fdb76f3ddc5942441c82e4330c078a41b2b2aaa366a071a54ee985b4d9832b2ce261fd975dfe512d79e2ea9a6c8c471a0984340cd9146",
+  "salt"      : "be4936d5d42954dcb9f22493144e7810",
+  "community" : "com07403645d72411989a4434",
+  "__v"       : 0
+}
+]

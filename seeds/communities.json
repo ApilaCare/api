@@ -1,0 +1,12 @@
+[
+  {
+    "_id"                : "com07403645d72411989a4434",
+    "name"               : "Test",
+    "communityMembers"   : ["57a07403645d72411989a4424"],
+    "pendingMembers"     : [],
+    "creator"            : "57a07403645d72411989a4424",
+    "boss"               : "57a07403645d72411989a4424",
+    "testCommunity"      : true,
+    "__v"                : 0
+  }
+]
