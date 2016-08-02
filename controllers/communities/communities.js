@@ -378,7 +378,7 @@ module.exports.restoreCommunity = function(req, res) {
 
  var communityid = req.params.communityid;
 
-  User.find({"community" : communityid})
+  User.find({"prevCommunity" : communityid})
   .exec(function(err, users) {
     if(users) {
 
