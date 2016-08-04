@@ -21,6 +21,8 @@ mongoose.connection.on('connected', function() {
         });
       }
 
+      //TODO: wait for the loop to finish
+
 });
 
 // create dummy user

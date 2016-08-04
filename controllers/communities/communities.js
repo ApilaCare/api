@@ -42,7 +42,8 @@ module.exports.addRole = function(req, res) {
 
       if(req.body.type === "boss") {
         communites.boss = req.params.userid;
-        console.log(communites.boss);
+        communites.minions.pull(req.params.userid);
+        communites.directors.pull(req.params.userid);
       } else if(req.body.type === "directors") {
         communites.directors.push(req.params.userid);
         communites.minions.pull(req.params.userid);
