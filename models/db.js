@@ -7,6 +7,10 @@ if (process.env.NODE_ENV === 'production') {
     dbURI = process.env.MONGODB_URI;
 }
 
+if(process.env.NODE_ENV === 'test') {
+  dbURI = "mongodb://localhost/apila_test";
+}
+
 mongoose.connect(dbURI);
 
 // CONNECTION EVENTS
