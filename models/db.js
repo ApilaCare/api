@@ -15,6 +15,9 @@ mongoose.connect(dbURI);
 
 // CONNECTION EVENTS
 mongoose.connection.on('connected', function() {
+    if(process.env.NODE_ENV === 'test') {
+      mongoose.connection.db.dropDatabase();
+    }
     console.log('Mongoose connected to ' + dbURI);
 });
 mongoose.connection.on('error', function(err) {
