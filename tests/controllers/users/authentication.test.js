@@ -1,5 +1,4 @@
 var utils = require('../../utils');
-var assert = require('assert');
 var faker = require('faker');
 
 var userAuth = require('../../../controllers/users/authentication');
