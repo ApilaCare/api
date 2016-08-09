@@ -1,7 +1,10 @@
 var mongoose = require('mongoose');
 
+process.env.NODE_ENV = "test";
+
 require('../models/users');
 require('../models/community');
+require('../apila');
 
 before(function(done) {
 

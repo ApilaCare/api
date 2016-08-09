@@ -68,8 +68,6 @@ module.exports.login = function(req, res) {
         return;
     }
 
-    console.log(req.body);
-
     req.body.email = req.body.email.toLowerCase();
 
     // pass name of strategy and a callback to authenticate method
@@ -83,7 +81,6 @@ module.exports.login = function(req, res) {
         // if Passport returned a user instance, generate and send a JWT (json web token)
         if (user) {
             token = user.generateJwt();
-            console.log(token);
 
             sendJSONresponse(res, 200, {
                 "token": token
