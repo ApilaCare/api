@@ -19,6 +19,7 @@ var residentSchema = new mongoose.Schema({
       longitude: {type: Number},
       latitude: {type: Number}
     },
+    administrativeNotes: {type: String},
     updateInfo: [mongoose.Schema.Types.Mixed],
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},
@@ -38,6 +39,7 @@ var residentSchema = new mongoose.Schema({
     frequencyOfBathing: {type: String}, // 1 per week, twice a week, everyday, outside agency
     acceptanceOfBathing: {type: String}, // likes, dislikes
       dislikesBathingDescribe: {type: String}, // if dislikes is selected | open field
+    bathingNotes: {type: String},
 
     // mobility information
     insideApartment: {
@@ -54,12 +56,14 @@ var residentSchema = new mongoose.Schema({
     fallRisk: {type: Boolean, default: false},
       fallRiskDescribe: {type: String}, // if yes is selected | physical limitations, modication challenges, cognition, choice
     bedReposition: {type: Boolean, default: false},
+    mobilityNotes: {type: String},
 
     // allergy information
     hasFoodAllergies: {type: Boolean, default: false},
       foodAllergies: [String], // if yes is selected
     hasMedicationAllergies: {type: Boolean, default: false},
       medicationAllergies: [String], // if yes is selected
+    allergyNotes: {type: String},
 
     // sleep information
     usualBedtime: {type: String}, // early evening, late evening, other
@@ -69,6 +73,7 @@ var residentSchema = new mongoose.Schema({
     assistanceToBed: {type: String}, // medication, positioning, pillows, drink, alcohol, hot tea, warm milk
     sleepsThroughNight: {type: Boolean, default: false},
       canCallForAssistance: {type: Boolean, default: false}, // if no | pop up for regular checks
+    sleepNotes: {type: String},
 
 
     // continent information
@@ -80,6 +85,7 @@ var residentSchema = new mongoose.Schema({
     catheter: {type: Boolean, default: false}, // always, sometimes, never
       catheterDescribe: {type: String}, // if yes | open field
     toiletingDevice: {type: String}, // urnal, seat riser, bedside comod, none
+    continentNotes: {type: String},
 
     // nutrition information
     overallNutrition: {type: String}, // good, poor
@@ -94,6 +100,7 @@ var residentSchema = new mongoose.Schema({
     foodLikes: [String],
     foodDislikes: [String],
     fingerFoods: {type: Boolean, default: false},
+    nutritionNotes: {type: String},
 
     // physical condition information
     skinCondition: {type: String}, // hydrated, dry
@@ -121,6 +128,7 @@ var residentSchema = new mongoose.Schema({
       lowerDentureFitDescribe: {type: String}, // if no | open field
     lowerTeeth: {type: String}, // Has own, Has dentures, has partial
     teethCondition: {type: String}, // poor, fair, good, excellent
+    physicalNotes: {type: String},
 
     // psychosocial information
     psychosocialStatus: [String], // check all that apply: alert, friendly, disoriented, withdrawn, lonely, happy, confused, uncooperative
@@ -148,6 +156,7 @@ var residentSchema = new mongoose.Schema({
     useFitnessEquipmentIndependently: {type: Boolean, default: false},
     familyInvolvement: {type: String}, // none, some, frequent
     highMaintenance: {type: Boolean, default: false},
+    psychosocialNotes: {type: String},
 
     // pain information
     hasPain: {type: Boolean, default: false},
@@ -158,6 +167,7 @@ var residentSchema = new mongoose.Schema({
       painDecreasedBy: {type: String}, // if yes |
       painManagedBy: {type: String}, // medication, hot pack, cold pack, positioning, topicals
       painLength: {type: String}, // new onset, chronic
+    painNotes: {type: String},
 
     // vitals information
     temperature: [vitalsInfoSchema],
