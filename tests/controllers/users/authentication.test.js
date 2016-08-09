@@ -1,12 +1,8 @@
-require('../../utils');
+var utils = require('../../utils');
 var assert = require('assert');
-var supertest = require('supertest');
 var faker = require('faker');
 
-//var dbModels = require('../../../models/db');
 var userAuth = require('../../../controllers/users/authentication');
-
-var server = supertest.agent("http://localhost:3300");
 
 describe('Authentication', function() {
 
@@ -22,7 +18,7 @@ describe('Authentication', function() {
     };
 
 
-    server
+    utils.server
       .post('/api/register')
       .set('Accept', 'application/json')
       .send(userData)
@@ -51,7 +47,7 @@ describe('Authentication', function() {
     };
 
     it("Test if register with alredy existing email fails", function(done) {
-      server
+      utils.server
         .post('/api/register')
         .set('Accept', 'application/json')
         .send(userData)
@@ -68,7 +64,7 @@ describe('Authentication', function() {
 
   describe("#login", function() {
     it("Test if login of the user works", function(done) {
-      server
+      utils.server
         .post('/api/login')
         .set('Accept', 'application/json')
         .send(currentUser)
