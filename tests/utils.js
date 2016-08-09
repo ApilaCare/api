@@ -51,6 +51,5 @@ function getTestUser() {
   return testUser;
 }
 
-
 exports.server = server;
 exports.getTestUser = getTestUser;

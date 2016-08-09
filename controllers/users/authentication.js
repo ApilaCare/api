@@ -5,6 +5,7 @@ var User = mongoose.model('User');
 var communityCtrl = require('../communities/communities');
 var utils = require('../../services/utils');
 
+// POST /register - User registration
 module.exports.register = function(req, res) {
 
     // respond with an error status if not al required fields are found
@@ -55,6 +56,7 @@ module.exports.register = function(req, res) {
 
 };
 
+// POST /login - User login
 module.exports.login = function(req, res) {
     // validate that required fields have been supplied
     if (!req.body.email || !req.body.password) {

@@ -1,3 +1,4 @@
+var utils = require('../../services/utils');
 var mongoose = require('mongoose');
 
 var User = mongoose.model('User');
@@ -5,12 +6,6 @@ var Community = mongoose.model('Community');
 var async = require('async');
 
 var stripeService = require('../../services/stripe');
-
-
-var sendJSONresponse = function(res, status, content) {
-    res.status(status);
-    res.json(content);
-};
 
 
 module.exports.saveCreditCard = function(req, res) {
@@ -31,25 +26,25 @@ module.exports.saveCreditCard = function(req, res) {
 
               user.save(function(err) {
                 if(err) {
-                  sendJSONresponse(res, 404, {message: "Error while saving user"});
+                   utils.sendJSONresponse(res, 404, {message: "Error while saving user"});
                 } else {
-                  sendJSONresponse(res, 200, {status: true});
+                   utils.sendJSONresponse(res, 200, {status: true});
                 }
               });
 
             } else {
-              sendJSONresponse(res, 404, {message: "Error while creating user stripe subscription"});
+               utils.sendJSONresponse(res, 404, {message: "Error while creating user stripe subscription"});
             }
           });
 
         } else {
-          sendJSONresponse(res, 404, {message: "Error while saving user card with stripe"});
+           utils.sendJSONresponse(res, 404, {message: "Error while saving user card with stripe"});
         }
       });
 
 
     } else {
-      sendJSONresponse(res, 404, {message: "Couldn't find the user"});
+       utils.sendJSONresponse(res, 404, {message: "Couldn't find the user"});
     }
   });
 }
@@ -62,13 +57,13 @@ module.exports.updateCustomer = function(req, res) {
     if(user) {
       stripeService.updateCustomer(user.stripeCustomer, token, function(customer) {
         if(customer) {
-          sendJSONresponse(res, 200, {"status" : true, "customer" : customer});
+           utils.sendJSONresponse(res, 200, {"status" : true, "customer" : customer});
         } else {
-          sendJSONresponse(res, 404, {"status" : false});
+           utils.sendJSONresponse(res, 404, {"status" : false});
         }
       });
     } else {
-      sendJSONresponse(res, 404, {message: "Couldn't find the user"});
+       utils.sendJSONresponse(res, 404, {message: "Couldn't find the user"});
     }
   });
 }
@@ -81,9 +76,9 @@ module.exports.getCustomer = function(req, res) {
       if(user.stripeCustomer) {
         stripeService.getCustomer(user.stripeCustomer, function(status, customer) {
           if(status) {
-            sendJSONresponse(res, 200, {status: true, "customer" : customer});
+             utils.sendJSONresponse(res, 200, {status: true, "customer" : customer});
           } else {
-            sendJSONresponse(res, 404, {status: false});
+             utils.sendJSONresponse(res, 404, {status: false});
           }
         });
       } else {
@@ -91,7 +86,7 @@ module.exports.getCustomer = function(req, res) {
       }
 
     } else {
-      sendJSONresponse(res, 404, {message: "Error while finding user"});
+       utils.sendJSONresponse(res, 404, {message: "Error while finding user"});
     }
 
   });
@@ -108,18 +103,18 @@ module.exports.cancelSubscription = function(req, res) {
           //revert all the members of the users community to their test community
           revertToTestCommunity(res, user.community, function(status) {
             if(status) {
-              sendJSONresponse(res, 200, status);
+               utils.sendJSONresponse(res, 200, status);
             } else {
-              sendJSONresponse(res, 404, {message: "Unable to revert users to test community"});
+               utils.sendJSONresponse(res, 404, {message: "Unable to revert users to test community"});
             }
           });
 
         } else {
-          sendJSONresponse(res, 404, {message: "Error while canceling stripe subscription"});
+           utils.sendJSONresponse(res, 404, {message: "Error while canceling stripe subscription"});
         }
       });
     } else {
-      sendJSONresponse(res, 404, {message: "Error while finding user"});
+       utils.sendJSONresponse(res, 404, {message: "Error while finding user"});
     }
   });
 }
@@ -129,9 +124,9 @@ module.exports.standardPlan = function(req, res) {
   stripeService.getStandardPlan(function(plan) {
     if(plan !== null) {
       console.log(plan);
-      sendJSONresponse(res, 200, plan);
+       utils.sendJSONresponse(res, 200, plan);
     } else {
-      sendJSONresponse(res, 404, {message : "Standard plan not found"});
+       utils.sendJSONresponse(res, 404, {message : "Standard plan not found"});
     }
   });
 }
@@ -167,7 +162,7 @@ function revertToTestCommunity(res, communityid, callback) {
         callback(true);
       });
     } else {
-      sendJSONresponse(res, 404, {message: "Error while finding users in community"});
+       utils.sendJSONresponse(res, 404, {message: "Error while finding users in community"});
     }
   });
 }

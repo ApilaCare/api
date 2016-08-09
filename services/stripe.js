@@ -12,12 +12,9 @@
       source: stripeToken,
       description: email
     }).then(function(customer) {
-      console.log(customer);
       callback(true, customer.id);
 
     }).catch(function(customer) {
-      console.log("Error while saving the credit card");
-      console.log(customer);
       callback(false);
     });
 
