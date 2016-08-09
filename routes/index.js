@@ -111,20 +111,22 @@ router.delete('/appointments/:appointmentid/comments/:commentid', auth, ctrlAppo
 
 // users
 router.get('/users', auth, ctrlUsers.usersList);
-router.put('/users/change/:username', auth, ctrlUsers.updateUsername);
-router.post('/users/:username/upload', auth, multipartyMiddleware, ctrlUsers.uploadImage);
+router.get('/users/getuser/:username', auth, ctrlUsers.getUser);
+router.get('/users/list/:community', auth, ctrlUsers.usersInCommunity);
+router.get('/users/community/:username', auth, ctrlUsers.userCommunity);
 router.get('/users/:username/image', ctrlUsers.userImage);
+router.post('/users/:username/upload', auth, multipartyMiddleware, ctrlUsers.uploadImage);
 router.post('/users/forgotpassowrd/:email', ctrlUsers.forgotPassword);
 router.post('/users/reset/:token', ctrlUsers.resetPassword);
-router.get('/users/community/:username', auth, ctrlUsers.userCommunity);
-router.get('/users/list/:community', auth, ctrlUsers.usersInCommunity);
-router.get('/users/getuser/:username', auth, ctrlUsers.getUser);
+router.put('/users/change/:username', auth, ctrlUsers.updateUsername);
 
+//users payment
 router.post('/users/:userid/savecard', auth, ctrlPayment.saveCreditCard);
 router.get('/users/:userid/customer', auth, ctrlPayment.getCustomer);
 router.delete('/users/:userid/subscription', auth, ctrlPayment.cancelSubscription);
 router.put('/users/:userid/update', auth, ctrlPayment.updateCustomer);
 
+//users authentication
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);
 

@@ -8,7 +8,12 @@ require('../models/users');
 require('../models/community');
 require('../apila');
 
-var userToken = "";
+var testUser = {
+  "name" : "first",
+  "email": "first@gmail.com",
+  "password": "123456",
+  "token" : ""
+};
 var server = supertest.agent("http://localhost:" + process.env.PORT);
 
 before(function(done) {
@@ -29,29 +34,23 @@ after(function() {
 
 //HELPER FUNCTIONS
 function setupData(callback) {
-  var userData = {
-    "name" : "first",
-    "email": "first@gmail.com",
-    "password": "123456"
-  };
-
 
   server
     .post('/api/register')
     .set('Accept', 'application/json')
-    .send(userData)
+    .send(testUser)
     .expect(200)
     .end(function(err,res){
-      userToken = res.body.token;
+      testUser.token = res.body.token;
       callback();
     });
 
 }
 
-function getUserToken() {
-  return userToken;
+function getTestUser() {
+  return testUser;
 }
 
 
 exports.server = server;
-exports.getUserToken = getUserToken;
+exports.getTestUser = getTestUser;
