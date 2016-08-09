@@ -32,6 +32,7 @@ var residentSchema = new mongoose.Schema({
     religion: {type: String},
     education: {type: String},
     occupation: {type: String},
+    lifeNotes: {type: String},
 
     // bathing information
     typeOfBathing: {type: String}, // shower, tub, spit bath
