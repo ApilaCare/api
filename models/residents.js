@@ -188,7 +188,7 @@ var residentSchema = new mongoose.Schema({
 
 var vitalsInfoSchema = new mongoose.Schema({
     data: {type: Number, required: true},
-    date: {type: Date, "default": Date.now},
+    date: {type: Date, 'default': Date.now},
 });
 
 mongoose.model('Resident', residentSchema);

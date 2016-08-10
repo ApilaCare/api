@@ -23,6 +23,7 @@ module.exports.residentsCreate = function(req, res) {
         sex: req.body.sex,
         submitBy: req.payload.name,
         community: req.body.community._id,
+        administrativeNotes: req.body.administrativeNotes,
         movedFrom: req.body.movedFrom
     }, function(err, resident) {
         if (err) {
@@ -120,13 +121,36 @@ module.exports.residentsReadOne = function(req, res) {
     } else {
         console.log('No residentid specified');
         sendJSONresponse(res, 404, {
-            "message": "No residentid in request"
+            'message': 'No residentid in request'
         });
     }
 };
 
+// GET /residents/:communityid/locations - Get residents movedFrom (location) data
+module.exports.getLocations = function(req, res) {
+
+  var community = req.params.communityid;
+
+  if(!community) {
+    sendJSONresponse(res, 404, {'message' : ''});
+    return;
+  }
+
+  Resid.find({'community' : community})
+  .select('movedFrom')
+  .exec(function(err, communities) {
+    if(communities) {
+      console.log(communities);
+      sendJSONresponse(res, 200, communities);
+    } else {
+      sendJSONresponse(res, 404, {'message' : 'residents not found'});
+    }
+  });
+};
+
+
 module.exports.residentById = function(req, res) {
-    console.log("pozvao" + req.params.residentid);
+    console.log('pozvao' + req.params.residentid);
 
     Resid
         .findById(req.params.residentid)
