@@ -1,16 +1,11 @@
 var mongoose = require('mongoose');
+var utils = require('../../services/utils');
 var Resid = mongoose.model('Resident');
 var User = mongoose.model('User');
 var moment = require('moment');
 
-var sendJSONresponse = function(res, status, content) {
-    res.status(status);
-    res.json(content);
-};
-
-// api/residents/new
+// POST /residents/new - Creates a new resident
 module.exports.residentsCreate = function(req, res) {
-    console.log(req.body);
 
     // create resident from the inputed data
     Resid.create({
@@ -27,11 +22,9 @@ module.exports.residentsCreate = function(req, res) {
         movedFrom: req.body.movedFrom
     }, function(err, resident) {
         if (err) {
-            console.log(err);
-            sendJSONresponse(res, 400, err);
+            utils.sendJSONresponse(res, 400, err);
         } else {
-            console.log(resident);
-            sendJSONresponse(res, 200, resident);
+            utils.sendJSONresponse(res, 200, resident);
         }
     });
 };
@@ -40,7 +33,7 @@ module.exports.residentsCreate = function(req, res) {
 module.exports.residentsList = function(req, res) {
     Resid.find({"community" : req.params.communityid}, function(err, residents) {
         console.log(residents);
-        sendJSONresponse(res, 200, residents);
+        utils.sendJSONresponse(res, 200, residents);
     });
 };
 
@@ -58,9 +51,9 @@ module.exports.getAverageAge = function(req, res) {
 
       averageAge = averageAge / residents.length;
 
-      sendJSONresponse(res, 200, averageAge);
+      utils.sendJSONresponse(res, 200, averageAge);
     } else {
-      sendJSONresponse(res, 404, {message: "Residents not found"});
+      utils.sendJSONresponse(res, 404, {message: "Residents not found"});
     }
   });
 }
@@ -79,9 +72,9 @@ module.exports.averageStayTime = function(req, res) {
 
       averageStay = averageStay / residents.length;
 
-      sendJSONresponse(res, 200, averageStay);
+      utils.sendJSONresponse(res, 200, averageStay);
     } else {
-      sendJSONresponse(res, 404, {message: "Residents not found"});
+      utils.sendJSONresponse(res, 404, {message: "Residents not found"});
     }
   });
 }
@@ -94,7 +87,7 @@ module.exports.residentsCount = function(req, res) {
     Resid.find({"community" : req.params.communityid, "buildingStatus": "In Building"},
     function(err, c) {
         console.log(c.length);
-        sendJSONresponse(res, 200, c.length);
+        utils.sendJSONresponse(res, 200, c.length);
     });
 };
 
@@ -106,21 +99,21 @@ module.exports.residentsReadOne = function(req, res) {
             .findById(req.params.residentid)
             .exec(function(err, resident) {
                 if (!resident) {
-                    sendJSONresponse(res, 404, {
+                    utils.sendJSONresponse(res, 404, {
                         "message": "residentid not found"
                     });
                     return;
                 } else if (err) {
                     console.log(err);
-                    sendJSONresponse(res, 404, err);
+                    utils.sendJSONresponse(res, 404, err);
                     return;
                 }
                 console.log(resident);
-                sendJSONresponse(res, 200, resident);
+                utils.sendJSONresponse(res, 200, resident);
             });
     } else {
         console.log('No residentid specified');
-        sendJSONresponse(res, 404, {
+        utils.sendJSONresponse(res, 404, {
             'message': 'No residentid in request'
         });
     }
@@ -132,7 +125,7 @@ module.exports.getLocations = function(req, res) {
   var community = req.params.communityid;
 
   if(!community) {
-    sendJSONresponse(res, 404, {'message' : ''});
+    utils.sendJSONresponse(res, 404, {'message' : ''});
     return;
   }
 
@@ -141,9 +134,9 @@ module.exports.getLocations = function(req, res) {
   .exec(function(err, communities) {
     if(communities) {
       console.log(communities);
-      sendJSONresponse(res, 200, communities);
+      utils.sendJSONresponse(res, 200, communities);
     } else {
-      sendJSONresponse(res, 404, {'message' : 'residents not found'});
+      utils.sendJSONresponse(res, 404, {'message' : 'residents not found'});
     }
   });
 };
@@ -159,12 +152,12 @@ module.exports.residentById = function(req, res) {
 
                 console.log(resident);
                 if (!resident) {
-                    sendJSONresponse(res, 404, {
+                    utils.sendJSONresponse(res, 404, {
                         "message": "resident not found"
                     });
                 } else {
 
-                    sendJSONresponse(res, 200, resident);
+                    utils.sendJSONresponse(res, 200, resident);
                 }
             });
 };
@@ -174,9 +167,9 @@ module.exports.residentBirthday = function(req, res) {
     Resid.find({"community" : req.params.communityid})
     .exec(function(err, residents) {
       if(res) {
-        sendJSONresponse(res, 200, residents);
+        utils.sendJSONresponse(res, 200, residents);
       } else {
-        sendJSONresponse(res, 404, null);
+        utils.sendJSONresponse(res, 404, null);
       }
 
     });
@@ -217,7 +210,7 @@ function addToArray(arr, value, type) {
 module.exports.residentsUpdateOne = function(req, res) {
 
     if (!req.params.residentid) {
-        sendJSONresponse(res, 404, {
+        utils.sendJSONresponse(res, 404, {
             "message": "Not found, residentid is required"
         });
         return;
@@ -236,7 +229,7 @@ module.exports.residentsUpdateOne = function(req, res) {
 
     if (isValidData === false) {
         console.log("invalid data");
-        sendJSONresponse(res, 404, err);
+        utils.sendJSONresponse(res, 404, err);
     }
 
     addToArray(req.body.respiration, req.body.newrespiration, "Vitals");
@@ -268,9 +261,9 @@ module.exports.residentsUpdateOne = function(req, res) {
 
             if (err) {
                 console.log(err);
-                sendJSONresponse(res, 404, err);
+                utils.sendJSONresponse(res, 404, err);
             } else {
-                sendJSONresponse(res, 200, resident);
+                utils.sendJSONresponse(res, 200, resident);
                 //console.log(resident);
             }
 
@@ -288,15 +281,15 @@ module.exports.residentsDeleteOne = function(req, res) {
                 function(err, resident) {
                     if (err) {
                         console.log(err);
-                        sendJSONresponse(res, 404, err);
+                        utils.sendJSONresponse(res, 404, err);
                         return;
                     }
                     console.log("resident id " + residentid + " deleted");
-                    sendJSONresponse(res, 204, null);
+                    utils.sendJSONresponse(res, 204, null);
                 }
             );
     } else {
-        sendJSONresponse(res, 404, {
+        utils.sendJSONresponse(res, 404, {
             "message": "No residentid"
         });
     }
@@ -313,13 +306,13 @@ var getAuthor = function(req, res, callback) {
             })
             .exec(function(err, user) {
                 if (!user) {
-                    sendJSONresponse(res, 404, {
+                    utils.sendJSONresponse(res, 404, {
                         "message": "User not found"
                     });
                     return;
                 } else if (err) {
                     console.log(err);
-                    sendJSONresponse(res, 404, err);
+                    utils.sendJSONresponse(res, 404, err);
                     return;
                 }
                 console.log(user);
@@ -328,7 +321,7 @@ var getAuthor = function(req, res, callback) {
             });
 
     } else {
-        sendJSONresponse(res, 404, {
+        utils.sendJSONresponse(res, 404, {
             "message": "User not found"
         });
         return;

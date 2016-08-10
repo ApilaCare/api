@@ -12,7 +12,8 @@ var testUser = {
   "name" : "first",
   "email": "first@gmail.com",
   "password": "123456",
-  "token" : ""
+  "token" : "",
+  "communityid" : ""
 };
 var server = supertest.agent("http://localhost:" + process.env.PORT);
 
@@ -51,5 +52,10 @@ function getTestUser() {
   return testUser;
 }
 
+function setCommunity(id) {
+  testUser.communityid = id;
+}
+
 exports.server = server;
+exports.setCommunity = setCommunity;
 exports.getTestUser = getTestUser;
