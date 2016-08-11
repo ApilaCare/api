@@ -85,7 +85,6 @@ describe('Users', function() {
             done(err);
           } else {
             communityid = res.body._id;
-            utils.setCommunity(communityid);
             done();
           }
       });

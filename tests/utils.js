@@ -13,7 +13,7 @@ var testUser = {
   "email": "first@gmail.com",
   "password": "123456",
   "token" : "",
-  "communityid" : ""
+  "community" : {}
 };
 var server = supertest.agent("http://localhost:" + process.env.PORT);
 
@@ -41,8 +41,9 @@ function setupData(callback) {
     .set('Accept', 'application/json')
     .send(testUser)
     .expect(200)
-    .end(function(err,res){
+    .end(function(err, res){
       testUser.token = res.body.token;
+      testUser.community = res.body.community;
       callback();
     });
 

@@ -40,10 +40,11 @@ module.exports.register = function(req, res) {
             };
 
             // create the user a new test community
-            communityCtrl.doCreateCommunity(data, function(status) {
+            communityCtrl.doCreateCommunity(data, function(status, community) {
               if(status) {
                 utils.sendJSONresponse(res, 200, {
-                    "token": token
+                    'token': token,
+                    'community' : community
                 });
               } else {
                 utils.sendJSONresponse(res, 404, {message: "Error while creating test community"});
