@@ -44,7 +44,8 @@ module.exports.register = function(req, res) {
               if(status) {
                 utils.sendJSONresponse(res, 200, {
                     'token': token,
-                    'community' : community
+                    'community' : community,
+                    'id' : user._id
                 });
               } else {
                 utils.sendJSONresponse(res, 404, {message: "Error while creating test community"});

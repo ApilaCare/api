@@ -6,9 +6,8 @@ var utils = require('../../services/utils');
 
 var async = require('async');
 
+// POST /communities/new - Creates an empty community
 module.exports.communitiesCreate = function(req, res) {
-
-    var username = req.body.username;
 
     Community.create({
         name : req.body.name,
@@ -17,19 +16,18 @@ module.exports.communitiesCreate = function(req, res) {
 
     }, function(err, community) {
         if (err) {
-            utils.sendJSONresponse(res, 400, err);
+          utils.sendJSONresponse(res, 400, err);
         } else {
           addUserToCommunity(req, res, community);
         }
     });
 };
 
+// POST - /communites/:communityid/role/:userid - Switches or adds a user role
 module.exports.addRole = function(req, res) {
 
   Community.findOne({_id: req.params.communityid}, function(err, communites) {
     if(communites) {
-
-      console.log(req.body.type);
 
       if(req.body.type === "boss") {
         communites.boss = req.params.userid;
@@ -53,11 +51,12 @@ module.exports.addRole = function(req, res) {
 
 
     } else {
-      utils.sendJSONresponse(res, 404, {message: "Community not found"})
+      utils.sendJSONresponse(res, 404, {message: "Community not found"});
     }
   });
-}
+};
 
+// GET /communities/ - List communities that aren't test communities
 module.exports.communitiesList = function(req, res) {
     Community.find({"testCommunity" : false}, function(err, communities) {
         console.log(communities);
@@ -65,7 +64,7 @@ module.exports.communitiesList = function(req, res) {
     });
 };
 
-//add a new initation/pending member to a community
+// PUT /communities/pending/:communityid/ - add a new initation/pending member to a community
 module.exports.addPendingMember = function(req, res) {
   if (!req.params.communityid) {
       utils.sendJSONresponse(res, 404, {
@@ -90,7 +89,7 @@ module.exports.addPendingMember = function(req, res) {
           });
         });
 
-}
+};
 
 module.exports.declineMember = function(req, res) {
   if (!req.params.communityid) {
@@ -106,7 +105,7 @@ module.exports.declineMember = function(req, res) {
 
           var index = community.pendingMembers.indexOf(req.body.member);
 
-          if(index != -1) {
+          if(index !== -1) {
             community.pendingMembers.splice(index, 1);
           }
 
@@ -120,9 +119,9 @@ module.exports.declineMember = function(req, res) {
 
           });
 
-}
+};
 
-//accept member to a community
+//  PUT /communities/accept/:communityid/ - Accept a pending member to a community
 module.exports.acceptMember = function(req, res) {
   if (!req.params.communityid) {
       utils.sendJSONresponse(res, 404, {
@@ -138,13 +137,11 @@ module.exports.acceptMember = function(req, res) {
 
           var index = community.pendingMembers.indexOf(req.body.member);
 
-          if(index != -1) {
+          if(index !== -1) {
             community.pendingMembers.splice(index, 1);
           }
 
           community.minions.push(req.body.member);
-
-          console.log(req.body.member);
 
           //set the data in the user also
           User.findById(req.body.member, function(err, user) {
@@ -162,13 +159,11 @@ module.exports.acceptMember = function(req, res) {
                 }
               });
 
-          });
+        });
 
+        });
 
-
-          });
-
-}
+};
 
 module.exports.communitiesUpdateOne = function(req, res) {
     if (!req.params.communityid) {
@@ -277,39 +272,20 @@ module.exports.removeMember = function(req, res) {
       utils.sendJSONresponse(res, 404, {message: "Error finding community"});
     }
   });
-}
+};
 
+// GET /communites/canceled/:userid
 // we are counting that their will be only one community to restore
 module.exports.hasCanceledCommunity = function(req, res) {
   Community.findOne({"testCommunity" : false, "creator" : req.params.userid})
   .exec(function(err, community) {
     if(community) {
-      console.log(community);
       utils.sendJSONresponse(res, 200, community);
     } else {
       utils.sendJSONresponse(res, 404, {message: "Error while finding user"});
     }
   });
-}
-
-function removeCommunityFromUser(res, userid, callback) {
-  User.findById(userid)
-  .exec(function(err, user) {
-    if(user) {
-      user.community = null;
-
-      user.save(function(err) {
-        if(err) {
-          utils.sendJSONresponse(res, 500, {message: "Error while saving the user"});
-        } else {
-          callback();
-        }
-      })
-    } else {
-      utils.sendJSONresponse(res, 404, {message: "User not found"});
-    }
-  });
-}
+};
 
 module.exports.communitiesDeleteOne = function(req, res) {
     var communityid = req.params.communityid;
@@ -331,37 +307,6 @@ module.exports.communitiesDeleteOne = function(req, res) {
         utils.sendJSONresponse(res, 404, {
             "message": "No residentid"
         });
-    }
-};
-
-
-var getAuthor = function(req, res, callback) {
-    console.log("Finding author with name " + req.body.pendingMember);
-    if (req.body.pendingMember) {
-        User
-            .findOne({
-                name: req.body.pendingMember
-            })
-            .exec(function(err, user) {
-                if (!user) {
-                    utils.sendJSONresponse(res, 404, {
-                        "message": "User not found"
-                    });
-                    return;
-                } else if (err) {
-                    console.log(err);
-                    utils.sendJSONresponse(res, 404, err);
-                    return;
-                }
-                console.log(user);
-                callback(req, res, user._id);
-            });
-
-    } else {
-        utils.sendJSONresponse(res, 404, {
-            "message": "User not found"
-        });
-        return;
     }
 };
 
@@ -394,7 +339,7 @@ module.exports.restoreCommunity = function(req, res) {
       utils.sendJSONresponse(res, 404, {message: "Error while finding users in community"});
     }
   });
-}
+};
 
 module.exports.doCreateCommunity = function(communityInfo, callback) {
 
@@ -427,7 +372,7 @@ module.exports.doCreateCommunity = function(communityInfo, callback) {
               } else {
                 callback(true, community);
               }
-            })
+            });
           } else {
             callback(false);
           }
@@ -435,34 +380,82 @@ module.exports.doCreateCommunity = function(communityInfo, callback) {
 
       }
   });
-}
+};
+
+//PRIVATE FUNCTIONS
 
 function addUserToCommunity(req, res, community) {
   var username = req.body.username;
 
+    User
+    .findOne({"name":username})
+    .exec(function(err, u) {
+        u.prevCommunity = u.community;
+        u.community = community._id;
 
-  User
-  .findOne({"name":username})
-  .exec(function(err, u) {
-    u.prevCommunity = u.community;
-    u.community = community._id;
+        community.communityMembers.push(u._id);
+        community.creator = u;
+        community.boss = u;
 
-    community.communityMembers.push(u._id);
-    community.creator = u;
-    community.boss = u;
+        community.save();
 
-    console.log(u);
-
-    community.save();
-
-    u.save(function(err, user) {
-      if(err) {
-        utils.sendJSONresponse(res, 400, err);
-      } else {
-        console.log("User added to community");
-        utils.sendJSONresponse(res, 200, community);
-      }
+        u.save(function(err, user) {
+          if(err) {
+            utils.sendJSONresponse(res, 400, err);
+          } else {
+            utils.sendJSONresponse(res, 200, community);
+          }
+        });
     });
+}
 
+
+var getAuthor = function(req, res, callback) {
+
+    if (req.body.pendingMember) {
+        User
+            .findOne({
+                name: req.body.pendingMember
+            })
+            .exec(function(err, user) {
+                if (!user) {
+                    utils.sendJSONresponse(res, 404, {
+                        "message": "User not found"
+                    });
+                    return;
+                } else if (err) {
+                    console.log(err);
+                    utils.sendJSONresponse(res, 404, err);
+                    return;
+                }
+                console.log(user);
+                callback(req, res, user._id);
+            });
+
+    } else {
+        utils.sendJSONresponse(res, 404, {
+            "message": "User not found"
+        });
+        return;
+    }
+};
+
+
+function removeCommunityFromUser(res, userid, callback) {
+  User.findById(userid)
+  .exec(function(err, user) {
+    if(user) {
+      user.community = null;
+
+      user.save(function(err) {
+        if(err) {
+          utils.sendJSONresponse(res, 500, {message: "Error while saving the user"});
+        } else {
+          callback();
+        }
+      });
+    } else {
+      utils.sendJSONresponse(res, 404, {message: "User not found"});
+    }
   });
 }

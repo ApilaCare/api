@@ -20,7 +20,7 @@ describe('Users', function() {
           if(err) {
             done(err);
           } else {
-            assert.equal(res.body.length, 2, 'Has two users, one from auth test another at setup');
+            assert.equal(res.body.length, 3, 'Has three users, one from auth test another at setup');
             done();
           }
       });
@@ -105,7 +105,7 @@ describe('Users', function() {
           if(err) {
             done(err);
           } else {
-            assert.equal(res.body.length, 1, "Number of users in community should be 1");
+            assert.equal(res.body.length, 2, "Number of users in community should be 2");
             done();
           }
       });
