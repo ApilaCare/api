@@ -59,7 +59,6 @@ module.exports.addRole = function(req, res) {
 // GET /communities/ - List communities that aren't test communities
 module.exports.communitiesList = function(req, res) {
     Community.find({"testCommunity" : false}, function(err, communities) {
-        console.log(communities);
         utils.sendJSONresponse(res, 200, communities);
     });
 };
@@ -177,7 +176,6 @@ module.exports.communitiesUpdateOne = function(req, res) {
         .exec(
             function(err, community) {
 
-                console.log(community);
 
                 if (!community) {
                     utils.sendJSONresponse(res, 404, {
@@ -223,7 +221,7 @@ module.exports.communitiesReadOne = function(req, res) {
                     utils.sendJSONresponse(res, 404, err);
                     return;
                 }
-                console.log(community);
+
                 utils.sendJSONresponse(res, 200, community);
             });
     } else {
@@ -319,7 +317,7 @@ module.exports.restoreCommunity = function(req, res) {
   .exec(function(err, users) {
     if(users) {
 
-      console.log(users);
+      
       async.each(users, function(user, cont) {
         user.community = user.prevCommunity;
         user.prevCommunity = communityid;

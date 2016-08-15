@@ -96,12 +96,10 @@ router.post('/issues/recovery/verify/:userid', auth, ctrlIssueRecovery.confirmPa
 
 // appointments
 router.get('/appointments/:communityid', auth, ctrlAppointments.appointmentsList);
-//router.get('/appointments/:month', auth,  ctrlAppointments.appointmentsListByMonth);
 router.get('/appointments/today/:communityid', auth,  ctrlAppointments.appointmentsToday);
-router.get('/appointments/:appointmentid', auth, ctrlAppointments.appointmentsReadOne);
+router.post('/appointments/new', auth, ctrlAppointments.appointmentsCreate);
 router.put('/appointments/update/:appointmentid', auth, ctrlAppointments.appointmentsUpdateOne);
 router.delete('/appointments/:appointmentid', auth, ctrlAppointments.appointmentsDeleteOne);
-router.post('/appointments/new', auth, ctrlAppointments.appointmentsCreate);
 
 // appointment comments
 router.post('/appointments/:appointmentid/comments', auth, ctrlAppointmentComments.appointmentCommentsCreate);

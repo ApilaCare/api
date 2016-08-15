@@ -2,12 +2,9 @@ var mongoose = require('mongoose');
 var Appoint = mongoose.model('Appointment');
 var User = mongoose.model('User');
 
-var sendJSONresponse = function(res, status, content) {
-    res.status(status);
-    res.json(content);
-};
+var utils = require('../../services/utils');
 
-/* POST /api/appointments/new */
+// POST /api/appointments/new - Creates a new appointment
 module.exports.appointmentsCreate = function(req, res) {
 
     //create appointment from the inputed data
@@ -27,74 +24,34 @@ module.exports.appointmentsCreate = function(req, res) {
     }, function(err, appointment) {
         if (err) {
             console.log(err);
-            sendJSONresponse(res, 400, err);
+            utils.sendJSONresponse(res, 400, err);
         } else {
             getFullAppointment(req, res, appointment._id);
         }
     });
 };
 
-/* GET list of appointments */
+// GET /appointments/:communityid - list all appointments populated with resident info
 module.exports.appointmentsList = function(req, res) {
 
-    console.log(req);
+  Appoint.find({
+    "community": req.params.communityid
+  }).populate("residentGoing").exec(function(err, appointments) {
+    if (err) {
+      utils.sendJSONresponse(res, 404, {
+        'message': 'Error while listing appointements'
+      });
+    } else {
+      utils.sendJSONresponse(res, 200, appointments);
+    }
 
-    // change sensitivity to day rather than by minute
-    var start = new Date();
-    start.setHours(0, 0, 0, 0);
-
-    Appoint.find({
-      "community" : req.params.communityid
-    }).populate("residentGoing").exec(function(err, appointments) {
-      //  console.log(appointments);
-        console.log(appointments);
-        sendJSONresponse(res, 200, appointments)
-    });
+  });
 };
 
-/* GET list by month of appointments */
-module.exports.appointmentsListByMonth = function(req, res) {
-
-
-    console.log("appoint by month");
-
-    // change sensitivity to day rather than by minute
-    var start = new Date();
-    start.setHours(0, 0, 0, 0);
-
-    var months = {
-      "January" : 0,
-      "February": 1,
-      "March" : 2,
-      "April": 3,
-      "May" : 4,
-      "June": 5,
-      "July" : 6,
-      "August": 7,
-      "September" : 8,
-      "October": 9,
-      "November" : 10,
-      "December": 11
-    };
-
-    console.log(months[req.params.month]);
-
-    var query = 'return this.time.getMonth() === ' + months[req.params.month];
-
-    Appoint.find({
-        $where : query
-    }).populate("residentGoing").exec(function(err, appointments) {
-      //  console.log(appointments);
-        console.log("In appointment list")
-        sendJSONresponse(res, 200, appointments)
-    });
-};
-
+// GET /appointments/today/:communityid - Number of appointments for today
 module.exports.appointmentsToday = function(req, res) {
 
    var today = new Date();
-
-   console.log(req.params);
 
    var query = 'return this.appointmentDate.getDate() === ' + today.getDate();
 
@@ -102,53 +59,22 @@ module.exports.appointmentsToday = function(req, res) {
       "community" : req.params.communityid,
       $where : query
     }).exec(function(err, appointments) {
-
-        var num = 0;
-
-        if(appointments !== undefined) {
-          num = appointments.length;
+        if(err) {
+          utils.sendJSONresponse(res, 404, {'message' : 'Error while finding appointments'});
+        } else {
+          utils.sendJSONresponse(res, 200, appointments.length);
         }
-
-        sendJSONresponse(res, 200, num)
     });
 };
 
-// get a single appointment details
-module.exports.appointmentsReadOne = function(req, res) {
-    console.log('Finding appointment details', req.params);
-    if (req.params && req.params.appointmentid) {
-        Appoint
-            .findById(req.params.appointmentid)
-            .populate("residentGoing")
-            .exec(function(err, appointment) {
-                if (!appointment) {
-                    sendJSONresponse(res, 404, {
-                        "message": "appointmentid not found (from controller)"
-                    });
-                    return;
-                } else if (err) {
-                    console.log(err);
-                    sendJSONresponse(res, 404, err);
-                    return;
-                }
-                console.log(appointment);
-                sendJSONresponse(res, 200, appointment);
-            });
-    } else {
-        console.log('No appointmentid specified');
-        sendJSONresponse(res, 404, {
-            "message": "No appointmentid in request"
-        });
-    }
-};
 
-/* PUT /api/appointments/:appointmentid */
+/* PUT /api/appointments/:appointmentid - Updates the appointment */
 module.exports.appointmentsUpdateOne = function(req, res) {
 
     console.log("In update appointment");
 
     if (!req.params.appointmentid) {
-        sendJSONresponse(res, 404, {
+        utils.sendJSONresponse(res, 404, {
             "message": "Not found, appointmentid is required"
         });
         return;
@@ -157,16 +83,15 @@ module.exports.appointmentsUpdateOne = function(req, res) {
     Appoint
         .findById(req.params.appointmentid)
         .populate("residentGoing")
-        .exec(
-            function(err, appointment) {
+        .exec(function(err, appointment) {
                 if (!appointment) {
 
-                    sendJSONresponse(res, 404, {
+                    utils.sendJSONresponse(res, 404, {
                         "message": "appointmentid not found"
                     });
                     return;
                 } else if (err) {
-                    sendJSONresponse(res, 400, err);
+                    utils.sendJSONresponse(res, 400, err);
                     return;
                 }
 
@@ -199,14 +124,13 @@ module.exports.appointmentsUpdateOne = function(req, res) {
 
                 appointment.save(function(err, appointment) {
                     if (err) {
-                        sendJSONresponse(res, 404, err);
+                        utils.sendJSONresponse(res, 404, err);
                     } else {
 
                         Appoint.
                         populate(appointment, "residentGoing",
                         function(err) {
-                          //console.log(appointment);
-                          sendJSONresponse(res, 200, appointment);
+                          utils.sendJSONresponse(res, 200, appointment);
                         });
 
 
@@ -217,7 +141,7 @@ module.exports.appointmentsUpdateOne = function(req, res) {
 };
 
 
-/* DELETE /api/appointments/:appointmentid */
+// DELETE /api/appointments/:appointmentid - deletes an appointment by its id
 module.exports.appointmentsDeleteOne = function(req, res) {
     var appointmentid = req.params.appointmentid;
     if (appointmentid) {
@@ -227,70 +151,38 @@ module.exports.appointmentsDeleteOne = function(req, res) {
                 function(err, appointment) {
                     if (err) {
                         console.log(err);
-                        sendJSONresponse(res, 404, err);
+                        utils.sendJSONresponse(res, 404, err);
                         return;
                     }
                     console.log("appointment id " + appointmentid + " deleted");
-                    sendJSONresponse(res, 204, null);
+                    utils.sendJSONresponse(res, 204, null);
                 }
             );
     } else {
-        sendJSONresponse(res, 404, {
+        utils.sendJSONresponse(res, 404, {
             "message": "No appointmentid"
         });
     }
 };
 
+//HELPER FUNCTIONS
+
+//get's appointment and resident info populated
 var getFullAppointment = function(req, res, appointId) {
       Appoint
-            .findById(appointId)
-            .populate("residentGoing")
-            .exec(function(err, appointment) {
-                if (!appointment) {
-                    sendJSONresponse(res, 404, {
-                        "message": "appointmentid not found (from controller)"
-                    });
-                    return;
-                } else if (err) {
-                    console.log(err);
-                    sendJSONresponse(res, 404, err);
-                    return;
-                }
-              //  console.log(appointment);
-                sendJSONresponse(res, 200, appointment);
-            });
-}
-
-
-var getAuthor = function(req, res, callback) {
-    console.log("Finding author with email " + req.payload.email);
-    // validate that JWT information is on request object
-    if (req.payload.email) {
-        User
-        // user email address to find user
-            .findOne({
-                email: req.payload.email
-            })
-            .exec(function(err, user) {
-                if (!user) {
-                    sendJSONresponse(res, 404, {
-                        "message": "User not found"
-                    });
-                    return;
-                } else if (err) {
-                    console.log(err);
-                    sendJSONresponse(res, 404, err);
-                    return;
-                }
-                console.log(user);
-                // run callback, passing user's name
-                callback(req, res, user.name);
-            });
-
-    } else {
-        sendJSONresponse(res, 404, {
-            "message": "User not found"
+        .findById(appointId)
+        .populate("residentGoing")
+        .exec(function(err, appointment) {
+            if (!appointment) {
+                utils.sendJSONresponse(res, 404, {
+                    "message": "appointmentid not found (from controller)"
+                });
+                return;
+            } else if (err) {
+                console.log(err);
+                utils.sendJSONresponse(res, 404, err);
+                return;
+            }
+            utils.sendJSONresponse(res, 200, appointment);
         });
-        return;
-    }
 };
