@@ -10,23 +10,12 @@ var sendJSONresponse = function(res, status, content) {
 /* POST /api/appointments/new */
 module.exports.appointmentsCreate = function(req, res) {
 
-    //here we join the date & time
-    var d = new Date(req.body.date);
-    var t = new Date(req.body.time);
-
-    d.setHours(t.getHours());
-    d.setMinutes(t.getMinutes());
-
-    console.log("DATE:    ");
-    console.log(req.body.appointmentDate);
-
     //create appointment from the inputed data
     Appoint.create({
         reason: req.body.reason,
         locationName: req.body.locationName,
         locationDoctor: req.body.locationDoctor,
         residentGoing: req.body.residentId,
-        time: d,
         appointmentDate: req.body.appointmentDate,
         hours: req.body.hours,
         minutes: req.body.minutes,
@@ -198,7 +187,6 @@ module.exports.appointmentsUpdateOne = function(req, res) {
                 appointment.reason = req.body.reason;
                     appointment.locationName = req.body.locationName;
                     appointment.locationDoctor = req.body.locationDoctor;
-                    appointment.time = d;
                     appointment.transportation = req.body.transportation;
                     appointment.cancel = req.body.cancel;
                     appointment.updateInfo.push(updateInfo);

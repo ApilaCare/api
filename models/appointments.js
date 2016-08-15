@@ -33,10 +33,6 @@ var appointmentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Resident'
     },
-    time: {
-        type: Date,
-        required: true
-    },
     appointmentDate : {
       type: Date
     },
