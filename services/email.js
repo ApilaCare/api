@@ -10,7 +10,7 @@
   };
 
   var transporter = nodemailer
-                .createTransport("smtps://" + config.email + ":" + config.password + "@smtp.gmail.com");
+      .createTransport("smtps://" + config.email + ":" + config.password + "@smtp.gmail.com");
 
 
   var mailOptions = {
@@ -29,7 +29,7 @@
     mailOptions.html = text;
 
     transporter.sendMail(mailOptions, callback);
-  }
+  };
 
   module.exports.sendForgotPassword = function(from, to, token, host, callback) {
     mailOptions.from = from;
@@ -41,7 +41,7 @@
           'If you did not request this, please ignore this email and your password will remain unchanged.\n';
 
     transporter.sendMail(mailOptions, callback);
-  }
+  };
 
   module.exports.sendConfidentialIssues = function(from, to, recoveredUser, issues, callback) {
     mailOptions.from = from;
@@ -53,9 +53,9 @@
     ];
     mailOptions.subject = "Recovered confidetial issues for " + recoveredUser;
     mailOptions.text = 'You have recovored condifential issues for member' + recoveredUser + "\n"
-                       + "In the attachment confidential.pdf you can see all the confidential issues from the user";
+               + "In the attachment confidential.pdf you can see all the confidential issues from the user";
 
     transporter.sendMail(mailOptions, callback);
-  }
+  };
 
 })();

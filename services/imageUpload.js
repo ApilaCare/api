@@ -27,15 +27,15 @@
             callback();
         }
       });
-  }
+  };
 
   module.exports.getRegion = function() {
     return region;
-  }
+  };
 
   module.exports.getBucket = function() {
     return bucket;
-  }
+  };
 
 
 })();
