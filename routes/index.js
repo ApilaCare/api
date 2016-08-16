@@ -2,8 +2,10 @@ var express = require('express');
 var router = express.Router();
 var jwt = require('express-jwt');
 
- var multiparty = require('connect-multiparty');
- var multipartyMiddleware = multiparty({uploadDir: "./"});
+require('../controllers/issues/schedule');
+
+var multiparty = require('connect-multiparty');
+var multipartyMiddleware = multiparty({uploadDir: "./"});
 
 var auth = jwt({
     // set secret using same environment variable as before
@@ -59,8 +61,8 @@ router.get('/issues/:username/s/:status/id/:communityid', auth, ctrlIssues.issue
 router.get('/issues/count/:username/id/:communityid', auth, ctrlIssues.issuesOpenCount);
 router.get('/issues/issuescount/:communityid', auth, ctrlIssues.issuesCount);
 router.get('/issues/due/:communityid', auth, ctrlIssues.dueIssuesList);
-router.post('/issues/new', auth, ctrlIssues.issuesCreate);
 router.get('/issues/:issueid', auth, ctrlIssues.issuesReadOne);
+router.post('/issues/new', auth, ctrlIssues.issuesCreate);
 router.put('/issues/:issueid', auth, ctrlIssues.issuesUpdateOne);
 router.delete('/issues/:issueid', auth, ctrlIssues.issuesDeleteOne);
 

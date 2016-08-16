@@ -55,7 +55,7 @@ module.exports.usersInCommunity = function(req, res) {
         }
   });
 
-}
+};
 
 // GET /users/community/:username - Gets community info for a username
 module.exports.userCommunity = function(req, res) {
@@ -81,7 +81,7 @@ module.exports.userCommunity = function(req, res) {
           }
         }
   });
-}
+};
 
 // GET /users/:username/image - Gets users image url
 module.exports.userImage = function(req, res) {
@@ -93,7 +93,7 @@ module.exports.userImage = function(req, res) {
       utils.sendJSONresponse(res, 404, null);
     }
   });
-}
+};
 
 module.exports.forgotPassword = function(req, res) {
 
@@ -118,7 +118,7 @@ module.exports.forgotPassword = function(req, res) {
 
         });
 
-}
+};
 
 module.exports.resetPassword = function(req, res) {
 
@@ -138,7 +138,7 @@ module.exports.resetPassword = function(req, res) {
          }
 
   });
-}
+};
 
 module.exports.uploadImage = function(req, res) {
 
@@ -175,7 +175,7 @@ module.exports.uploadImage = function(req, res) {
 
 
   });
-}
+};
 
 module.exports.updateUsername = function(req, res) {
 
@@ -190,12 +190,12 @@ module.exports.updateUsername = function(req, res) {
           utils.sendJSONresponse(res, 404, null);
 
         }
-      })
+      });
     } else {
       utils.sendJSONresponse(res, 404, null);
     }
   });
-}
+};
 
 
 // HELPER FUNCTIONS

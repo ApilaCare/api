@@ -68,10 +68,4 @@ var issueSchema = new mongoose.Schema({
 });
 
 mongoose.model('Issue', issueSchema);
-mongoose.model('MemberRecover', memberRecoverSchema)
-
-/* adding documents to mongodb
-db.issues.save({
-
-})
-*/
+mongoose.model('MemberRecover', memberRecoverSchema);
