@@ -12,16 +12,20 @@ var fs = require('fs');
 var imageUploadService = require('../../services/imageUpload');
 
 
-// GET /users - Returns list of user names in the app
+// GET /users - Returns list of users
 module.exports.usersList = function(req, res) {
-  User.find({}, 'name',  function(err, users) {
-      if(err) {
-        utils.sendJSONresponse(res, 404, {"message" : "Error while getting user list"});
+  User.find({})
+    .populate("", "-salt -hash")
+    .exec(function(err, users) {
+      if (err) {
+        utils.sendJSONresponse(res, 404, {
+          "message": "Error while getting user list"
+        });
       } else {
         utils.sendJSONresponse(res, 200, users);
       }
-  });
-}
+    });
+};
 
 // GET /users/getuser/:username - Get user info by username
 module.exports.getUser = function(req, res) {

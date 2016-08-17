@@ -3,6 +3,7 @@ var Iss = mongoose.model('Issue');
 var User = mongoose.model('User');
 var utils = require('../../services/utils');
 
+//TODO: careful when populating user info exclude hash and stuff
 
 // POST /issues/new - Creates a new issue
 module.exports.issuesCreate = function(req, res) {
@@ -20,25 +21,32 @@ module.exports.issuesCreate = function(req, res) {
       console.log(err);
       utils.sendJSONresponseresponse(res, 400, err);
     } else {
-      utils.sendJSONresponse(res, 200, issue);
+
+      User.populate(issue, {path: 'responsibleParty'}, function(err, populatedIssue) {
+        utils.sendJSONresponse(res, 200, populatedIssue);
+      });
+
+
     }
   });
 };
 
 
-//GET /issues/count/:username/id/:communityid - Number of open issues asigned to an user
+//GET /issues/count/:userid/id/:communityid - Number of open issues asigned to an user
 module.exports.issuesOpenCount = function(req, res) {
 
-  var username = req.params.username;
+  var userid = req.params.userid;
   var community = req.params.communityid;
 
-  if (!community || !username) {
+  console.log("userid: " + userid);
+
+  if (!community || !userid) {
     utils.sendJSONresponse(res, 404, 0);
   }
 
   Iss.find({
     status: "Open",
-    responsibleParty: username,
+    responsibleParty: userid,
     community: community
   }, function(err, issues) {
     if (issues) {
@@ -102,19 +110,23 @@ module.exports.issuesList = function(req, res) {
                   issues: {$push : issueTemplate}}},
                   {'$sort' : {"count" : -1}}],
      function(err, issues) {
-        console.log(issues);
-        utils.sendJSONresponse(res, 200, issues);
+      // console.log(issues);
+       User.populate(issues, {path: '_id', model: 'User'} , function(err, populatedIss) {
+        //console.log(issues);
+         console.log(populatedIss);
+         utils.sendJSONresponse(res, 200, issues);
+       });
+
     });
 };
 
-module.exports.issuesListByUsername = function(req, res) {
+module.exports.issuesListByStatus = function(req, res) {
 
-  //var username = req.params.username;
   var s = req.params.status;
   var c =  req.params.communityid;
 
   Iss.find({status: s, community: c}, function(err, issues) {
-      console.log(issues);
+      //console.log(issues);
       utils.sendJSONresponse(res, 200, issues);
   });
 };

@@ -44,7 +44,11 @@ var memberRecoverSchema =  new mongoose.Schema({
 
 var issueSchema = new mongoose.Schema({
     title: {type: String,required: true},
-    responsibleParty: {type: String,required: true},
+    responsibleParty: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
     resolutionTimeframe: {type: String, required: true},
     submitDate: {type: Date, default: Date.now},
     shelvedDate: {type: Date},

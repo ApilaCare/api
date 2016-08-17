@@ -57,8 +57,8 @@ router.delete('/communities/:communityid/', auth, ctrlCommunities.communitiesDel
 
 // issues
 router.get('/issues/list/:status/id/:communityid', auth, ctrlIssues.issuesList);
-router.get('/issues/:username/s/:status/id/:communityid', auth, ctrlIssues.issuesListByUsername);
-router.get('/issues/count/:username/id/:communityid', auth, ctrlIssues.issuesOpenCount);
+router.get('/issues/:username/s/:status/id/:communityid', auth, ctrlIssues.issuesListByStatus);
+router.get('/issues/count/:userid/id/:communityid', auth, ctrlIssues.issuesOpenCount);
 router.get('/issues/issuescount/:communityid', auth, ctrlIssues.issuesCount);
 router.get('/issues/due/:communityid', auth, ctrlIssues.dueIssuesList);
 router.get('/issues/:issueid', auth, ctrlIssues.issuesReadOne);
