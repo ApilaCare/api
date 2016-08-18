@@ -27,15 +27,15 @@ module.exports.usersList = function(req, res) {
     });
 };
 
-// GET /users/getuser/:username - Get user info by username
+// GET /users/getuser/:userid - Get user info by userid
 module.exports.getUser = function(req, res) {
 
-  if(!req.params.username) {
-    utils.sendJSONresponse(res, 404, {"message" : "Username is not set"});
+  if(!req.params.userid) {
+    utils.sendJSONresponse(res, 404, {"message" : "Userid is not set"});
     return;
   }
 
-  User.findOne({"name" : req.params.username})
+  User.findById(req.params.userid)
       .populate("", "-salt -hash")
       .exec(function(err, user) {
         if(user) {
@@ -61,12 +61,12 @@ module.exports.usersInCommunity = function(req, res) {
 
 };
 
-// GET /users/community/:username - Gets community info for a username
+// GET /users/community/:userid - Gets community info for a userid
 module.exports.userCommunity = function(req, res) {
 
-  var username = req.params.username;
+  var userid = req.params.userid;
 
-  User.findOne({"name" : username})
+  User.findById(userid)
       .exec(function(err, user) {
         if(err) {
           sendJSONresponse(res, 404, {"message" : "Error while finding user"});
@@ -87,16 +87,24 @@ module.exports.userCommunity = function(req, res) {
   });
 };
 
-// GET /users/:username/image - Gets users image url
+// GET /users/:userid/image - Gets users image url
 module.exports.userImage = function(req, res) {
 
-  User.findOne({name: req.params.username}, function(err, user) {
-    if(user) {
-      utils.sendJSONresponse(res, 200, user.userImage);
-    } else {
-      utils.sendJSONresponse(res, 404, null);
-    }
-  });
+  if (!req.params.userid) {
+    utils.sendJSONresponse(res, 404, {
+      "message": "Userid is not set"
+    });
+    return;
+  }
+
+  User.findById(req.params.userid)
+    .exec(function(err, user) {
+      if (user) {
+        utils.sendJSONresponse(res, 200, user.userImage);
+      } else {
+        utils.sendJSONresponse(res, 404, null);
+      }
+    });
 };
 
 module.exports.forgotPassword = function(req, res) {
@@ -151,29 +159,33 @@ module.exports.uploadImage = function(req, res) {
   var stream = fs.createReadStream(file.path);
 
   var params = {
-      Key: file.originalFilename,
-      Body: stream
+    Key: file.originalFilename,
+    Body: stream
   };
 
   imageUploadService.upload(params, file.path, function() {
-      var fullUrl = "https://" + imageUploadService.getRegion()
-      + ".amazonaws.com/" + imageUploadService.getBucket() + "/" +
-          escape(file.originalFilename);
+    var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
+     imageUploadService.getBucket() + "/" +  escape(file.originalFilename);
 
-      fs.unlinkSync(file.path);
+    fs.unlinkSync(file.path);
 
-      User.findOne({name: req.params.username}, function(err, user) {
-        if(user) {
+    User.findById(req.params.userid)
+      .exec(function(err, user) {
+        if (user) {
           user.userImage = fullUrl;
           user.save(function(err) {
-            if(err) {
-              utils.sendJSONresponse(res, 404, {message: "Unable to save user"});
+            if (err) {
+              utils.sendJSONresponse(res, 404, {
+                message: "Unable to save user"
+              });
             } else {
               utils.sendJSONresponse(res, 200, fullUrl);
             }
           });
         } else {
-          utils.sendJSONresponse(res, 404, {message: "Unable to find user"});
+          utils.sendJSONresponse(res, 404, {
+            message: "Unable to find user"
+          });
         }
       });
 
@@ -183,24 +195,28 @@ module.exports.uploadImage = function(req, res) {
 
 module.exports.updateUsername = function(req, res) {
 
-  User.findOne({name: req.params.username}, function(err, user) {
-    if(user) {
-      user.name = req.body.username;
+  User.findById(req.params.userid)
+    .exec(function(err, user) {
+      if (user) {
+        user.name = req.body.username;
 
-      user.save(function(err, u) {
-        if(err) {
-          utils.sendJSONresponse(res, 200, u);
-        } else {
-          utils.sendJSONresponse(res, 404, null);
-
-        }
-      });
-    } else {
-      utils.sendJSONresponse(res, 404, null);
-    }
-  });
+        user.save(function(err, u) {
+          if (err) {
+            console.log(err);
+            if(err.err.indexOf('dup key') !== -1) {
+              utils.sendJSONresponse(res, 404, {'message' : 'This username is already taken'});
+            } else {
+              utils.sendJSONresponse(res, 404, {'message' : 'Error while saving user'});
+            }
+          } else {
+            utils.sendJSONresponse(res, 200, u);
+          }
+        });
+      } else {
+        utils.sendJSONresponse(res, 404, {'message' : 'User not found'});
+      }
+    });
 };
-
 
 // HELPER FUNCTIONS
 

@@ -111,14 +111,14 @@ router.delete('/appointments/:appointmentid/comments/:commentid', auth, ctrlAppo
 
 // users
 router.get('/users', auth, ctrlUsers.usersList);
-router.get('/users/getuser/:username', auth, ctrlUsers.getUser);
+router.get('/users/getuser/:userid', auth, ctrlUsers.getUser);
 router.get('/users/list/:community', auth, ctrlUsers.usersInCommunity);
-router.get('/users/community/:username', auth, ctrlUsers.userCommunity);
-router.get('/users/:username/image', ctrlUsers.userImage);
-router.post('/users/:username/upload', auth, multipartyMiddleware, ctrlUsers.uploadImage);
+router.get('/users/community/:userid', auth, ctrlUsers.userCommunity);
+router.get('/users/:userid/image', ctrlUsers.userImage);
+router.post('/users/:userid/upload', auth, multipartyMiddleware, ctrlUsers.uploadImage);
 router.post('/users/forgotpassowrd/:email', ctrlUsers.forgotPassword);
 router.post('/users/reset/:token', ctrlUsers.resetPassword);
-router.put('/users/change/:username', auth, ctrlUsers.updateUsername);
+router.put('/users/change/:userid', auth, ctrlUsers.updateUsername);
 
 //users payment
 router.post('/users/:userid/savecard', auth, ctrlPayment.saveCreditCard);
