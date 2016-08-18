@@ -232,9 +232,10 @@ module.exports.communitiesReadOne = function(req, res) {
     }
 };
 
+
 module.exports.removeMember = function(req, res) {
 
-  console.log(req.params.communityid);
+  console.log(req.params.userid);
 
   Community.findOne({"_id" : req.params.communityid}, function(err, community) {
     if(community) {
@@ -242,18 +243,7 @@ module.exports.removeMember = function(req, res) {
       community.directors.pull(req.params.userid);
       community.minions.pull(req.params.userid);
 
-      console.log(req.params.username);
-
-      //if the user we are removing is the creator, set the one who removed him the creator
-      if(req.params.userid === community.creator) {
-        User.findOne({name: req.params.username}, function(err, user) {
-          if(user) {
-            community.creator = user._id;
-          } else {
-            utils.sendJSONresponse(res, 404, {message: "Error finding user"});
-          }
-        });
-      }
+      //community.creator = req.params.userid;
 
       removeCommunityFromUser(res, req.params.userid, function() {
         community.save(function(err) {
@@ -317,7 +307,7 @@ module.exports.restoreCommunity = function(req, res) {
   .exec(function(err, users) {
     if(users) {
 
-      
+
       async.each(users, function(user, cont) {
         user.community = user.prevCommunity;
         user.prevCommunity = communityid;

@@ -44,7 +44,7 @@ module.exports.getUser = function(req, res) {
           utils.sendJSONresponse(res, 404, {message: "User not found!"});
         }
   });
-}
+};
 
 // GET /users/list/:community - List all users from a community
 module.exports.usersInCommunity = function(req, res) {
