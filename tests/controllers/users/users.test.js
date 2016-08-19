@@ -29,12 +29,12 @@ describe('Users', function() {
   });
 
   describe('#get user', function() {
-    it('Get user info by username', function(done) {
+    it('Get user info by userid', function(done) {
 
       var user = utils.getTestUser();
 
       utils.server
-        .get('/api/users/getuser/' + user.name)
+        .get('/api/users/getuser/' + user.id)
         .set('Authorization', 'Bearer ' + user.token)
         .expect(200)
         .end(function(err,res){
@@ -51,7 +51,7 @@ describe('Users', function() {
 
 
   describe('#get user', function() {
-    it('Show error if username not specified', function(done) {
+    it('Show error if userid not specified', function(done) {
 
       var user = utils.getTestUser();
 
@@ -72,12 +72,12 @@ describe('Users', function() {
   });
 
   describe('#user community', function() {
-    it('Gets users community info, by username', function(done) {
+    it('Gets users community info, by userid', function(done) {
 
       var user = utils.getTestUser();
 
       utils.server
-        .get('/api/users/community/' + user.name)
+        .get('/api/users/community/' + user.id)
         .set('Authorization', 'Bearer ' + user.token)
         .expect(200)
         .end(function(err,res){
@@ -119,7 +119,7 @@ describe('Users', function() {
       var user = utils.getTestUser();
 
       utils.server
-        .get('/api/users/' + user.name + '/image')
+        .get('/api/users/' + user.id + '/image')
         .set('Authorization', 'Bearer ' + user.token)
         .expect(200)
         .end(function(err,res){

@@ -44,6 +44,7 @@ function setupData(callback) {
     .end(function(err, res){
       testUser.token = res.body.token;
       testUser.community = res.body.community;
+      testUser.id = res.body.id;
       callback();
     });
 

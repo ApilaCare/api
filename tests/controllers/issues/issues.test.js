@@ -12,7 +12,7 @@ describe('Issues', function() {
 
       var issueData = {
         "title": 'Issue 1',
-        "responsibleParty": user.name,
+        "responsibleParty": user.id,
         "resolutionTimeframe": 'Days',
         "description": 'Some description',
         "confidential": false,
@@ -67,7 +67,7 @@ describe('Issues', function() {
       var user = utils.getTestUser();
 
       utils.server
-        .get('/api/issues/count/' + user.name + '/id/' + user.community._id)
+        .get('/api/issues/count/' + user.id + '/id/' + user.community._id)
         .set('Accept', 'application/json')
         .set('Authorization', 'Bearer ' + user.token)
         .expect(200)
