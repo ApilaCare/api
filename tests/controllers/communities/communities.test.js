@@ -29,6 +29,7 @@ describe('Communities', function() {
             done(err);
           } else {
             communityid = res.body._id;
+            utils.setCommunity(communityid);
             done();
           }
         });

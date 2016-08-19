@@ -47,7 +47,7 @@ module.exports.saveCreditCard = function(req, res) {
        utils.sendJSONresponse(res, 404, {message: "Couldn't find the user"});
     }
   });
-}
+};
 
 module.exports.updateCustomer = function(req, res) {
   var userid = req.params.userid;
@@ -66,7 +66,7 @@ module.exports.updateCustomer = function(req, res) {
        utils.sendJSONresponse(res, 404, {message: "Couldn't find the user"});
     }
   });
-}
+};
 
 module.exports.getCustomer = function(req, res) {
   var user = req.params.userid;
@@ -90,7 +90,7 @@ module.exports.getCustomer = function(req, res) {
     }
 
   });
-}
+};
 
 module.exports.cancelSubscription = function(req, res) {
   var userid = req.params.userid;
@@ -117,7 +117,7 @@ module.exports.cancelSubscription = function(req, res) {
        utils.sendJSONresponse(res, 404, {message: "Error while finding user"});
     }
   });
-}
+};
 
 // get's full plans info for the default standard plan
 module.exports.standardPlan = function(req, res) {
@@ -129,36 +129,29 @@ module.exports.standardPlan = function(req, res) {
        utils.sendJSONresponse(res, 404, {message : "Standard plan not found"});
     }
   });
-}
+};
 
 // HELPER FUNCTIONS
 
 function revertToTestCommunity(res, communityid, callback) {
 
-  console.log(communityid);
-
   User.find({"community" : communityid})
   .exec(function(err, users) {
     if(users) {
 
-      console.log(users);
       async.each(users, function(user, cont) {
         user.community = user.prevCommunity;
         user.prevCommunity = communityid;
-
-        console.log("In async for each");
 
         user.save(function(err) {
           if(err) {
             cont(false);
           } else {
-              console.log('Saving users');
             cont();
 
           }
         });
       }, function(err) {
-        console.log("we are finished" + err);
         callback(true);
       });
     } else {

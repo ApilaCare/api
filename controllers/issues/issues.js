@@ -22,7 +22,9 @@ module.exports.issuesCreate = function(req, res) {
       utils.sendJSONresponseresponse(res, 400, err);
     } else {
 
-      User.populate(issue, {path: 'responsibleParty'}, function(err, populatedIssue) {
+      User.populate(issue, {
+        path: 'responsibleParty'
+      }, function(err, populatedIssue) {
         utils.sendJSONresponse(res, 200, populatedIssue);
       });
 
@@ -38,10 +40,9 @@ module.exports.issuesOpenCount = function(req, res) {
   var userid = req.params.userid;
   var community = req.params.communityid;
 
-  console.log("userid: " + userid);
-
   if (!community || !userid) {
     utils.sendJSONresponse(res, 404, 0);
+    return;
   }
 
   Iss.find({
@@ -58,90 +59,150 @@ module.exports.issuesOpenCount = function(req, res) {
   });
 };
 
+// GET /issues/issuescount/:communityid - Number of open isues for a community
 module.exports.issuesCount = function(req, res) {
 
-  console.log("issuesCount");
-  var c =  req.params.communityid;
+  var communityid = req.params.communityid;
 
-  if(c === undefined){
+  if (!communityid) {
     utils.sendJSONresponse(res, 404, 0);
+    return;
   }
 
-  Iss.find({status: "Open", community: c}, function(err, issues) {
-      console.log(issues.length);
+  Iss.find({
+    status: "Open",
+    community: communityid
+  }, function(err, issues) {
+    if(err) {
+      utils.sendJSONresponse(res, 404, {'message' : err});
+    } else {
       utils.sendJSONresponse(res, 200, issues.length);
+    }
+
   });
 };
 
-/* GET list of issues */
+// GET /issues/list/:status/id/:communityid - Gets a list of issues grouped by responsibleParty
+// and sorted by users issue number
 module.exports.issuesList = function(req, res) {
 
-    console.log("list issue with ID: " + req.params.communityid);
+  var id = req.params.communityid;
+  var status = req.params.status;
 
-    var id = req.params.communityid;
+  if(!id || !status) {
+    utils.sendJSONresponse(res, 404, {'message' : "params not specified"});
+    return;
+  }
 
-    var issueTemplate = {
-                 "title" : "$title",
-                 "responsibleParty" : "$responsibleParty",
-                 "resolutionTimeframe" : "$resolutionTimeframe",
-                 "description" : "$description",
-                 "submitBy" : "$submitBy",
-                 "submitDate": "$submitDate",
-                 "comments" : "$comments",
-                 "updateInfo" : "$updateInfo",
-                 "status"  : "$status",
-                 "idMembers": "$idMembers",
-                 "idLabels" : "$idLabels",
-                 "idAttachmentCover" : "$idAttachmentCover",
-                 "attachments" : "$attachments",
-                 "labels"    : "$labels",
-                 "checklists": "$checklists",
-                 "_id" : "$_id",
-                 "community" : "$community",
-                 "due" : "$due",
-                 "confidential" : "$confidential"
-               };
+  var issueTemplate = {
+    "title": "$title",
+    "responsibleParty": "$responsibleParty",
+    "resolutionTimeframe": "$resolutionTimeframe",
+    "description": "$description",
+    "submitBy": "$submitBy",
+    "submitDate": "$submitDate",
+    "comments": "$comments",
+    "updateInfo": "$updateInfo",
+    "status": "$status",
+    "idMembers": "$idMembers",
+    "idLabels": "$idLabels",
+    "idAttachmentCover": "$idAttachmentCover",
+    "attachments": "$attachments",
+    "labels": "$labels",
+    "checklists": "$checklists",
+    "_id": "$_id",
+    "community": "$community",
+    "due": "$due",
+    "confidential": "$confidential"
+  };
 
-    Iss.aggregate([{'$match' : {community : new mongoose.Types.ObjectId(id),
-                                status : req.params.status}},
+  Iss.aggregate([{
+        '$match': {
+          community: new mongoose.Types.ObjectId(id),
+          status: req.params.status
+        }
+      },
+      {
+        '$group': {
+          "_id": "$responsibleParty",
+          count: {
+            "$sum": 1
+          },
+          issues: {
+            $push: issueTemplate
+          }
+        }
+      }, {
+        '$sort': {
+          "count": -1
+        }
+      }
+    ],
+    function(err, issues) {
 
-      {'$group' : {"_id": "$responsibleParty",
-                  count: {"$sum" : 1},
-                  issues: {$push : issueTemplate}}},
-                  {'$sort' : {"count" : -1}}],
-     function(err, issues) {
-      // console.log(issues);
-       User.populate(issues, {path: '_id', model: 'User'} , function(err, populatedIss) {
-        //console.log(issues);
-         console.log(populatedIss);
-         utils.sendJSONresponse(res, 200, issues);
-       });
+      //Populate user model so we have responsibleParty name and not just the _id
+      User.populate(issues, {
+        path: '_id',
+        model: 'User'
+      }, function(err) {
+        if(err) {
+          utils.sendJSONresponse(res, 404, {'message' : err});
+        } else {
+          utils.sendJSONresponse(res, 200, issues);
+        }
+
+      });
 
     });
 };
 
+// GET /issues/:username/s/:status/id/:communityid - List issues in a community by status
 module.exports.issuesListByStatus = function(req, res) {
 
-  var s = req.params.status;
-  var c =  req.params.communityid;
+  var status = req.params.status;
+  var communityid = req.params.communityid;
 
-  Iss.find({status: s, community: c}, function(err, issues) {
-      //console.log(issues);
+  if(!status || !communityid) {
+    utils.sendJSONresponse(res, 404, {'message' : 'Params are not specified'});
+    return;
+  }
+
+  Iss.find({
+    status: status,
+    community: communityid
+  }, function(err, issues) {
+    if(err) {
+      utils.sendJSONresponse(res, 404, {'message' : err});
+    } else {
       utils.sendJSONresponse(res, 200, issues);
+    }
   });
 };
 
+// GET /issues/due/:communityid - List of issues that are due in a community
 module.exports.dueIssuesList = function(req, res) {
-  Iss.find({"due" : {$exists: true}, community: req.params.communityid},
-  function(err, issues) {
-    if(issues) {
-      utils.sendJSONresponse(res, 200, issues);
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        "message": "Issues with due date not found"
-      });
-    }
-  });
+
+  var communityid = req.params.communityid;
+
+  if(!communityid) {
+    utils.sendJSONresponse(res, 404, {'message': 'Params not specified'});
+  }
+
+  Iss.find({
+      "due": {
+        $exists: true
+      },
+      community: communityid
+    },
+    function(err, issues) {
+      if (issues) {
+        utils.sendJSONresponse(res, 200, issues);
+      } else {
+        utils.sendJSONresponse(res, 404, {
+          "message": "Issues with due date not found"
+        });
+      }
+    });
 };
 
 // GET /issues/:issueid - Reads issue info by id
@@ -172,101 +233,96 @@ module.exports.issuesReadOne = function(req, res) {
   }
 };
 
-/* PUT /api/issue/:issueid */
+// PUT issues/:issueid - Updates issue by its id
 module.exports.issuesUpdateOne = function(req, res) {
 
-    if (!req.params.issueid) {
-        utils.sendJSONresponse(res, 404, {
-            "message": "Not found, issueid is required"
+  if (!req.params.issueid) {
+    utils.sendJSONresponse(res, 404, {
+      "message": "Not found, issueid is required"
+    });
+    return;
+  }
+
+  var updateInfo = {
+    "updateBy": req.body.modifiedBy,
+    "updateDate": req.body.modifiedDate,
+    "updateField": req.body.updateField
+  };
+
+  Iss
+    .findById(req.params.issueid)
+    .exec(
+      function(err, issue) {
+
+        if (!issue) {
+          utils.sendJSONresponse(res, 404, {
+            "message": "issueid not found"
+          });
+          return;
+        } else if (err) {
+          utils.sendJSONresponse(res, 400, err);
+          return;
+        }
+
+        issue.title = req.body.title;
+        issue.responsibleParty = req.body.responsibleParty;
+        issue.resolutionTimeframe = req.body.resolutionTimeframe;
+        issue.submitBy = req.body.submitBy;
+        issue.description = req.body.description;
+        issue.status = req.body.status;
+        issue.due = req.body.due;
+
+        issue.checklists = req.body.checklists;
+        issue.labels = req.body.labels;
+        issue.updateInfo = req.body.updateInfo;
+        issue.shelvedDate = req.body.shelvedDate;
+
+        if (req.body.deletedMember !== undefined) {
+          issue.idMembers.splice(issue.idMembers.map(function(d) {
+            return d.name;
+          }).indexOf(req.body.deletedMember), 1);
+        } else {
+          issue.idMembers = req.body.idMembers;
+        }
+
+
+        if (updateInfo.updateField !== undefined) {
+          if (updateInfo.updateField.length > 0) {
+            issue.updateInfo.push(updateInfo);
+          }
+
+        }
+
+        issue.save(function(err, issue) {
+          if (err) {
+            utils.sendJSONresponse(res, 404, err);
+          } else {
+            utils.sendJSONresponse(res, 200, issue);
+          }
         });
-        return;
-    }
-
-    console.log("UPDATE");
-
-    var updateInfo = {
-        "updateBy": req.body.modifiedBy,
-        "updateDate": req.body.modifiedDate,
-        "updateField": req.body.updateField
-    };
-
-    Iss
-        .findById(req.params.issueid)
-        .exec(
-            function(err, issue) {
-                if (!issue) {
-                    utils.sendJSONresponse(res, 404, {
-                        "message": "issueid not found"
-                    });
-                    return;
-                } else if (err) {
-                    utils.sendJSONresponse(res, 400, err);
-                    return;
-                }
-
-                issue.title = req.body.title;
-                issue.responsibleParty = req.body.responsibleParty;
-                issue.resolutionTimeframe = req.body.resolutionTimeframe;
-                issue.submitBy = req.body.submitBy;
-                issue.description = req.body.description;
-                issue.status = req.body.status;
-                issue.due = req.body.due;
-
-                issue.checklists = req.body.checklists;
-                issue.labels = req.body.labels;
-                issue.updateInfo = req.body.updateInfo;
-                issue.shelvedDate = req.body.shelvedDate;
-
-                console.log(req.body);
-                if(req.body.deletedMember !== undefined) {
-                  issue.idMembers.splice(issue.idMembers.map
-                    (function(d){return d.name;}).indexOf(req.body.deletedMember), 1);
-                } else {
-                    issue.idMembers = req.body.idMembers;
-                }
-
-
-
-                console.log(issue.idMembers);
-
-                if(updateInfo.updateField !== undefined) {
-                  if(updateInfo.updateField.length > 0) {
-                    issue.updateInfo.push(updateInfo);
-                  }
-
-                }
-
-                issue.save(function(err, issue) {
-                    if (err) {
-                        utils.sendJSONresponse(res, 404, err);
-                    } else {
-                        utils.sendJSONresponse(res, 200, issue);
-                    }
-                });
-            }
-        );
+      }
+    );
 };
 
-/* DELETE /api/issue/:issueid */
+// DELETE /issues/:issueid - Delte an issue by id
 module.exports.issuesDeleteOne = function(req, res) {
-    var issueid = req.params.issueid;
-    if (issueid) {
-        Iss
-            .findByIdAndRemove(issueid)
-            .exec(
-                function(err, issue) {
-                    if (err) {
-                        console.log(err);
-                        utils.sendJSONresponse(res, 404, err);
-                        return;
-                    }
-                    console.log("issue id " + issueid + " deleted");
-                    utils.sendJSONresponse(res, 204, null);
-                }
-            );
-    } else {
-        sendJSONresponse(res, 404, {
-            "message": "No issueid"
-        });
-    }
+  var issueid = req.params.issueid;
+  if (issueid) {
+    Iss
+      .findByIdAndRemove(issueid)
+      .exec(
+        function(err, issue) {
+          if (err) {
+            console.log(err);
+            utils.sendJSONresponse(res, 404, err);
+            return;
+          }
+          utils.sendJSONresponse(res, 204, null);
+        }
+      );
+  } else {
+    sendJSONresponse(res, 404, {
+      "message": "No issueid"
+    });
+  }
 };
