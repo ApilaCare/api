@@ -1,16 +1,17 @@
 var mongoose = require('mongoose');
+var utils = require('../../services/utils');
+
 var Iss = mongoose.model('Issue');
 var User = mongoose.model('User');
-
-var sendJSONresponse = function(res, status, content) {
-    res.status(status);
-    res.json(content);
-};
 
 /* POST a new label, providing a issueid */
 /* /api/issues/:issueid/labels/new */
 module.exports.issueLabelsCreate = function(req, res) {
-    console.log("Commenting max kek, or some labels lol");
+
+    if(utils.checkParams(req, res, ['issueid'])) {
+      return;
+    }
+
     getAuthor(req, res, function(req, res, userName) {
         if (req.params.issueid) {
             Iss
@@ -18,7 +19,7 @@ module.exports.issueLabelsCreate = function(req, res) {
                 .exec(
                     function(err, issue) {
                         if (err) {
-                            sendJSONresponse(res, 400, err);
+                            utils.sendJSONresponse(res, 400, err);
                         } else {
 
                             doAddLabel(req, res, issue, userName);
@@ -26,7 +27,7 @@ module.exports.issueLabelsCreate = function(req, res) {
                     }
                 );
         } else {
-            sendJSONresponse(res, 404, {
+            utils.sendJSONresponse(res, 404, {
                 "message": "Not found, issueid required"
             });
         }
@@ -34,7 +35,7 @@ module.exports.issueLabelsCreate = function(req, res) {
 };
 
 var getAuthor = function(req, res, callback) {
-    console.log("Finding author with email " + req.payload.email);
+
     if (req.payload.email) {
         User
             .findOne({
@@ -42,13 +43,13 @@ var getAuthor = function(req, res, callback) {
             })
             .exec(function(err, user) {
                 if (!user) {
-                    sendJSONresponse(res, 404, {
+                    utils.sendJSONresponse(res, 404, {
                         "message": "User not found"
                     });
                     return;
                 } else if (err) {
                     console.log(err);
-                    sendJSONresponse(res, 404, err);
+                    utils.sendJSONresponse(res, 404, err);
                     return;
                 }
                 console.log(user);
@@ -56,7 +57,7 @@ var getAuthor = function(req, res, callback) {
             });
 
     } else {
-        sendJSONresponse(res, 404, {
+        utils.sendJSONresponse(res, 404, {
             "message": "User not found"
         });
         return;
@@ -66,7 +67,7 @@ var getAuthor = function(req, res, callback) {
 var doAddLabel = function(req, res, issue, username) {
 
     if (!issue) {
-        sendJSONresponse(res, 404, "issueid not found");
+        utils.sendJSONresponse(res, 404, "issueid not found");
     } else {
         issue.labels.push({
             author: req.payload.name, // I dont think we need to track which users created a label
@@ -81,10 +82,11 @@ var doAddLabel = function(req, res, issue, username) {
         issue.save(function(err, issue) {
             var thisLabel;
             if (err) {
-                sendJSONresponse(res, 400, err);
+                utils.sendJSONresponse(res, 400, err);
+                console.log(err);
             } else {
                 thisLabel = issue.labels[issue.labels.length - 1];
-                sendJSONresponse(res, 201, thisLabel);
+                utils.sendJSONresponse(res, 201, thisLabel);
             }
         });
     }
@@ -92,12 +94,11 @@ var doAddLabel = function(req, res, issue, username) {
 
 
 module.exports.issueLabelsUpdateOne = function(req, res) {
-    if (!req.params.issueid || !req.params.labelid) {
-        sendJSONresponse(res, 404, {
-            "message": "Not found, issueid and labelid are both required"
-        });
-        return;
+
+    if(utils.checkParams(req, res, ['issueid', 'labelid'])) {
+      return;
     }
+
     Iss
         .findById(req.params.issueid)
         .select('labels')
@@ -108,18 +109,18 @@ module.exports.issueLabelsUpdateOne = function(req, res) {
                 console.log(issue);
 
                 if (!issue) {
-                    sendJSONresponse(res, 404, {
+                    utils.sendJSONresponse(res, 404, {
                         "message": "issueid not found"
                     });
                     return;
                 } else if (err) {
-                    sendJSONresponse(res, 400, err);
+                    utils.sendJSONresponse(res, 400, err);
                     return;
                 }
                 if (issue.labels && issue.labels.length > 0) {
                     thisLabel = issue.labels.id(req.params.labelid);
                     if (!thisLabel) {
-                        sendJSONresponse(res, 404, {
+                        utils.sendJSONresponse(res, 404, {
                             "message": "labelid not found"
                         });
                     } else {
@@ -129,14 +130,14 @@ module.exports.issueLabelsUpdateOne = function(req, res) {
                         issue.save(function(err, issue) {
                             if (err) {
                                 console.log(err);
-                                sendJSONresponse(res, 404, err);
+                                utils.sendJSONresponse(res, 404, err);
                             } else {
-                                sendJSONresponse(res, 200, thisLabel);
+                                utils.sendJSONresponse(res, 200, thisLabel);
                             }
                         });
                     }
                 } else {
-                    sendJSONresponse(res, 404, {
+                    utils.sendJSONresponse(res, 404, {
                         "message": "No label to update"
                     });
                 }
@@ -145,7 +146,11 @@ module.exports.issueLabelsUpdateOne = function(req, res) {
 };
 
 module.exports.issueLabelsReadOne = function(req, res) {
-    console.log("Getting single label");
+
+  if(utils.checkParams(req, res, ['issueid', 'labelid'])) {
+    return;
+  }
+
     if (req.params && req.params.issueid && req.params.labelid) {
         Iss
             .findById(req.params.issueid)
@@ -155,18 +160,18 @@ module.exports.issueLabelsReadOne = function(req, res) {
                     console.log(issue);
                     var response, label;
                     if (!issue) {
-                        sendJSONresponse(res, 404, {
+                        utils.sendJSONresponse(res, 404, {
                             "message": "issueid not found"
                         });
                         return;
                     } else if (err) {
-                        sendJSONresponse(res, 400, err);
+                        utils.sendJSONresponse(res, 400, err);
                         return;
                     }
                     if (issue.labels && issue.labels.length > 0) {
                         label = issue.labels.id(req.params.labelid);
                         if (!label) {
-                            sendJSONresponse(res, 404, {
+                            utils.sendJSONresponse(res, 404, {
                                 "message": "label not found"
                             });
                         } else {
@@ -177,53 +182,48 @@ module.exports.issueLabelsReadOne = function(req, res) {
                                 },
                                 label: label
                             };
-                            sendJSONresponse(res, 200, response);
+                            utils.sendJSONresponse(res, 200, response);
                         }
                     } else {
-                        sendJSONresponse(res, 404, {
+                        utils.sendJSONresponse(res, 404, {
                             "message": "No labels found"
                         });
                     }
                 }
             );
     } else {
-        sendJSONresponse(res, 404, {
+        utils.sendJSONresponse(res, 404, {
             "message": "Not found, issueid and labelid are both required"
         });
     }
 };
 
-module.exports.issueLabelsList = function(req, res) {}
 
 // app.delete('/api/issues/:issueid/labels/:labelid'
 module.exports.issueLabelsDeleteOne = function(req, res) {
 
-    console.log("deleting labels");
+  if(utils.checkParams(req, res, ['issueid', 'labelid'])) {
+    return;
+  }
 
-    if (!req.params.issueid || !req.params.labelid) {
-        sendJSONresponse(res, 404, {
-            "message": "Not found, issueid and labelid are both required"
-        });
-        return;
-    }
     Iss
         .findById(req.params.issueid)
         .select('labels updateInfo')
         .exec(
             function(err, issue) {
                 if (!issue) {
-                    sendJSONresponse(res, 404, {
+                    utils.sendJSONresponse(res, 404, {
                         "message": "issueid not found"
                     });
                     return;
                 } else if (err) {
-                    sendJSONresponse(res, 400, err);
+                    utils.sendJSONresponse(res, 400, err);
                     return;
                 }
                 if (issue.labels && issue.labels.length > 0) {
                     if (!issue.labels.id(req.params.labelid)) {
 
-                        sendJSONresponse(res, 404, {
+                        utils.sendJSONresponse(res, 404, {
                             "message": "labelid not found"
                         });
                     } else {
@@ -250,14 +250,14 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
                         issue.save(function(err) {
                             if (err) {
                                console.log(err);
-                                sendJSONresponse(res, 404, err);
+                                utils.sendJSONresponse(res, 404, err);
                             } else {
-                                sendJSONresponse(res, 204, {});
+                                utils.sendJSONresponse(res, 204, {});
                             }
                         });
                     }
                 } else {
-                    sendJSONresponse(res, 404, {
+                    utils.sendJSONresponse(res, 404, {
                         "message": "No label to delete"
                     });
                 }

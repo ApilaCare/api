@@ -30,34 +30,43 @@ module.exports.usersList = function(req, res) {
 // GET /users/getuser/:userid - Get user info by userid
 module.exports.getUser = function(req, res) {
 
-  if(!req.params.userid) {
-    utils.sendJSONresponse(res, 404, {"message" : "Userid is not set"});
+  if (utils.checkParams(req, res, ['userid'])) {
     return;
   }
 
   User.findById(req.params.userid)
-      .populate("", "-salt -hash")
-      .exec(function(err, user) {
-        if(user) {
-          utils.sendJSONresponse(res, 200, user);
-        } else {
-          utils.sendJSONresponse(res, 404, {message: "User not found!"});
-        }
-  });
+    .populate("", "-salt -hash")
+    .exec(function(err, user) {
+      if (user) {
+        utils.sendJSONresponse(res, 200, user);
+      } else {
+        utils.sendJSONresponse(res, 404, {
+          message: "User not found!"
+        });
+      }
+    });
 };
 
 // GET /users/list/:community - List all users from a community
 module.exports.usersInCommunity = function(req, res) {
 
-  User.find({community: req.params.community})
-      .populate("recovery", "-salt -hash")
-      .exec( function(err, users) {
-        if(err) {
-          utils.sendJSONresponse(res, 404, {"message" : "Error finding users in community"});
-        } else {
-          utils.sendJSONresponse(res, 200, users);
-        }
-  });
+  if (utils.checkParams(req, res, ['community'])) {
+    return;
+  }
+
+  User.find({
+      community: req.params.community
+    })
+    .populate("recovery", "-salt -hash")
+    .exec(function(err, users) {
+      if (err) {
+        utils.sendJSONresponse(res, 404, {
+          "message": "Error finding users in community"
+        });
+      } else {
+        utils.sendJSONresponse(res, 200, users);
+      }
+    });
 
 };
 
@@ -66,34 +75,39 @@ module.exports.userCommunity = function(req, res) {
 
   var userid = req.params.userid;
 
-  User.findById(userid)
-      .exec(function(err, user) {
-        if(err) {
-          sendJSONresponse(res, 404, {"message" : "Error while finding user"});
-        } else {
+  if (utils.checkParams(req, res, ['userid'])) {
+    return;
+  }
 
-          if(user.community) {
-            Community.findById(user.community)
+  User.findById(userid)
+    .exec(function(err, user) {
+      if (err) {
+        sendJSONresponse(res, 404, {
+          "message": "Error while finding user"
+        });
+      } else {
+
+        if (user.community) {
+          Community.findById(user.community)
             .populate("communityMembers pendingMembers directors minions creator boss communityMembers.recovery", "-salt -hash")
-            .exec( function(err, community) {
-              if(err) {
-                utils.sendJSONresponse(res, 400, {"message" : "Error while finding community"});
+            .exec(function(err, community) {
+              if (err) {
+                utils.sendJSONresponse(res, 400, {
+                  "message": "Error while finding community"
+                });
               } else {
                 utils.sendJSONresponse(res, 200, community);
               }
             });
-          }
         }
-  });
+      }
+    });
 };
 
 // GET /users/:userid/image - Gets users image url
 module.exports.userImage = function(req, res) {
 
-  if (!req.params.userid) {
-    utils.sendJSONresponse(res, 404, {
-      "message": "Userid is not set"
-    });
+  if (utils.checkParams(req, res, ['userid'])) {
     return;
   }
 
@@ -109,47 +123,62 @@ module.exports.userImage = function(req, res) {
 
 module.exports.forgotPassword = function(req, res) {
 
-      crypto.randomBytes(20, function(err, buf) {
-        var token = buf.toString('hex');
+  if (utils.checkParams(req, res, ['email'])) {
+    return;
+  }
 
-        User.findOne({"email": req.params.email}, function(err, user) {
+  crypto.randomBytes(20, function(err, buf) {
+    var token = buf.toString('hex');
 
-          if(user) {
-            user.resetPasswordToken = token;
-            user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    User.findOne({
+      "email": req.params.email
+    }, function(err, user) {
 
-            user.save(function(err) {
-              doSendPasswordForget(req, res, token);
-            });
-          } else {
-            utils.sendJSONresponse(res, 404, null);
-          }
+      if (user) {
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
-
+        user.save(function(err) {
+          doSendPasswordForget(req, res, token);
         });
+      } else {
+        utils.sendJSONresponse(res, 404, null);
+      }
 
-        });
+
+    });
+
+  });
 
 };
 
 module.exports.resetPassword = function(req, res) {
 
-  User.findOne({"resetPasswordToken": req.params.token, "resetPasswordExpires": {$gt: Date.now()}},
-       function(err, user) {
+  if (utils.checkParams(req, res, ['token'])) {
+    return;
+  }
 
-         if(user) {
-           user.setPassword(req.body.password);
-           user.resetPasswordToken = undefined;
-           user.resetPasswordExpires = undefined;
+  User.findOne({
+      "resetPasswordToken": req.params.token,
+      "resetPasswordExpires": {
+        $gt: Date.now()
+      }
+    },
+    function(err, user) {
 
-           user.save(function(err) {
-             utils.sendJSONresponse(res, 200, null);
-           });
-         } else {
-           utils.sendJSONresponse(res, 403, null);
-         }
+      if (user) {
+        user.setPassword(req.body.password);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
 
-  });
+        user.save(function(err) {
+          utils.sendJSONresponse(res, 200, null);
+        });
+      } else {
+        utils.sendJSONresponse(res, 403, null);
+      }
+
+    });
 };
 
 module.exports.uploadImage = function(req, res) {
@@ -165,7 +194,7 @@ module.exports.uploadImage = function(req, res) {
 
   imageUploadService.upload(params, file.path, function() {
     var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
-     imageUploadService.getBucket() + "/" +  escape(file.originalFilename);
+      imageUploadService.getBucket() + "/" + escape(file.originalFilename);
 
     fs.unlinkSync(file.path);
 
@@ -195,6 +224,10 @@ module.exports.uploadImage = function(req, res) {
 
 module.exports.updateUsername = function(req, res) {
 
+  if (utils.checkParams(req, res, ['userid'])) {
+    return;
+  }
+
   User.findById(req.params.userid)
     .exec(function(err, user) {
       if (user) {
@@ -203,17 +236,23 @@ module.exports.updateUsername = function(req, res) {
         user.save(function(err, u) {
           if (err) {
             console.log(err);
-            if(err.err.indexOf('dup key') !== -1) {
-              utils.sendJSONresponse(res, 404, {'message' : 'This username is already taken'});
+            if (err.err.indexOf('dup key') !== -1) {
+              utils.sendJSONresponse(res, 404, {
+                'message': 'This username is already taken'
+              });
             } else {
-              utils.sendJSONresponse(res, 404, {'message' : 'Error while saving user'});
+              utils.sendJSONresponse(res, 404, {
+                'message': 'Error while saving user'
+              });
             }
           } else {
             utils.sendJSONresponse(res, 200, u);
           }
         });
       } else {
-        utils.sendJSONresponse(res, 404, {'message' : 'User not found'});
+        utils.sendJSONresponse(res, 404, {
+          'message': 'User not found'
+        });
       }
     });
 };
@@ -222,11 +261,11 @@ module.exports.updateUsername = function(req, res) {
 
 function doSendPasswordForget(req, res, token) {
   emailService.sendForgotPassword("supprot@apila.com", req.params.email, token, req.headers.host,
-  function(error, info) {
-    if(error){
+    function(error, info) {
+      if (error) {
         utils.sendJSONresponse(res, 404, null);
-    }
+      }
 
-    utils.sendJSONresponse(res, 200, null);
-  });
+      utils.sendJSONresponse(res, 200, null);
+    });
 }

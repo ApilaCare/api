@@ -40,8 +40,7 @@ module.exports.issuesOpenCount = function(req, res) {
   var userid = req.params.userid;
   var community = req.params.communityid;
 
-  if (!community || !userid) {
-    utils.sendJSONresponse(res, 404, 0);
+  if (utils.checkParams(req, res, ['userid', 'communityid'])) {
     return;
   }
 
@@ -64,8 +63,7 @@ module.exports.issuesCount = function(req, res) {
 
   var communityid = req.params.communityid;
 
-  if (!communityid) {
-    utils.sendJSONresponse(res, 404, 0);
+  if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
 
@@ -73,8 +71,10 @@ module.exports.issuesCount = function(req, res) {
     status: "Open",
     community: communityid
   }, function(err, issues) {
-    if(err) {
-      utils.sendJSONresponse(res, 404, {'message' : err});
+    if (err) {
+      utils.sendJSONresponse(res, 404, {
+        'message': err
+      });
     } else {
       utils.sendJSONresponse(res, 200, issues.length);
     }
@@ -89,8 +89,7 @@ module.exports.issuesList = function(req, res) {
   var id = req.params.communityid;
   var status = req.params.status;
 
-  if(!id || !status) {
-    utils.sendJSONresponse(res, 404, {'message' : "params not specified"});
+  if (utils.checkParams(req, res, ['status', 'communityid'])) {
     return;
   }
 
@@ -117,27 +116,25 @@ module.exports.issuesList = function(req, res) {
   };
 
   Iss.aggregate([{
-        '$match': {
-          community: new mongoose.Types.ObjectId(id),
-          status: req.params.status
-        }
-      },
-      {
-        '$group': {
-          "_id": "$responsibleParty",
-          count: {
-            "$sum": 1
-          },
-          issues: {
-            $push: issueTemplate
-          }
-        }
-      }, {
-        '$sort': {
-          "count": -1
+      '$match': {
+        community: new mongoose.Types.ObjectId(id),
+        status: req.params.status
+      }
+    }, {
+      '$group': {
+        "_id": "$responsibleParty",
+        count: {
+          "$sum": 1
+        },
+        issues: {
+          $push: issueTemplate
         }
       }
-    ],
+    }, {
+      '$sort': {
+        "count": -1
+      }
+    }],
     function(err, issues) {
 
       //Populate user model so we have responsibleParty name and not just the _id
@@ -145,8 +142,10 @@ module.exports.issuesList = function(req, res) {
         path: '_id',
         model: 'User'
       }, function(err) {
-        if(err) {
-          utils.sendJSONresponse(res, 404, {'message' : err});
+        if (err) {
+          utils.sendJSONresponse(res, 404, {
+            'message': err
+          });
         } else {
           utils.sendJSONresponse(res, 200, issues);
         }
@@ -162,8 +161,7 @@ module.exports.issuesListByStatus = function(req, res) {
   var status = req.params.status;
   var communityid = req.params.communityid;
 
-  if(!status || !communityid) {
-    utils.sendJSONresponse(res, 404, {'message' : 'Params are not specified'});
+  if (utils.checkParams(req, res, ['status', 'communityid'])) {
     return;
   }
 
@@ -171,8 +169,10 @@ module.exports.issuesListByStatus = function(req, res) {
     status: status,
     community: communityid
   }, function(err, issues) {
-    if(err) {
-      utils.sendJSONresponse(res, 404, {'message' : err});
+    if (err) {
+      utils.sendJSONresponse(res, 404, {
+        'message': err
+      });
     } else {
       utils.sendJSONresponse(res, 200, issues);
     }
@@ -184,8 +184,8 @@ module.exports.dueIssuesList = function(req, res) {
 
   var communityid = req.params.communityid;
 
-  if(!communityid) {
-    utils.sendJSONresponse(res, 404, {'message': 'Params not specified'});
+  if (utils.checkParams(req, res, ['communityid'])) {
+    return;
   }
 
   Iss.find({
@@ -207,6 +207,10 @@ module.exports.dueIssuesList = function(req, res) {
 
 // GET /issues/:issueid - Reads issue info by id
 module.exports.issuesReadOne = function(req, res) {
+
+  if (utils.checkParams(req, res, ['issueid'])) {
+    return;
+  }
 
   if (req.params && req.params.issueid) {
     Iss
@@ -236,10 +240,7 @@ module.exports.issuesReadOne = function(req, res) {
 // PUT issues/:issueid - Updates issue by its id
 module.exports.issuesUpdateOne = function(req, res) {
 
-  if (!req.params.issueid) {
-    utils.sendJSONresponse(res, 404, {
-      "message": "Not found, issueid is required"
-    });
+  if (utils.checkParams(req, res, ['issueid'])) {
     return;
   }
 
@@ -307,6 +308,11 @@ module.exports.issuesUpdateOne = function(req, res) {
 // DELETE /issues/:issueid - Delte an issue by id
 module.exports.issuesDeleteOne = function(req, res) {
   var issueid = req.params.issueid;
+
+  if (utils.checkParams(req, res, ['issueid'])) {
+    return;
+  }
+
   if (issueid) {
     Iss
       .findByIdAndRemove(issueid)
