@@ -34,6 +34,7 @@ module.exports.getUser = function(req, res) {
     return;
   }
 
+
   User.findById(req.params.userid)
     .populate("", "-salt -hash")
     .exec(function(err, user) {
@@ -61,7 +62,7 @@ module.exports.usersInCommunity = function(req, res) {
     .exec(function(err, users) {
       if (err) {
         utils.sendJSONresponse(res, 404, {
-          "message": "Error finding users in community"
+          "message": err
         });
       } else {
         utils.sendJSONresponse(res, 200, users);
