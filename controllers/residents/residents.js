@@ -203,6 +203,31 @@ module.exports.residentBirthday = function(req, res) {
     });
 };
 
+// DELETE /residents/:residentid/listitem - Removes a list item from resident info like foodLikes...
+module.exports.removeListItem = function(req, res) {
+
+  var residentid = req.params.residentid;
+
+  Resid.findById(residentid)
+    .exec(function(err, resident) {
+      if (err) {
+        utils.sendJSONresponse(res, 404, {'message' : err });
+      } else {
+
+        resident[req.body.type] = req.body.list;
+
+        resident.save(function(err, r) {
+          if(err) {
+            utils.sendJSONresponse(res, 404, {'message' : err});
+          } else {
+            utils.sendJSONresponse(res, 200, r);
+          }
+        });
+
+      }
+    });
+};
+
 // PUT /api/residents/update/:residentid
 module.exports.residentsUpdateOne = function(req, res) {
 

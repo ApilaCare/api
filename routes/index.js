@@ -148,6 +148,7 @@ router.get('/residents/average_age/:communityid', sanitizeInput , auth, ctrlResi
 router.get('/residents/average_stay/:communityid', sanitizeInput , auth, ctrlResidents.averageStayTime);
 router.post('/residents/new', sanitizeInput , auth, ctrlResidents.residentsCreate);
 router.put('/residents/update/:residentid', sanitizeInput , auth, ctrlResidents.residentsUpdateOne);
+router.put('/residents/:residentid/listitem', sanitizeInput , auth, ctrlResidents.removeListItem);
 router.delete('/residents/:residentid', sanitizeInput , auth, ctrlResidents.residentsDeleteOne);
 
 module.exports = router;
