@@ -203,6 +203,26 @@ module.exports.residentBirthday = function(req, res) {
     });
 };
 
+module.exports.addListItem = function(req, res) {
+  Resid.findById(residentid)
+    .exec(function(err, resident) {
+      if (err) {
+        utils.sendJSONresponse(res, 404, {'message' : err });
+      } else {
+
+        resident.save(function(err, r) {
+          if(err) {
+            utils.sendJSONresponse(res, 404, {'message' : err});
+          } else {
+            utils.sendJSONresponse(res, 200, r);
+          }
+        });
+
+      }
+
+    });
+};
+
 // DELETE /residents/:residentid/listitem - Removes a list item from resident info like foodLikes...
 module.exports.removeListItem = function(req, res) {
 
@@ -215,6 +235,15 @@ module.exports.removeListItem = function(req, res) {
       } else {
 
         resident[req.body.type] = req.body.list;
+        // resident.updateInfo({
+        //   "updateField": {
+        //     "field" : req.body.type,
+        //     "new" : "",
+        //     "old" : ""
+        //   },
+        //   "updateDate" : new Date(),
+        //   "updateBy" : ""
+        // });
 
         resident.save(function(err, r) {
           if(err) {
@@ -235,13 +264,17 @@ module.exports.residentsUpdateOne = function(req, res) {
     return;
   }
 
+  console.log(req.body.updateField);
+
   var updateInfo = {
     "updateBy": req.body.modifiedBy,
     "updateDate": req.body.modifiedDate,
     "updateField": req.body.updateField
   };
 
-  req.body.updateInfo.push(updateInfo);
+  if(req.body.updateField) {
+    req.body.updateInfo.push(updateInfo);
+  }
 
   var isValidData = true;
 
