@@ -260,14 +260,13 @@ module.exports.residentsUpdateOne = function(req, res) {
   addToArray(req.body.internationalNormalizedRatio, req.body.newinternationalNormalizedRatio, "Vitals");
   addToArray(req.body.weight, req.body.newweight, "Vitals");
 
-  addToArray(req.body.foodAllergies, req.body.newfoodAllergies, "");
-  addToArray(req.body.medicationAllergies, req.body.newmedicationAllergies, "");
+  req.body.foodAllergies = req.body.newfoodAllergies;
+  req.body.medicationAllergies = req.body.newmedicationAllergies;
 
-  //addToArray(req.body.psychosocialStatus, req.body.newpsychosocialStatus, "");
   req.body.psychosocialStatus = req.body.newpsychosocialStatus;
 
-  addToArray(req.body.foodLikes, req.body.newfoodLikes, "");
-  addToArray(req.body.foodDislikes, req.body.newfoodDislikes, "");
+  req.body.foodLikes = req.body.newfoodLikes;
+  req.body.foodDislikes = req.body.newfoodDislikes;
 
   Resid.findOneAndUpdate({
       _id: req.params.residentid
