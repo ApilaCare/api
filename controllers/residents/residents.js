@@ -4,6 +4,9 @@ var Resid = mongoose.model('Resident');
 var User = mongoose.model('User');
 var moment = require('moment');
 
+var _ = require('lodash');
+
+
 //TODO: birthday method needed?
 
 // POST /residents/new - Creates a new resident
@@ -210,6 +213,8 @@ module.exports.addListItem = function(req, res) {
         utils.sendJSONresponse(res, 404, {'message' : err });
       } else {
 
+        resident[req.body.type] = req.body.list;
+
         resident.save(function(err, r) {
           if(err) {
             utils.sendJSONresponse(res, 404, {'message' : err});
@@ -223,8 +228,8 @@ module.exports.addListItem = function(req, res) {
     });
 };
 
-// DELETE /residents/:residentid/listitem - Removes a list item from resident info like foodLikes...
-module.exports.removeListItem = function(req, res) {
+// PUT /residents/:residentid/listitem - Removes a list item from resident info like foodLikes...
+module.exports.updateListItem = function(req, res) {
 
   var residentid = req.params.residentid;
 
@@ -234,16 +239,26 @@ module.exports.removeListItem = function(req, res) {
         utils.sendJSONresponse(res, 404, {'message' : err });
       } else {
 
-        resident[req.body.type] = req.body.list;
-        // resident.updateInfo({
-        //   "updateField": {
-        //     "field" : req.body.type,
-        //     "new" : "",
-        //     "old" : ""
-        //   },
-        //   "updateDate" : new Date(),
-        //   "updateBy" : ""
-        // });
+        var oldValue = "";
+        var newValue = "";
+
+        if(req.body.operation === "remove") {
+          resident[req.body.type].pull(req.body.selectedItem);
+          oldValue = req.body.selectedItem;
+        } else {
+          resident[req.body.type].push(req.body.selectedItem);
+          newValue = req.body.selectedItem;
+        }
+
+        resident.updateInfo.push({
+          "updateField": [{
+            "field" : req.body.type,
+            "new" : newValue,
+            "old" : oldValue
+          }],
+          "updateDate" : new Date(),
+          "updateBy" : req.body.updateBy
+        });
 
         resident.save(function(err, r) {
           if(err) {
