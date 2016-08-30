@@ -198,6 +198,9 @@ describe('Residents', function() {
 
             var sum = (stay1 + stay2) / 2;
 
+            console.log(stay1);
+            console.log(stay2);
+
             assert.equal(res.body, sum, 'Check if the average stay time is equal');
 
             done();
