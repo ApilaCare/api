@@ -11,71 +11,42 @@ module.exports.issueCommentsCreate = function(req, res) {
     return;
   }
 
-  getAuthor(req, res, function(req, res, userName) {
-    if (req.params.issueid) {
-      Iss
-        .findById(req.params.issueid)
-        .select('comments')
-        .exec(
-          function(err, issue) {
-            if (err) {
-              utils.sendJSONresponse(res, 400, err);
-            } else {
+  if (req.params.issueid) {
+    Iss
+      .findById(req.params.issueid)
+      .select('comments')
+      .exec(
+        function(err, issue) {
+          if (err) {
+            utils.sendJSONresponse(res, 400, err);
+          } else {
 
-              doAddComment(req, res, issue, userName);
-            }
+            doAddComment(req, res, issue);
           }
-        );
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        "message": "Not found, issueid required"
-      });
-    }
-  });
-};
-
-var getAuthor = function(req, res, callback) {
-  console.log("Finding author with email " + req.payload.email);
-  if (req.payload.email) {
-    User
-      .findOne({
-        email: req.payload.email
-      })
-      .exec(function(err, user) {
-        if (!user) {
-          utils.sendJSONresponse(res, 404, {
-            "message": "User not found"
-          });
-          return;
-        } else if (err) {
-          console.log(err);
-          utils.sendJSONresponse(res, 404, err);
-          return;
         }
-        console.log(user);
-        callback(req, res, user.name);
-      });
-
+      );
   } else {
     utils.sendJSONresponse(res, 404, {
-      "message": "User not found"
+      "message": "Not found, issueid required"
     });
-    return;
   }
 };
 
-var doAddComment = function(req, res, issue, username) {
+var doAddComment = function(req, res, issue) {
+
+  console.log(req.body.author);
 
   if (!issue) {
     utils.sendJSONresponse(res, 404, "issueid not found");
   } else {
     issue.comments.push({
-      author: req.payload.name,
+      author: req.body.author,
       commentText: req.body.commentText
     });
     issue.save(function(err, issue) {
       var thisComment;
       if (err) {
+        console.log(err);
         utils.sendJSONresponse(res, 400, err);
       } else {
         thisComment = issue.comments[issue.comments.length - 1];
