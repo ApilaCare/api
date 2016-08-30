@@ -14,7 +14,8 @@ module.exports.issueCommentsCreate = function(req, res) {
   if (req.params.issueid) {
     Iss
       .findById(req.params.issueid)
-      .select('comments')
+      //.select('comments')
+      .populate('comments.author', 'email name userImage')
       .exec(
         function(err, issue) {
           if (err) {
@@ -33,8 +34,6 @@ module.exports.issueCommentsCreate = function(req, res) {
 };
 
 var doAddComment = function(req, res, issue) {
-
-  console.log(req.body.author);
 
   if (!issue) {
     utils.sendJSONresponse(res, 404, "issueid not found");
@@ -56,6 +55,26 @@ var doAddComment = function(req, res, issue) {
   }
 };
 
+// GET /issues/:issueid/comments
+module.exports.issueCommentsList = function(req, res) {
+
+  if (utils.checkParams(req, res, ['issueid'])) {
+    return;
+  }
+
+  Iss
+    .findById(req.params.issueid)
+    .populate('comments.author', 'email name userImage')
+    .exec(
+      function(err, issue) {
+        if(err) {
+          utils.sendJSONresponse(res, 404, {'message' : err});
+        } else {
+          utils.sendJSONresponse(res, 200, issue.comments);
+        }
+      });
+
+};
 
 module.exports.issueCommentsUpdateOne = function(req, res) {
 
