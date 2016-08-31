@@ -58,6 +58,26 @@ module.exports.issuesOpenCount = function(req, res) {
   });
 };
 
+// GET /issues/:issueid/updateinfo - Returns all updateInfo populated for an issue
+module.exports.issueUpdateInfo = function(req, res) {
+  var issueid = req.params.issueid;
+
+  if (utils.checkParams(req, res, ['issueid'])) {
+    return;
+  }
+
+  Iss.findById(issueid)
+     .populate('updateInfo.updateBy', 'email name userImage')
+     .exec(function(err, issue) {
+       if(err) {
+         utils.sendJSONresponse(res, 404, {'message' : err});
+       } else {
+           utils.sendJSONresponse(res, 200, issue.updateInfo);
+       }
+     });
+
+};
+
 // GET /issues/issuescount/:communityid - Number of open isues for a community
 module.exports.issuesCount = function(req, res) {
 
@@ -138,10 +158,13 @@ module.exports.issuesList = function(req, res) {
     function(err, issues) {
 
       //Populate user model so we have responsibleParty name and not just the _id
-      User.populate(issues, {
+      User.populate(issues, [{
         path: '_id',
         model: 'User'
-      }, function(err) {
+      },{
+        path: 'updateInfo.updateBy',
+        model: 'User'
+      }], function(err) {
         if (err) {
           utils.sendJSONresponse(res, 404, {
             'message': err
@@ -244,6 +267,8 @@ module.exports.issuesUpdateOne = function(req, res) {
     return;
   }
 
+  console.log("User id " + req.body.modifiedBy);
+
   var updateInfo = {
     "updateBy": req.body.modifiedBy,
     "updateDate": req.body.modifiedDate,
@@ -275,7 +300,7 @@ module.exports.issuesUpdateOne = function(req, res) {
 
         issue.checklists = req.body.checklists;
         issue.labels = req.body.labels;
-        issue.updateInfo = req.body.updateInfo;
+        //issue.updateInfo = req.body.updateInfo;
         issue.shelvedDate = req.body.shelvedDate;
 
         if (req.body.deletedMember !== undefined) {
@@ -296,9 +321,12 @@ module.exports.issuesUpdateOne = function(req, res) {
 
         issue.save(function(err, issue) {
           if (err) {
+            console.log(err);
             utils.sendJSONresponse(res, 404, err);
           } else {
-            utils.sendJSONresponse(res, 200, issue);
+            Iss.populate(issue.updateField, {'path' : 'updateBy'}, function(err, iss) {
+              utils.sendJSONresponse(res, 200, iss);
+            });
           }
         });
       }

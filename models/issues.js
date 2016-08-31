@@ -42,6 +42,12 @@ var memberRecoverSchema =  new mongoose.Schema({
     active: {type: Boolean, default: false} // recovery is active when the boss confirms the password
 });
 
+var updateInfoSchema = new mongoose.Schema({
+  updateBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+  updateDate: {type: Date, default: Date.now},
+  updateField: [mongoose.Schema.Types.Mixed]
+});
+
 var issueSchema = new mongoose.Schema({
     title: {type: String,required: true},
     responsibleParty: {
@@ -64,7 +70,7 @@ var issueSchema = new mongoose.Schema({
     due: {type: Date},
     confidential: {type: Boolean},
     idLabels: [String],
-    updateInfo: [mongoose.Schema.Types.Mixed],
+    updateInfo: [updateInfoSchema],
     community: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Community'
