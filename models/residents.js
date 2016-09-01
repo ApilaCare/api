@@ -140,7 +140,7 @@ var residentSchema = new mongoose.Schema({
     // psychosocial information
     psychosocialStatus: [String], // check all that apply: alert, friendly, disoriented, withdrawn, lonely, happy, confused, uncooperative
     psychosocialStatusDescribe: {type: String},
-    comprehension: {type: String}, // slow, moderate, quick
+    comprehension: {type: Number}, // slow, moderate, quick
     smokes: {type: Boolean, default: false},
       smokesDescribe: {type: String}, // if yes | open field
     alcohol: {type: Boolean, default: false},

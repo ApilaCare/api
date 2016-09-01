@@ -54,7 +54,6 @@ module.exports.residentsList = function(req, res) {
         });
         console.log(err);
       } else {
-        console.log(residents[0].updateInfo);
         utils.sendJSONresponse(res, 200, residents);
       }
 
