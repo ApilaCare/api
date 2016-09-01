@@ -43,17 +43,22 @@ module.exports.residentsList = function(req, res) {
   }
 
   Resid.find({
-    'community': community
-  }, function(err, residents) {
-    if (err) {
-      utils.sendJSONresponse(res, 404, {
-        'message': 'Error listing residents'
-      });
-    } else {
-      utils.sendJSONresponse(res, 200, residents);
-    }
 
-  });
+      'community': community
+    })
+    .populate('updateInfo.updateBy', 'email name userImage')
+    .exec(function(err, residents) {
+      if (err) {
+        utils.sendJSONresponse(res, 404, {
+          'message': 'Error listing residents'
+        });
+        console.log(err);
+      } else {
+        console.log(residents[0].updateInfo);
+        utils.sendJSONresponse(res, 200, residents);
+      }
+
+    });
 };
 
 // GET /residents/count/:communityid - Number of residents in building
@@ -279,7 +284,7 @@ module.exports.residentsUpdateOne = function(req, res) {
     return;
   }
 
-  console.log(req.body.updateField);
+  console.log("Besoo" + req.body.modifiedBy);
 
   var updateInfo = {
     "updateBy": req.body.modifiedBy,

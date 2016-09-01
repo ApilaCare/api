@@ -325,7 +325,7 @@ module.exports.issuesUpdateOne = function(req, res) {
             utils.sendJSONresponse(res, 404, err);
           } else {
             Iss.populate(issue.updateField, {'path' : 'updateBy'}, function(err, iss) {
-              utils.sendJSONresponse(res, 200, iss);
+                    utils.sendJSONresponse(res, 200, iss);
             });
           }
         });

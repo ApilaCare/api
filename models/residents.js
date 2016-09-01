@@ -1,5 +1,11 @@
 var mongoose = require('mongoose');
 
+var updateInfoSchema = new mongoose.Schema({
+  updateBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+  updateDate: {type: Date, default: Date.now},
+  updateField: [mongoose.Schema.Types.Mixed]
+});
+
 var residentSchema = new mongoose.Schema({
 
     // administrative information
@@ -20,7 +26,7 @@ var residentSchema = new mongoose.Schema({
       latitude: {type: Number}
     },
     administrativeNotes: {type: String},
-    updateInfo: [mongoose.Schema.Types.Mixed],
+    updateInfo: [updateInfoSchema],
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},
     community: {
