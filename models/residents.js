@@ -9,7 +9,7 @@ var residentContactSchema = new mongoose.Schema({
     physicalAddress: {type: String},
     primaryContact: {type: Boolean, default: false},
     relation: {type: String},
-    contactNotes: {type String},
+    contactNotes: {type: String},
 
     // automatic
     submitBy: {type: String, required: true},
@@ -227,7 +227,7 @@ var residentSchema = new mongoose.Schema({
     wanderer: {type: Boolean}, // "Leaves without Intention"
     highMaintenance: {type: Boolean, default: false},
     anxiety: {type: Boolean, default: false},
-      antipsychoticMeds: {type: Boolean: default: false}, // if yes |
+      antipsychoticMeds: {type: Boolean, default: false}, // if yes |
 
     // habits
     smokes: {type: Boolean, default: false},
