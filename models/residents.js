@@ -4,7 +4,7 @@ var residentContactSchema = new mongoose.Schema({
     firstName: {type: String},
     lastName: {type: String},
     primaryPhoneNumber: {type: String},
-    secondaryPhoneNumber: {type: String}
+    secondaryPhoneNumber: {type: String},
     email: {type: String},
     physicalAddress: {type: String},
     primaryContact: {type: Boolean, default: false},
