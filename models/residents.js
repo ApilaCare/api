@@ -41,7 +41,7 @@ var residentSchema = new mongoose.Schema({
     },
 
     // random
-    assessmentInterval: {type: String},  // weekly, monthly, quarterly, yearly, none
+    assessmentInterval: {type: Number},  // scale 0-4 | weekly, monthly, quarterly, yearly, none
     fullCode: {type: Boolean},
     primaryDoctor: {type: String},
     pharmacy: {type: String},
@@ -80,7 +80,7 @@ var residentSchema = new mongoose.Schema({
     // bathing information ----------------------------------------------------------
     typeOfBathing: {type: String}, // shower, tub, spit bath
     timeOfBathing: {type: String}, // morning, evening, before breakfast, after breakfast, after supper, before supper?
-    frequencyOfBathing: {type: Number}, // scale of 0-7.  0 being none.  7 being everyday (7 days a week)
+    frequencyOfBathing: {type: Number}, // scale of 0-4 | none, once a week, twice a week, every other day, every day
     acceptanceOfBathing: {type: String}, // likes, dislikes, refuses
       dislikesBathingDescribe: {type: String}, // if dislikes or refuses is selected | open field
     bathingNotes: {type: String},
@@ -136,13 +136,13 @@ var residentSchema = new mongoose.Schema({
 
       // if continentIndependent is true, assume full continents
       colostomy: {type: Boolean, default: false},
-        bowelContinent: {type: String}, // always, sometimes, never
-      constipated: {type: String}, // always, sometimes, never
-      laxative: {type: String}, // always, sometimes, never
+        bowelContinent: {type: Number}, // scale 0 - 2 | always, sometimes, never
+      constipated: {type: Number}, // scale 0 - 2 | always, sometimes, never
+      laxative: {type: Number}, // scale 0 - 2 | always, sometimes, never
       urostomy: {type: Boolean, default: false},
-        bladderContinent: {type: String}, // always, sometimes, never
-      dribbles: {type: String}, // always, sometimes, never
-      catheter: {type: Boolean, default: false}, // always, sometimes, never
+        bladderContinent: {type: String}, // scale 0 - 2 | always, sometimes, neverscale 0 - 2 | always, sometimes, never
+      dribbles: {type: String}, // scale 0 - 2 | always, sometimes, never
+      catheter: {type: Boolean, default: false},
         catheterDescribe: {type: String}, // if yes | open field
       toiletingDevice: {type: String}, // urinal, seat riser, bedside commode, none, bars around toilet
 
@@ -153,7 +153,7 @@ var residentSchema = new mongoose.Schema({
       poorNutritionDescribe: {type: String}, // if not eating, poor, or over eating | shake, bedtime snack, resident choice (add more options)
     diabetic: {type: Boolean, default: false},
       diabeticType: {type: String}, // if yes | diet controlled, medication controlled, insulin controlled
-      bloodSugarMonitoring: {type: Boolean, default: false}, // if yes | regular, sometimes, daily
+      bloodSugarMonitoring: {type: Boolean, default: false}, // if yes |
     bedtimeSnack: {type: Boolean, default: false},
     adaptiveEquipment: {type: String}, // plate guard, built up silverware, special cups, none
     needsFoodInSmallPeices: {type: Boolean, default: false},
