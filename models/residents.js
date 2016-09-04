@@ -16,6 +16,12 @@ var residentContactSchema = new mongoose.Schema({
     submitDate: {type: Date, default: Date.now}
 });
 
+var updateInfoSchema = new mongoose.Schema({
+  updateBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+  updateDate: {type: Date, default: Date.now},
+  updateField: [mongoose.Schema.Types.Mixed]
+});
+
 var residentSchema = new mongoose.Schema({
 
     // administrative information ----------------------------------------------------------
@@ -50,7 +56,8 @@ var residentSchema = new mongoose.Schema({
 
     // automatic
     carePoints: {type: Number},
-    updateInfo: [mongoose.Schema.Types.Mixed],
+    updateInfo: [mongoose.Schema.Types.Mixed], // this one correct?
+    updateInfo2: [updateInfoSchema],           // or is this one correct?  (remove 2 in name then)
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},
     community: {
