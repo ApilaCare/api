@@ -55,7 +55,7 @@ var residentSchema = new mongoose.Schema({
 
     // random
     assessmentInterval: {type: Number},  // scale 0-4 | weekly, monthly, quarterly, yearly, none
-    fullCode: {type: Boolean, default false},
+    fullCode: {type: Boolean, default: false},
     primaryDoctor: {type: String},
     pharmacy: {type: String},
     longTermCareInsurance: {type: Boolean, default: false},
