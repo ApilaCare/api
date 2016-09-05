@@ -314,6 +314,7 @@ module.exports.residentsUpdateOne = function(req, res) {
   req.body.medicationAllergies = req.body.newmedicationAllergies;
 
   req.body.psychosocialStatus = req.body.newpsychosocialStatus;
+  req.body.shopping = req.body.newShoppingStatus;
 
   req.body.foodLikes = req.body.newfoodLikes;
   req.body.foodDislikes = req.body.newfoodDislikes;
@@ -323,6 +324,7 @@ module.exports.residentsUpdateOne = function(req, res) {
     }, req.body,
     function(err, resident) {
       if (err) {
+        console.log(err);
         utils.sendJSONresponse(res, 404, err);
       } else {
         utils.sendJSONresponse(res, 200, resident);

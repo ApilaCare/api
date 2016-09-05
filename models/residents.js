@@ -70,8 +70,7 @@ var residentSchema = new mongoose.Schema({
 
     // automatic
     carePoints: {type: Number},
-    updateInfo: [mongoose.Schema.Types.Mixed], // this one correct?
-    updateInfo2: [updateInfoSchema],           // or is this one correct?  (remove 2 in name then)
+    updateInfo: [updateInfoSchema], 
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},
     community: {
