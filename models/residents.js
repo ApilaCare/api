@@ -70,7 +70,7 @@ var residentSchema = new mongoose.Schema({
 
     // automatic
     carePoints: {type: Number},
-    updateInfo: [updateInfoSchema], 
+    updateInfo: [updateInfoSchema],
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},
     community: {
@@ -170,8 +170,8 @@ var residentSchema = new mongoose.Schema({
 
       // bladder
       urostomy: {type: Boolean, default: false},
-        bladderContinent: {type: String}, // scale 0 - 2 | always, sometimes, neverscale 0 - 2 | always, sometimes, never
-      dribbles: {type: String}, // scale 0 - 2 | always, sometimes, never
+        bladderContinent: {type: Number}, // scale 0 - 2 | always, sometimes, neverscale 0 - 2 | always, sometimes, never
+      dribbles: {type: Number}, // scale 0 - 2 | always, sometimes, never
       catheter: {type: Boolean, default: false},
         catheterDescribe: {type: String}, // if yes | open field
 
