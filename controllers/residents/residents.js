@@ -283,8 +283,6 @@ module.exports.residentsUpdateOne = function(req, res) {
     return;
   }
 
-  console.log("Besoo" + req.body.modifiedBy);
-
   var updateInfo = {
     "updateBy": req.body.modifiedBy,
     "updateDate": req.body.modifiedDate,
