@@ -88,7 +88,7 @@ var residentSchema = new mongoose.Schema({
 
     // outside agency
     outsideAgency: {type: String}, // hospice, homehealth, home care, social worker, private duty, other (select one)
-    outsideAgencyFile: [String], // upload the outside agencys assessment
+    outsideAgencyFile: {type: String}, // upload the outside agencys assessment
 
     // speech
     easilyUnderstood: {type: Boolean, default: false},

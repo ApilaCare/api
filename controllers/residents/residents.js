@@ -5,6 +5,8 @@ var User = mongoose.model('User');
 var moment = require('moment');
 
 var _ = require('lodash');
+var fs = require('fs');
+var imageUploadService = require('../../services/imageUpload');
 
 
 //TODO: birthday method needed?
@@ -331,6 +333,49 @@ module.exports.residentsUpdateOne = function(req, res) {
       }
 
     });
+
+};
+
+module.exports.uploadOutsideAgencyAssesment = function(req, res) {
+  var residentid = req.params.residentid;
+
+  if (utils.checkParams(req, res, ['residentid'])) {
+    return;
+  }
+
+  var file = req.files.file;
+
+  var stream = fs.createReadStream(file.path);
+
+  var params = {
+    Key: file.originalFilename,
+    Body: stream
+  };
+
+  imageUploadService.upload(params, file.path, function() {
+    var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
+      imageUploadService.getBucket() + "/" + escape(file.originalFilename);
+
+    fs.unlinkSync(file.path);
+
+    Resid.findById(residentid)
+    .exec(function(err, resident) {
+      if(err) {
+        utils.sendJSONresponse(res, 404, {"message" : err});
+      } else {
+        resident.outsideAgencyFile = fullUrl;
+
+        resident.save(function(err) {
+          if(err) {
+            utils.sendJSONresponse(res, 404, {"message" : err});
+          } else {
+            utils.sendJSONresponse(res, 200, fullUrl);
+          }
+        });
+      }
+    });
+
+  });
 
 };
 
