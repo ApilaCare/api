@@ -240,6 +240,7 @@ module.exports.updateListItem = function(req, res) {
   var residentid = req.params.residentid;
 
   Resid.findById(residentid)
+    .populate('updateInfo.updateBy', 'email name userImage')
     .exec(function(err, resident) {
       if (err) {
         utils.sendJSONresponse(res, 404, {'message' : err });
@@ -323,17 +324,19 @@ module.exports.residentsUpdateOne = function(req, res) {
   req.body.foodDislikes = req.body.newfoodDislikes;
 
   Resid.findOneAndUpdate({
-      _id: req.params.residentid
-    }, req.body,
-    function(err, resident) {
-      if (err) {
-        console.log(err);
-        utils.sendJSONresponse(res, 404, err);
-      } else {
-        utils.sendJSONresponse(res, 200, resident);
-      }
+    _id: req.params.residentid
+  }, req.body)
+  .populate('updateInfo.updateBy', 'email name userImage')
+  .exec(function(err, resident) {
+    if (err) {
+      console.log(err);
+      utils.sendJSONresponse(res, 404, err);
+    } else {
 
-    });
+      utils.sendJSONresponse(res, 200, resident);
+    }
+
+  });
 
 };
 
