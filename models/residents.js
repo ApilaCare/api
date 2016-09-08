@@ -355,7 +355,7 @@ var residentSchema = new mongoose.Schema({
       maxPainTime: {type: String}, // if yes |
       painIncreasedBy: {type: String}, // if yes |
       painDecreasedBy: {type: String}, // if yes |
-      painManagedBy: {type: String}, // medication, hot pack, cold pack, positioning, topicals (check all that apply)
+      painManagedBy: [String], // medication, hot pack, cold pack, positioning, topicals (check all that apply)
       painLength: {type: String}, // new onset, chronic
     painNotes: {type: String},
 

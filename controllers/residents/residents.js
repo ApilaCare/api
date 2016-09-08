@@ -317,6 +317,7 @@ module.exports.residentsUpdateOne = function(req, res) {
 
   req.body.psychosocialStatus = req.body.newpsychosocialStatus;
   req.body.shopping = req.body.newShoppingStatus;
+  req.body.painManagedBy = req.body.newPainManagedBy;
 
   req.body.foodLikes = req.body.newfoodLikes;
   req.body.foodDislikes = req.body.newfoodDislikes;
