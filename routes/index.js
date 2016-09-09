@@ -149,6 +149,7 @@ router.get('/residents/:communityid/locations', sanitizeInput , auth, ctrlReside
 router.get('/residents/average_age/:communityid', sanitizeInput , auth, ctrlResidents.getAverageAge);
 router.get('/residents/average_stay/:communityid', sanitizeInput , auth, ctrlResidents.averageStayTime);
 router.post('/residents/new', sanitizeInput , auth, ctrlResidents.residentsCreate);
+router.post('/residents/:residentid/contact', sanitizeInput, auth, ctrlResidents.addContact);
 router.post('/residents/:residentid/upload', sanitizeInput, auth, multipartyMiddleware, ctrlResidents.uploadOutsideAgencyAssesment);
 router.put('/residents/update/:residentid', sanitizeInput , auth, ctrlResidents.residentsUpdateOne);
 router.put('/residents/:residentid/listitem', sanitizeInput , auth, ctrlResidents.updateListItem);

@@ -17,7 +17,7 @@ var residentContactSchema = new mongoose.Schema({
     contactNotes: {type: String},
 
     // automatic
-    submitBy: {type: String, required: true},
+    submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     submitDate: {type: Date, default: Date.now}
 });
 
@@ -62,11 +62,13 @@ var residentSchema = new mongoose.Schema({
     receiveingLongTermCareInsurance: {type: Boolean, default: false},
     handlesFinances: {type: String}, // _id of contact sub document
     appointmentCoordination: {type: String}, // self, needs assistance, family
-    residentContact: [residentContactSchema],
     communicatedWithResident: {type: Boolean, default: false},
     communicatedWithPrimaryContact: {type: Boolean, default: false},
     communicatedWithTrustedPerson: {type: Boolean, default: false},
     administrativeNotes: {type: String},
+
+    // contacts
+    residentContacts: [residentContactSchema],
 
     // automatic
     carePoints: {type: Number},

@@ -212,27 +212,35 @@ module.exports.residentBirthday = function(req, res) {
     });
 };
 
-module.exports.addListItem = function(req, res) {
+//POST /residents/:residentid/contact - Adds a new contact to the list
+module.exports.addContact = function(req, res) {
+
+  var residentid = req.params.residentid;
+
+  if (utils.checkParams(req, res, ['residentid'])) {
+    return;
+  }
+
   Resid.findById(residentid)
-    .exec(function(err, resident) {
-      if (err) {
-        utils.sendJSONresponse(res, 404, {'message' : err });
-      } else {
+  .exec(function(err, resident) {
+    if(err) {
+      utils.sendJSONresponse(res, 404, {'message' : err});
+    } else {
+      resident.residentContacts.push(req.body);
 
-        resident[req.body.type] = req.body.list;
+      resident.save(function(err, resid) {
+        if(err) {
+          utils.sendJSONresponse(res, 404, {'message' : err});
+        } else {
+          utils.sendJSONresponse(res, 200, resid.residentContacts);
+        }
+      });
+    }
+  });
 
-        resident.save(function(err, r) {
-          if(err) {
-            utils.sendJSONresponse(res, 404, {'message' : err});
-          } else {
-            utils.sendJSONresponse(res, 200, r);
-          }
-        });
-
-      }
-
-    });
 };
+
+
 
 // PUT /residents/:residentid/listitem - Removes a list item from resident info like foodLikes...
 module.exports.updateListItem = function(req, res) {
