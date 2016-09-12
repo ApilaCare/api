@@ -142,7 +142,6 @@ router.post('/login', ctrlAuth.login);
 
 // residents
 router.get('/residents/list/:communityid', sanitizeInput , auth, ctrlResidents.residentsList);
-router.get('/residents/birthday/:communityid', sanitizeInput , auth, ctrlResidents.residentBirthday);
 router.get('/residents/:residentid', sanitizeInput , auth, ctrlResidents.residentById);
 router.get('/residents/count/:communityid', sanitizeInput , auth, ctrlResidents.residentsCount);
 router.get('/residents/:communityid/locations', sanitizeInput , auth, ctrlResidents.getLocations);

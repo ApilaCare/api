@@ -9,8 +9,6 @@ var fs = require('fs');
 var imageUploadService = require('../../services/imageUpload');
 
 
-//TODO: birthday method needed?
-
 // POST /residents/new - Creates a new resident
 module.exports.residentsCreate = function(req, res) {
 
@@ -45,7 +43,6 @@ module.exports.residentsList = function(req, res) {
   }
 
   Resid.find({
-
       'community': community
     })
     .populate('updateInfo.updateBy', 'email name userImage')
@@ -192,26 +189,6 @@ module.exports.residentById = function(req, res) {
       });
 };
 
-// GET /residents/birthday/:communityid - Get residents of a communities (birthdays)
-module.exports.residentBirthday = function(req, res) {
-
-  if (utils.checkParams(req, res, ['communityid'])) {
-    return;
-  }
-
-  Resid.find({
-      "community": req.params.communityid
-    })
-    .exec(function(err, residents) {
-      if (res) {
-        utils.sendJSONresponse(res, 200, residents);
-      } else {
-        utils.sendJSONresponse(res, 404, null);
-      }
-
-    });
-};
-
 //POST /residents/:residentid/contact - Adds a new contact to the list
 module.exports.addContact = function(req, res) {
 
@@ -239,8 +216,6 @@ module.exports.addContact = function(req, res) {
   });
 
 };
-
-
 
 // PUT /residents/:residentid/listitem - Removes a list item from resident info like foodLikes...
 module.exports.updateListItem = function(req, res) {
@@ -348,6 +323,7 @@ module.exports.residentsUpdateOne = function(req, res) {
 
 };
 
+//POST /residents/:residentid/upload - uploads assessment files to aws
 module.exports.uploadOutsideAgencyAssesment = function(req, res) {
   var residentid = req.params.residentid;
 

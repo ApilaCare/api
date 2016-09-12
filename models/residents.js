@@ -60,7 +60,7 @@ var residentSchema = new mongoose.Schema({
     pharmacy: {type: String},
     longTermCareInsurance: {type: Boolean, default: false},
     receiveingLongTermCareInsurance: {type: Boolean, default: false},
-    handlesFinances: {type: String}, // _id of contact sub document
+    handlesFinances: {type: mongoose.Schema.Types.ObjectId, ref: 'Contact'}, // _id of contact sub document
     appointmentCoordination: {type: String}, // self, needs assistance, family
     communicatedWithResident: {type: Boolean, default: false},
     communicatedWithPrimaryContact: {type: Boolean, default: false},
@@ -383,3 +383,4 @@ var vitalsInfoSchema = new mongoose.Schema({
 });
 
 mongoose.model('Resident', residentSchema);
+mongoose.model('Contact', residentContactSchema);
