@@ -116,7 +116,9 @@ module.exports.getCustomer = function(req, res) {
           }
         });
       } else {
-
+        utils.sendJSONresponse(res, 404, {
+          status: false
+        });
       }
 
     } else {
