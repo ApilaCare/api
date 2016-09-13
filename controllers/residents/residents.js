@@ -262,6 +262,7 @@ module.exports.updateListItem = function(req, res) {
     });
 };
 
+
 // PUT /api/residents/update/:residentid
 module.exports.residentsUpdateOne = function(req, res) {
 
@@ -269,10 +270,13 @@ module.exports.residentsUpdateOne = function(req, res) {
     return;
   }
 
+  var communicatedWith = setCommunicatedWithField(req);
+
   var updateInfo = {
     "updateBy": req.body.modifiedBy,
     "updateDate": req.body.modifiedDate,
-    "updateField": req.body.updateField
+    "updateField": req.body.updateField,
+    "communicatedWith": communicatedWith
   };
 
   if(req.body.updateField) {
@@ -423,7 +427,25 @@ function addToArray(arr, value, type) {
       }
 
     }
-
   }
 
+}
+
+
+function setCommunicatedWithField(req) {
+  var communicatedWith = [];
+
+  if(req.body.communicatedWithResident === true) {
+    communicatedWith.push("resident");
+  }
+
+  if(req.body.communicatedWithPrimaryContact === true) {
+    communicatedWith.push("primary");
+  }
+
+  if(req.body.communicatedWithTrustedPerson === true) {
+    communicatedWith.push("trusted");
+  }
+
+  return communicatedWith;
 }
