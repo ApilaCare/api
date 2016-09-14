@@ -205,6 +205,16 @@ module.exports.addContact = function(req, res) {
     } else {
       resident.residentContacts.push(req.body);
 
+      resident.updateInfo.push({
+        "updateField": [{
+          "field" : "create-contact",
+          "new" : req.body.firstName + " " + req.body.lastName,
+          "old" : ""
+        }],
+        "updateDate" : new Date(),
+        "updateBy" : req.body.submitBy
+      });
+
       resident.save(function(err, resid) {
         if(err) {
           utils.sendJSONresponse(res, 404, {'message' : err});
