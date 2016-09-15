@@ -75,6 +75,7 @@ var residentSchema = new mongoose.Schema({
 
     // automatic
     carePoints: {type: Number},
+    regulationPoints: {type: Number},
     assessmentIntervalFile: [String],
     updateInfo: [updateInfoSchema],
     submitDate: {type: Date, default: Date.now},
