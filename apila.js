@@ -10,6 +10,8 @@ var cors = require('cors');
 require('./models/db');
 require('./config/passport');
 
+require('./controllers/residents/resident_schedule');
+
 // (commented out because routes in the server are not used)
 // var routes = require('./app_server/routes/index');
 var routesApi = require('./routes/index');
