@@ -92,7 +92,7 @@ var residentSchema = new mongoose.Schema({
     occupation: {type: String},
     contribution: {type: String},
     shopping: [String], // family, self, friend (check all that apply)
-    supportGroup: {type: Boolean},
+    supportGroup: {type: Boolean, default: false},
 
     // outside agency
     outsideAgency: {type: String}, // hospice, homehealth, home care, social worker, private duty, other (select one)
