@@ -43,6 +43,7 @@ var residentSchema = new mongoose.Schema({
       maidenName: {type: String}, // if female | open field
     maritalStatus: {type: String}, // single, divorced, widowed, married, single never married
     veteran: {type: Boolean, default: false},
+    socialSecurityNumber: {type: Number},
 
     // location
     buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out
@@ -53,6 +54,7 @@ var residentSchema = new mongoose.Schema({
       longitude: {type: Number},
       latitude: {type: Number}
     },
+    admittedFrom: {type: String}, // home, hospital, rehab, other
 
     // random
     assessmentInterval: {type: Number},  // scale 0-4 | weekly, monthly, quarterly, yearly, none
@@ -73,6 +75,7 @@ var residentSchema = new mongoose.Schema({
 
     // automatic
     carePoints: {type: Number},
+    assessmentIntervalFile: [String],
     updateInfo: [updateInfoSchema],
     submitDate: {type: Date, default: Date.now},
     submitBy: {type: String, required: true},
@@ -88,10 +91,11 @@ var residentSchema = new mongoose.Schema({
     occupation: {type: String},
     contribution: {type: String},
     shopping: [String], // family, self, friend (check all that apply)
+    supportGroup: {type: Boolean},
 
     // outside agency
     outsideAgency: {type: String}, // hospice, homehealth, home care, social worker, private duty, other (select one)
-    outsideAgencyFile: {type: String}, // upload the outside agencys assessment
+    outsideAgencyFile: [String], // upload the outside agencys assessment
 
     // speech
     easilyUnderstood: {type: Boolean, default: false},
@@ -110,7 +114,8 @@ var residentSchema = new mongoose.Schema({
     typeOfBathing: {type: String}, // shower, tub, spit bath
     timeOfBathing: {type: String}, // morning, evening, before breakfast, after breakfast, after supper, before supper?
     frequencyOfBathing: {type: Number}, // scale of 0-4 | none, once a week, twice a week, every other day, every day
-    acceptanceOfBathing: {type: String}, // likes, dislikes, refuses
+      bathingDays: [String], // if once a week, twice a week, every other day | array of days of the week, similar to how allergies work
+    acceptanceOfBathing: {type: String}, // likes, dislikes, refuses, indifferent
       dislikesBathingDescribe: {type: String}, // if dislikes or refuses is selected | open field
     bathingAssist: {type: String}, // full assistance, standby, independent, partial assistance
     bathingNotes: {type: String},
@@ -118,24 +123,25 @@ var residentSchema = new mongoose.Schema({
     // mobility information ----------------------------------------------------------
     insideApartment: {
         useOfAssistiveDevice: {type: String}, // walker, cane, wheelchair, electric wheelchair, no device, other
-        assitanceWithDevice: {type: String},
+          assitanceWithDevice: {type: String}, // if walker, cane, wheelchair, electric wheelchair, other
         specialAmbulationNeeds: {type: String},
 
         // devices
-        transferPole: {type: Boolean, default: false},
-        liftReclinerChair: {type: Boolean, default: false},
-        transferLift: {type: Boolean, default: false},
-        sideRails: {type: Boolean, default: false},
-          mobilitySafetyAssessment: {type: String, default: "Assessed for Safety"},  // if yes to side rails, transfer pole, transfer lift: autofill to say "Assessed for Safety"
+        apartmentMobilityDevices: [String], // check all that apply:
+                                            //  [transfer pole, side rails, pivot transfer, lift recliner chair, transfer lift]
+          mobilitySafetyAssessment: {type: String, default: "Assessed for Safety"},  // if any selected | autofill to say "Assessed for Safety"
     },
+
     outsideApartment: {
         useOfAssistiveDevice: {type: String}, // walker, cane, wheelchair, electric wheelchair, no device, other
-        assitanceWithDevice: {type: String},
+          assitanceWithDevice: {type: String}, // if walker, cane, wheelchair, electric wheelchair, other
         specialAmbulationNeeds: {type: String},
     },
+
     transfers: {type: String}, // standby, independent, full assist, transfer pole, gait belt
+      transfersDescribe: {type: String}, // if anything other than 'independent' |
     fallRisk: {type: Boolean, default: false},
-      fallRiskDescribe: {type: String}, // if yes is selected | physical limitations, modication challenges, cognition, choice
+      fallRiskDescribe: {type: String}, // if yes is selected | physical limitations, medication challenges, cognition, choice, other
     bedReposition: {type: Boolean, default: false},
       bedRepositionExplain: {type: String},
       bedRepositionOutsideAgency: {type: String},
@@ -143,16 +149,14 @@ var residentSchema = new mongoose.Schema({
     mobilityNotes: {type: String},
 
     // allergy information ----------------------------------------------------------
-    hasFoodAllergies: {type: Boolean, default: false},
-      foodAllergies: [String], // if yes is selected
-    hasMedicationAllergies: {type: Boolean, default: false},
-      medicationAllergies: [String], // if yes is selected
-    otherAllergies: [String], // not putting boolean conditional here because I dont like it and it may die also with foods and meds
+    foodAllergies: [String],
+    medicationAllergies: [String],
+    otherAllergies: [String],
     allergyNotes: {type: String},
 
     // sleep information ----------------------------------------------------------
-    usualBedtime: {type: String}, // early evening, late evening, other
-    usualArisingTime: {type: String}, // early morning, mid morning, late morning, other
+    usualBedtime: {type: String}, // open field
+    usualArisingTime: {type: String}, // open field
     nap: {type: Boolean, default: false},
       napDescribe: {type: String}, // if yes | open field
     assistanceToBed: {type: String}, // medication, positioning, pillows, drink, alcohol, hot tea, warm milk
@@ -169,7 +173,7 @@ var residentSchema = new mongoose.Schema({
       colostomy: {type: Boolean, default: false},
         bowelContinent: {type: Number}, // scale 0 - 2 | always, sometimes, never
       constipated: {type: Number}, // scale 0 - 2 | always, sometimes, never
-      laxative: {type: Number}, // scale 0 - 2 | always, sometimes, never
+      laxative: {type: String, default: "Offer laxative of choice and/or as physician ordered.  Encourage fluid intake."},
 
       // bladder
       urostomy: {type: Boolean, default: false},
@@ -180,7 +184,7 @@ var residentSchema = new mongoose.Schema({
 
       // assistance
       incontinentApparel: {type: Boolean, default: false},
-        incontinentApparelAssist: {type: String}, // if yes | independent, standby, partial, full
+        incontinentApparelAssist: {type: String}, // if yes | independent, full
       toiletTransfer: {type: String}, // independent, standby, partial assitance, full assistance
       toiletingDevice: {type: String}, // urinal, seat riser, bedside commode, none, bars around toilet
       toiletingAssist: {type: String}, // independent, reminder, partial assistance, full assistance
@@ -196,22 +200,22 @@ var residentSchema = new mongoose.Schema({
       bloodSugarMonitoring: {type: Boolean, default: false}, // if yes |
     bedtimeSnack: {type: Boolean, default: false},
     adaptiveEquipment: {type: String}, // plate guard, built up silverware, special cups, none
-    needsFoodInSmallPeices: {type: Boolean, default: false},
-    typeOfDiet: {type: String}, // pureed, ground, regular, soft
+    typeOfDiet: {type: String}, // BRAT, gluten free, full vegan, partial vegan, lactose free, other, regular
+    specialDiet: {type: String}, // pureed, ground, regular, soft
     foodLikes: [String],
     foodDislikes: [String],
     fingerFoods: {type: Boolean, default: false},
-    feedAssist: {type: String}, // independent, standby, partial assistance, full assistance
+    feedAssist: {type: String}, // independent, reminder, partial assistance, full assistance
     foodInRoom: {type: Boolean, default: false},
     drinkInRoom: {type: Boolean, default: false},
     nutritionNotes: {type: String},
 
     // physical condition information ----------------------------------------------------------
     // skin
-    skinCondition: {type: String}, // hydrated, dry, grey, ashen, jaundice, clammy, pale, normal
+    skinCondition: {type: String}, // average, tears easily
     hasWound: {type: Boolean, default: false}, // only if the wound needs dressing
       hasWoundDescribe: {type: String}, // if yes | open field
-      woundAmount: {type: Number}, // if yes | number of wounds
+      woundAmount: {type: Number},      // if yes | number of wounds
     skinBreakdown: {type: Boolean, default: false}, // "At risk for skin breakdown"
 
     // infection
@@ -223,36 +227,35 @@ var residentSchema = new mongoose.Schema({
     pneumoniaRisk: {type: Boolean, default: false},
 
     // hearing
-    rightEar: {type: String}, // adequate, adequate with aid, poor
-    leftEar: {type: String}, // adequate, adequate with aid, poor
+    rightEar: {type: String}, // adequate, adequate with aid, poor, none
+    leftEar: {type: String},  // adequate, adequate with aid, poor, none
     hearingAbility: {type: Number}, // number scale 0 through 10 | just display numerical value
     wearsHearingAid: {type: Boolean, default: false},
-      helpWithHearingAid: {type: Boolean, default: false}, // if yes | yes/no
-        helpWithHearingAidDescribe: {type: String}, // if yes | open field
+      helpWithHearingAidDescribe: {type: String}, // if yes | open field
     hearingNotes: {type: String},
-    hearingAssist: {type: String}, // full, independent, reminder
 
     // vision
-    visionAssistance: {type: String}, // glasses, contacts, none
-    rightEye: {type: String}, // adequate, adequate with aid, poor
-    leftEye: {type: String}, // adequate, adequate with aid, poor
+    visionDevice: {type: String}, // glasses, contacts, none
+    rightEye: {type: String}, // adequate, adequate with aid, poor, none
+    leftEye: {type: String}, // adequate, adequate with aid, poor, none
     visionAbility: {type: Number}, // number scale 0 through 10
-    visionNotes: {type: String},
     visionAssist: {type: String}, // full, independent, reminder
+    visionNotes: {type: String},
 
     // teeth
     dentistName: {type: String},
-    upperDentureFit: {type: Boolean, default: false},
-      upperDentureFitDescribe: {type: String}, // if no | open field
+    teethCare: {type: Number}, // scale 0-4 | great, good, decent, lacking, none
+      teethCareDescribe: {type: String}, // if "lacking" or "none" | open field
     upperTeeth: {type: String}, // Has own, Has dentures, has partial
-    lowerDentureFit: {type: Boolean, default: false},
-      lowerDentureFitDescribe: {type: String}, // if no | open field
     lowerTeeth: {type: String}, // Has own, Has dentures, has partial
     teethCondition: {type: Number}, // number scale 0 through 10
     teethAssist: {type: String}, // full, independent, reminder
+    teethNotes: {type: String},
 
     // oxygen
     oxygen: {type: Boolean, default: false},
+      oxygenType: {type: String}, // if true | Liquid, concentrate
+      oxygenFlow: {type: String}, // if true | continuous flow, helios
 
     // medication
     medsAtBedside: {type: Boolean, default: false},
@@ -270,7 +273,7 @@ var residentSchema = new mongoose.Schema({
     // hair
     hairAssist: {type: Boolean, default: false},
     barber: {type: Boolean, default: false},
-    shaveAssist: {type: String}, // independent, standby, partial, full
+    shaveAssist: {type: String}, // independent, reminder, full
     hairNotes: {type: String},
 
     // nails
@@ -299,6 +302,7 @@ var residentSchema = new mongoose.Schema({
 
     // night time routine
     bedAssist: {type: String}, // independent, full assist, partial assist, stand by
+    bedAssistDescribe: {type: String},
 
 
     // psychosocial information ----------------------------------------------------------
@@ -313,7 +317,8 @@ var residentSchema = new mongoose.Schema({
     sunDowner: {type: Boolean},
       sunDownerExplain: {type: String}, // if yes | open field
     wanderer: {type: Boolean}, // "Leaves without Intention"
-    highMaintenance: {type: Boolean, default: false},
+    highMaintenance: {type: Number}, // scale 0-100 | display numerical value
+    highMaintenanceDescribe: {type: String},
     anxiety: {type: Boolean, default: false},
       antipsychoticMeds: {type: Boolean, default: false}, // if yes |
 
