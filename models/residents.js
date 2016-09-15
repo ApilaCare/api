@@ -21,6 +21,7 @@ var residentContactSchema = new mongoose.Schema({
     submitDate: {type: Date, default: Date.now}
 });
 
+
 var updateInfoSchema = new mongoose.Schema({
   updateBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   communicatedWith: [String],

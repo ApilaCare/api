@@ -365,7 +365,7 @@ module.exports.uploadOutsideAgencyAssesment = function(req, res) {
       if(err) {
         utils.sendJSONresponse(res, 404, {"message" : err});
       } else {
-        resident.outsideAgencyFile = fullUrl;
+        resident.outsideAgencyFile.push(fullUrl);
 
         resident.save(function(err) {
           if(err) {
