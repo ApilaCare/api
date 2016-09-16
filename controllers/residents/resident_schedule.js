@@ -3,6 +3,8 @@ var schedule = require('node-schedule');
 
 var Resid = mongoose.model('Resident');
 
+var exportResidentService = require('./../../services/exportResident.service');
+
 var WEEKLY = 0, MONTHLY = 1, QUARTELY = 2, YEARLY = 3;
 
 //Go through each resident and based of their assessmentInterval export care plan
@@ -13,6 +15,8 @@ var WEEKLY = 0, MONTHLY = 1, QUARTELY = 2, YEARLY = 3;
     if(err) {
       console.log("Error while finding resident");
     } else {
+
+      exportResidentService.exportCarePlan(residents[0]);
 
       for (var i = 0; i < residents.length; ++i) {
 
@@ -32,7 +36,7 @@ function setScheduleInterval(scheduleInterval, resident) {
     if(scheduleInterval === WEEKLY) {
       callScheduleJob("day", 7, resident);
     } else if (scheduleInterval === MONTHLY) {
-      callScheduleJob("second", 31, resident);
+      callScheduleJob("day", 31, resident);
     }  else if (scheduleInterval === QUARTELY) {
       callScheduleJob("day", 365/4, resident);
     }  else if (scheduleInterval === YEARLY) {
