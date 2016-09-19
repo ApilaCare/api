@@ -6,8 +6,7 @@ var User = mongoose.model('User');
 var emailService = require('../../services/email');
 var Iss = mongoose.model('Issue');
 var Community = mongoose.model('Community');
-var pdf = require('pdfkit');
-var fs = require('fs');
+var issueExport = require('./../../services/exports/issueRecovery');
 
 var _ = require('lodash');
 
@@ -202,23 +201,6 @@ function findRecoveryByUser(res, userid, callback) {
     });
 }
 
-function createPdf(issues) {
-  var doc = new pdf;
-
-  doc.pipe(fs.createWriteStream('confidential.pdf'));
-
-
-  doc.text("Confidential issues", 50, 50);
-
-  for (var i = 0; i < issues.length; ++i) {
-    doc.text(issues[i].title, 50, 80 + (i * 15));
-  }
-
-  doc.end();
-
-  return doc;
-}
-
 // getting confidentials issues from the recovoredUser and convert it to pdf and send with email to boss
 function unlockCondifentialIssues(recovery) {
   console.log("In unlocking process");
@@ -226,7 +208,7 @@ function unlockCondifentialIssues(recovery) {
   //getting issues
   getConfidentialIssues(recovery.recoveredMember, function(issues) {
 
-    var attachement = createPdf(issues);
+    var attachement = issueExport(issues, 'confidential.pdf');
 
     /*
     emailService.sendConfidentialIssues("support@apila.care", recovery.recoveredMember.email,

@@ -25,39 +25,6 @@ module.exports.appointmentCommentsCreate = function(req, res) {
   }
 };
 
-var getAuthor = function(req, res, callback) {
-  console.log("Finding author with email " + req.payload.email);
-  // validate that JWT information is on request object
-  if (req.payload.email) {
-    User
-    // user email address to find user
-      .findOne({
-        email: req.payload.email
-      })
-      .exec(function(err, user) {
-        if (!user) {
-          utils.sendJSONresponse(res, 404, {
-            "message": "User not found"
-          });
-          return;
-        } else if (err) {
-          console.log(err);
-          utils.sendJSONresponse(res, 404, err);
-          return;
-        }
-        console.log(user);
-        // run callback, passing user's name
-        callback(req, res, user.name);
-      });
-
-  } else {
-    utils.sendJSONresponse(res, 404, {
-      "message": "User not found"
-    });
-    return;
-  }
-};
-
 
 var doAddComment = function(req, res, appointment, author) {
   if (!appointment) {

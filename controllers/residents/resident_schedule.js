@@ -3,7 +3,7 @@ var schedule = require('node-schedule');
 
 var Resid = mongoose.model('Resident');
 
-var exportResidentService = require('./../../services/exportResident.service');
+var exportResidentService = require('./../../services/exports/intervalCarePlans');
 
 var WEEKLY = 0, MONTHLY = 1, QUARTELY = 2, YEARLY = 3;
 
@@ -16,7 +16,7 @@ var WEEKLY = 0, MONTHLY = 1, QUARTELY = 2, YEARLY = 3;
       console.log("Error while finding resident");
     } else {
 
-      exportResidentService.exportCarePlan(residents[0]);
+      //exportResidentService.exportCarePlan(residents[0]);
 
       for (var i = 0; i < residents.length; ++i) {
 
@@ -59,5 +59,5 @@ function createRule(type, value) {
 }
 
 function exportCarePlan(resident) {
-  console.log("Hello there the export is called");
+  //console.log("Hello there the export is called");
 }

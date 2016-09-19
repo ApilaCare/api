@@ -92,29 +92,6 @@ describe('Residents', function() {
     });
   });
 
-  describe('#get residents birthday', function() {
-    it('Getting list of residents for birthday info', function(done) {
-
-      var user = utils.getTestUser();
-
-      utils.server
-        .get('/api/residents/birthday/' + user.community._id)
-        .set('Accept', 'application/json')
-        .set('Authorization', 'Bearer ' + user.token)
-        .expect(200)
-        .end(function(err,res){
-          if(err) {
-            done(err);
-          } else {
-            assert.equal(1, res.body.length, 'Check if one user is sent');
-            done();
-          }
-
-        });
-
-    });
-  });
-
   describe('#get locations', function() {
     it('Get residents location (movedFrom info)', function(done) {
 
