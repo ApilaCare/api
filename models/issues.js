@@ -1,5 +1,12 @@
 var mongoose = require('mongoose');
 
+var finalPlanSchema = new mongoose.Schema({
+  text: {type: String},
+  checklist: {type: Boolean},
+  author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+  createdOn: {type: Date, default: Date.now}
+});
+
 var issueCommentSchema = new mongoose.Schema({
     author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     commentText: {type: String, required: true},
@@ -70,6 +77,7 @@ var issueSchema = new mongoose.Schema({
     due: {type: Date},
     confidential: {type: Boolean},
     idLabels: [String],
+    finalPlan: [finalPlanSchema],
     updateInfo: [updateInfoSchema],
     community: {
       type: mongoose.Schema.Types.ObjectId,
