@@ -80,7 +80,6 @@ router.get('/issues/:issueid/comments/', sanitizeInput, auth, ctrlIssueComments.
 
 // issue checklists
 router.post('/issues/:issueid/checklists/new', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistsCreate);
-router.get('/issues/:issueid/checklists/:checklistid',sanitizeInput , auth,  ctrlIssueChecklists.issueChecklistsReadOne);
 router.put('/issues/:issueid/checklists/newitem/:listid', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistAddItem);
 router.put('/issues/:issueid/checklists/:checklistid', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistsUpdateOne);
 router.delete('/issues/:issueid/checklists/:checklistid', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistsDeleteOne);
@@ -91,10 +90,7 @@ router.put('/issues/:issueid/labels/:labelid', sanitizeInput , auth, ctrlIssueLa
 router.delete('/issues/:issueid/labels/:labelid', sanitizeInput , auth, ctrlIssueLabels.issueLabelsDeleteOne);
 
 // issue attachments
-//router.post('/issues/:issueid/attachments/upload', auth, multipartyMiddleware, ctrlIssueAttachments.issueAttachmentsUpload);
 router.post('/issues/:issueid/attachments/new', sanitizeInput , auth, multipartyMiddleware, ctrlIssueAttachments.issueAttachmentsCreate);
-router.get('/issues/:issueid/attachments/:attachmentid', sanitizeInput , auth, ctrlIssueAttachments.issueAttachmentsReadOne);
-router.put('/issues/:issueid/attachments/:attachmentid', sanitizeInput , auth, ctrlIssueAttachments.issueAttachmentsUpdateOne);
 router.delete('/issues/:issueid/attachments/:attachmentid', sanitizeInput , auth, ctrlIssueAttachments.issueAttachmentsDeleteOne);
 
 // issues recovery

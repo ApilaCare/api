@@ -10,6 +10,9 @@ var issueExport = require('./../../services/exports/issueRecovery');
 
 var _ = require('lodash');
 
+//TODO: Split this up so we dont have callback hell
+
+//POST /issues/recovery/:communityid - create a new memer recovery process
 module.exports.createMemberRecovery = function(req, res) {
 
   var recoveredMember = req.body.recoveredMember;
@@ -67,6 +70,68 @@ module.exports.createMemberRecovery = function(req, res) {
   });
 };
 
+//POST /issues/recovery/verify/:userid - Confirm the password
+module.exports.confirmPassword = function(req, res) {
+
+  if (utils.checkParams(req, res, ['userid'])) {
+    return;
+  }
+
+  if (!req.body.password) {
+    utils.sendJSONresponse(res, 404, {
+      "message": "No password sent"
+    });
+    return;
+  }
+
+  var password = req.body.password;
+
+  //find the user and check to see if the password matches
+  User.findOne({
+    "_id": req.params.userid
+  }, function(err, user) {
+    if (user) {
+      if (user.validPassword(password)) {
+
+        if (req.body.type === "boss") {
+          bossConfirmedPassword(req.body.recoveryid);
+        } else {
+
+          findRecoveryByUser(res, req.params.userid, function(recovery) {
+            recovery.chosenMemberPasswordConfirmed = true;
+            recovery.save(function() {
+
+              // both of the users have verified password
+              if (recovery.bossPasswordConfirmed === true) {
+                unlockCondifentialIssues(recovery);
+              }
+
+
+              utils.sendJSONresponse(res, 200, {
+                "message": true
+              });
+            });
+          });
+        }
+
+
+      } else {
+        utils.sendJSONresponse(res, 404, {
+          "message": false
+        });
+      }
+    } else {
+      utils.sendJSONresponse(res, 404, {
+        "message": "User not found for password verification"
+      });
+    }
+  });
+
+};
+
+
+///////////////////////////// HELPER FUNCTIONS /////////////////////////////
+
 // this will select a random user except the one who submited the request
 function selectRandomUser(res, boss, recoveredMember, communityid, callback) {
   Community.findOne({
@@ -107,83 +172,30 @@ function selectRandomUser(res, boss, recoveredMember, communityid, callback) {
     });
 }
 
-
-module.exports.confirmPassword = function(req, res) {
-
-  if (utils.checkParams(req, res, ['userid'])) {
-    return;
-  }
-
-  if (!req.body.password) {
-    utils.sendJSONresponse(res, 404, {
-      "message": "No password sent"
-    });
-    return;
-  }
-
-  var password = req.body.password;
-
-  //find the user and chek to see if the password matches
+// given a user id and the chosenUser, it set's the user with a reference to it's chosenUser
+function setRecoveryToUser(res, userid, chosenMember, callback) {
   User.findOne({
-    "_id": req.params.userid
+    "_id": userid
   }, function(err, user) {
     if (user) {
-      if (user.validPassword(password)) {
+      user.recovery = chosenMember._id;
 
-        if (req.body.type === "boss") {
-          IssRecovery.findOne({
-            "_id": req.body.recoveryid
-          }, function(err, recovery) {
-            if (recovery) {
-
-              recovery.bossPasswordConfirmed = true;
-              recovery.active = true;
-              recovery.save(function() {
-                utils.sendJSONresponse(res, 200, {
-                  "message": true
-                });
-              });
-
-
-            } else {
-              utils.sendJSONresponse(res, 404, {
-                "message": false
-              });
-            }
+      user.save(function(err) {
+        if (err) {
+          utils.sendJSONresponse(res, 404, {
+            message: "Unable to save user"
           });
         } else {
-
-          findRecoveryByUser(res, req.params.userid, function(recovery) {
-            recovery.chosenMemberPasswordConfirmed = true;
-            recovery.save(function() {
-
-              // both of the users have verified password
-              if (recovery.bossPasswordConfirmed === true) {
-                unlockCondifentialIssues(recovery);
-              }
-
-
-              utils.sendJSONresponse(res, 200, {
-                "message": true
-              });
-            });
-          });
+          callback();
         }
-
-
-      } else {
-        utils.sendJSONresponse(res, 404, {
-          "message": false
-        });
-      }
+      });
     } else {
       utils.sendJSONresponse(res, 404, {
-        "message": "User not found for password verification"
+        message: "Unable to find the user"
       });
     }
   });
-
-};
+}
 
 function findRecoveryByUser(res, userid, callback) {
   IssRecovery.findOne({
@@ -199,6 +211,47 @@ function findRecoveryByUser(res, userid, callback) {
         });
       }
     });
+}
+
+function getConfidentialIssues(recoveredMember, callback) {
+
+  Iss.find({
+      "confidential": true,
+      "submitBy": recoveredMember.name
+    },
+    function(err, issues) {
+      if (issues) {
+        callback(issues);
+      } else {
+        console.log("Error while finding issues");
+      }
+
+    });
+}
+
+function bossConfirmedPassword(recoveryid) {
+
+  IssRecovery.findOne({
+    "_id": recoveryid
+  }, function(err, recovery) {
+    if (recovery) {
+
+      recovery.bossPasswordConfirmed = true;
+      recovery.active = true;
+
+      recovery.save(function() {
+        utils.sendJSONresponse(res, 200, {
+          "message": true
+        });
+      });
+
+    } else {
+      utils.sendJSONresponse(res, 404, {
+        "message": false
+      });
+    }
+  });
+
 }
 
 // getting confidentials issues from the recovoredUser and convert it to pdf and send with email to boss
@@ -223,48 +276,5 @@ function unlockCondifentialIssues(recovery) {
     });
     */
 
-  });
-}
-
-function getConfidentialIssues(recoveredMember, callback) {
-
-  console.log(recoveredMember.name);
-
-  Iss.find({
-      "confidential": true,
-      "submitBy": recoveredMember.name
-    },
-    function(err, issues) {
-      if (issues) {
-        callback(issues);
-      } else {
-        console.log("Error while finding issues");
-      }
-
-    });
-}
-
-// given a user id and the chosenUser, it set's the user with a reference to it's chosenUser
-function setRecoveryToUser(res, userid, chosenMember, callback) {
-  User.findOne({
-    "_id": userid
-  }, function(err, user) {
-    if (user) {
-      user.recovery = chosenMember._id;
-
-      user.save(function(err) {
-        if (err) {
-          utils.sendJSONresponse(res, 404, {
-            message: "Unable to save user"
-          });
-        } else {
-          callback();
-        }
-      });
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Unable to find the user"
-      });
-    }
   });
 }
