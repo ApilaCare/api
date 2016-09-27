@@ -15,6 +15,9 @@ var testUser = {
   "token" : "",
   "community" : {}
 };
+
+var issueid = '';
+
 var server = supertest.agent("http://localhost:" + process.env.PORT);
 
 before(function(done) {
@@ -58,6 +61,17 @@ function setCommunity(id) {
   testUser.communityid = id;
 }
 
+function setIssueId(id) {
+  issueid = id;
+}
+
+function getIssueId(id) {
+  return issueid;
+}
+
 exports.server = server;
 exports.setCommunity = setCommunity;
 exports.getTestUser = getTestUser;
+
+exports.setIssueId = setIssueId;
+exports.getIssueId = getIssueId;

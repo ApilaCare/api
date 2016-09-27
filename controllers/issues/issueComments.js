@@ -17,6 +17,7 @@ module.exports.issueCommentsCreate = function(req, res) {
       .exec(
         function(err, issue) {
           if (err) {
+            console.log(err);
             utils.sendJSONresponse(res, 400, err);
           } else {
             doAddComment(req, res, issue);
