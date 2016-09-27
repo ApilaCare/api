@@ -62,7 +62,7 @@ module.exports.issueLabelsUpdateOne = function(req, res) {
                             "message": "labelid not found"
                         });
                     } else {
-                        thisLabel.author = req.body.author; // probably dont need thisLabel
+                        thisLabel.author = req.body.author;
                         thisLabel.name = req.body.name;
                         thisLabel.color = req.body.color;
                         issue.save(function(err, issue) {

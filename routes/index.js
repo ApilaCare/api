@@ -76,10 +76,7 @@ router.delete('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesDeleteO
 
 // issue comments
 router.post('/issues/:issueid/comments/new', sanitizeInput , auth, ctrlIssueComments.issueCommentsCreate);
-router.get('/issues/:issueid/comments/:commentid',sanitizeInput , auth,  ctrlIssueComments.issueCommentsReadOne);
 router.get('/issues/:issueid/comments/', sanitizeInput, auth, ctrlIssueComments.issueCommentsList);
-router.put('/issues/:issueid/comments/:commentid', sanitizeInput , auth, ctrlIssueComments.issueCommentsUpdateOne);
-router.delete('/issues/:issueid/comments/:commentid', sanitizeInput , auth, ctrlIssueComments.issueCommentsDeleteOne);
 
 // issue checklists
 router.post('/issues/:issueid/checklists/new', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistsCreate);
