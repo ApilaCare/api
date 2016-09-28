@@ -19,6 +19,7 @@ var todoItemSchema = new mongoose.Schema({
                                               //                 13 = every year,
 
   // automatic
+  completeOn: {type: Date},
   createdOn: {type: Date, default: Date.now}
   itemId: {type: Number, required: true},  // maybe have this create a ObjectId("xyz") for the subdocument
 });
@@ -37,8 +38,8 @@ var todoSchema = new mongoose.Schema({
   //    item                            becomes not completed;
   //    posted         becomes          item posted
   //    to do          overdue          to do again
-  //    |---------------|---------------|
-  //    |---------time interval---------|
+  //      |---------------|---------------|
+  //      |---------time interval---------|
 
   // counters
   completed: [counterSchema], // completed before certain amount of time
