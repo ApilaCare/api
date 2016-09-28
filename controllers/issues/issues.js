@@ -33,6 +33,42 @@ module.exports.issuesCreate = function(req, res) {
   });
 };
 
+//PUT /issues/:issueid/finalplan - Adds a final plan item to an issue
+module.exports.addFinalPlan = function(req, res) {
+
+  var issueid = req.params.issueid;
+
+  if (utils.checkParams(req, res, ['issueid'])) {
+    return;
+  }
+
+  Iss.findById(issueid)
+     .exec(function(err, issue) {
+
+       if(err) {
+         utils.sendJSONresponse(res, 404, {'message' : 'Issue not found to add a final plan'});
+       } else {
+
+         var finalPlan = {
+           "text" : req.body.text,
+           "checklist" : req.body.checklist,
+           "author" : req.body.author
+         };
+
+         issue.finalPlan.push(finalPlan);
+
+         issue.save(function(err, issue) {
+           if(err) {
+             utils.sendJSONresponse(res, 404,
+               {'message' : 'Unable to save issue while adding final plan'});
+           } else {
+             utils.sendJSONresponse(res, 200, finalPlan);
+           }
+         });
+       }
+
+     });
+};
 
 //GET /issues/count/:userid/id/:communityid - Number of open issues asigned to an user
 module.exports.issuesOpenCount = function(req, res) {
@@ -127,6 +163,7 @@ module.exports.issuesList = function(req, res) {
     "idLabels": "$idLabels",
     "idAttachmentCover": "$idAttachmentCover",
     "attachments": "$attachments",
+    "finalPlan": "$finalPlan",
     "labels": "$labels",
     "checklists": "$checklists",
     "_id": "$_id",

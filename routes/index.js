@@ -72,6 +72,7 @@ router.get('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesReadOne);
 router.get('/issues/:issueid/updateinfo', sanitizeInput, auth, ctrlIssues.issueUpdateInfo);
 router.post('/issues/new', sanitizeInput , auth, ctrlIssues.issuesCreate);
 router.put('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesUpdateOne);
+router.put('/issues/:issueid/finalplan', sanitizeInput, auth, ctrlIssues.addFinalPlan);
 router.delete('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesDeleteOne);
 
 // issue comments
