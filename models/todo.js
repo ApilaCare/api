@@ -35,9 +35,9 @@ var todoSchema = new mongoose.Schema({
 
   // visual representation of the counters:
   //
-  //    item                            becomes not completed;
+  //    item                            becomes "not completed";
   //    posted         becomes          item posted
-  //    to do          overdue          to do again
+  //    to do          "overdue"        to do again
   //      |---------------|---------------|
   //      |---------time interval---------|
 
@@ -46,6 +46,10 @@ var todoSchema = new mongoose.Schema({
   overDue: [counterSchema], // not completed
   notCompleted: [counterSchema],
 
+  // automatic
+  createdBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}, // have each todo tied to a user;
+                                                                  // probably automatically create a new document
+                                                                  // when a user registers
 });
 
 mongoose.model('To-Do', todoSchema);
