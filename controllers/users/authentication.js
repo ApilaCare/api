@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var User = mongoose.model('User');
 
 var communityCtrl = require('../communities/communities');
+var todoCtrl = require('../todos/todos');
 var utils = require('../../services/utils');
 
 // POST /register - User registration
@@ -39,10 +40,18 @@ module.exports.register = function(req, res) {
         "name": "Test"
       };
 
+      // create a new empty to do on register
+      todoCtrl.createEmptyToDo(u._id, function(status) {
+        if(status) {
+          console.log("Created an empty todo");
+        } else {
+          console.log("Error while creating empty todo");
+        }
+      });
+
       // create the user a new test community
       communityCtrl.doCreateCommunity(data, function(status, community) {
         if (status) {
-          console.log(community);
           utils.sendJSONresponse(res, 200, {
             'token': token,
             'community': community,
@@ -54,7 +63,6 @@ module.exports.register = function(req, res) {
           });
         }
       });
-
 
     }
   });

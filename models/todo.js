@@ -21,12 +21,12 @@ var todoItemSchema = new mongoose.Schema({
   // automatic
   completeOn: {type: Date},
   createdOn: {type: Date, default: Date.now}
-  itemId: {type: Number, required: true},  // maybe have this create a ObjectId("xyz") for the subdocument
+  //itemId: {type: Number, required: true},  // maybe have this create a ObjectId("xyz") for the subdocument
 });
 
 var counterSchema = new mongoose.Schema({
   count: {type: Number, required: true, default: 0},
-  counterItemId: {type: Number, required: true}, // itemId from todoItemSchema
+  counterItemId: {type: mongoose.Schema.Types.ObjectId, ref: 'todoItemSchema', required: true}, // itemId from todoItemSchema
 });
 
 var todoSchema = new mongoose.Schema({

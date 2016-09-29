@@ -48,6 +48,8 @@ var ctrlAppointmentComments = require('../controllers/appointments/appointmentCo
 // communities
 var ctrlCommunities = require('../controllers/communities/communities');
 
+// todos
+var ctrlToDos = require('../controllers/todos/todos');
 
 // communities
 router.get('/communities/', sanitizeInput, auth, ctrlCommunities.communitiesList);
