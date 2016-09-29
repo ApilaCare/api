@@ -134,6 +134,11 @@ router.put('/users/:userid/update', sanitizeInput , auth, ctrlPayment.updateCust
 router.post('/register', ctrlAuth.register);
 router.post('/login', ctrlAuth.login);
 
+// todos
+router.get('/todos/:todoid', sanitizeInput, auth, ctrlToDos.listTasks);
+router.post('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.addTask);
+router.put('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.updateTask);
+router.delete('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.deleteTask);
 
 // residents
 router.get('/residents/list/:communityid', sanitizeInput , auth, ctrlResidents.residentsList);

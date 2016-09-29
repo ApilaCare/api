@@ -31,7 +31,7 @@ var counterSchema = new mongoose.Schema({
 
 var todoSchema = new mongoose.Schema({
 
-  todoItem: [todoItemSchema],
+  tasks: [todoItemSchema],
 
   // visual representation of the counters:
   //
