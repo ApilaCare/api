@@ -4,19 +4,18 @@ var utils = require('../../services/utils');
 var ToDo = mongoose.model('To-Do');
 
 // creates an empty todo object called when a user is registered
-module.exports.createEmptyToDo = function(author, callback) {
+module.exports.createEmptyToDo = function(callback) {
 
   ToDo.create({
     todoItem: [],
     completed: [],
     overDue: [],
-    notCompleted: [],
-    createdBy: author,
+    notCompleted: []
   }, function(err, todo) {
     if (err) {
       callback(false);
     } else {
-      callback(true);
+      callback(todo._id);
     }
   });
 

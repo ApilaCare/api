@@ -26,44 +26,14 @@ module.exports.register = function(req, res) {
   // use setPassword method to set salt and hash
   user.setPassword(req.body.password);
 
-  // save new user to MongoDB
-  user.save(function(err, u) {
-    var token;
-    if (err) {
-      utils.sendJSONresponse(res, 404, err);
+  // create a new empty to do on register
+  todoCtrl.createEmptyToDo(function(todoid) {
+    if(todoid) {
+      //Save User
+      user.todoid = todoid;
+      saveUser(user, todoid, res);
     } else {
-      // generate a JWT using schema method and send it to browser
-      token = user.generateJwt();
-
-      var data = {
-        "creator": u._id,
-        "name": "Test"
-      };
-
-      // create a new empty to do on register
-      todoCtrl.createEmptyToDo(u._id, function(status) {
-        if(status) {
-          console.log("Created an empty todo");
-        } else {
-          console.log("Error while creating empty todo");
-        }
-      });
-
-      // create the user a new test community
-      communityCtrl.doCreateCommunity(data, function(status, community) {
-        if (status) {
-          utils.sendJSONresponse(res, 200, {
-            'token': token,
-            'community': community,
-            'id': user._id
-          });
-        } else {
-          utils.sendJSONresponse(res, 404, {
-            message: "Error while creating test community"
-          });
-        }
-      });
-
+      utils.sendJSONresponse(res, 500, {"message" : "Error while saving todo"});
     }
   });
 
@@ -103,3 +73,40 @@ module.exports.login = function(req, res) {
     // make sure that req and res are available to Passport
   })(req, res);
 };
+
+function saveUser(user, todoid, res) {
+
+  user.save(function(err, u) {
+    var token;
+    if (err) {
+      utils.sendJSONresponse(res, 404, err);
+      return;
+    } else {
+      // generate a JWT using schema method and send it to browser
+      token = user.generateJwt();
+
+      var data = {
+        "creator": u._id,
+        "name": "Test"
+      };
+
+      // create the user a new test community
+      communityCtrl.doCreateCommunity(data, function(status, community) {
+        if (status) {
+          utils.sendJSONresponse(res, 200, {
+            'token': token,
+            'community': community,
+            'id': user._id,
+            'todoid' : todoid
+          });
+          return;
+        } else {
+          utils.sendJSONresponse(res, 404, {
+            message: "Error while creating test community"
+          });
+          return;
+        }
+      });
+    }
+  });
+}

@@ -47,7 +47,9 @@ var todoSchema = new mongoose.Schema({
   notCompleted: [counterSchema],
 
   // automatic
-  createdBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}, // have each todo tied to a user;
+  //NOTE: for easier use in the frontend (having the todoid of that user),
+  //I have added the todo to the user model
+  //createdBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}, // have each todo tied to a user;
                                                                   // probably automatically create a new document
                                                                   // when a user registers
 });
