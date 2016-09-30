@@ -3,11 +3,13 @@ var utils = require('../../services/utils');
 
 var ToDo = mongoose.model('To-Do');
 
+var _ = require('lodash');
+
 // creates an empty todo object called when a user is registered
 module.exports.createEmptyToDo = function(callback) {
 
   ToDo.create({
-    todoItem: [],
+    tasks: [],
     completed: [],
     overDue: [],
     notCompleted: []
@@ -24,7 +26,11 @@ module.exports.createEmptyToDo = function(callback) {
 //GET /todos/:todoid - List all the tasks from the todo
 module.exports.listTasks = function(req, res) {
 
-  var todoId = req.body.todoid;
+  var todoId = req.params.todoid;
+
+  if (utils.checkParams(req, res, ['todoid'])) {
+    return;
+  }
 
   ToDo.findById(todoId)
   .exec(function(err, todo) {
@@ -40,7 +46,11 @@ module.exports.listTasks = function(req, res) {
 //POST /todos/:todoid/task/:taskid - Creates a new task (todo item)
 module.exports.addTask = function(req, res) {
 
-  var todoId = req.body.todoid;
+  var todoId = req.params.todoid;
+
+  if (utils.checkParams(req, res, ['todoid'])) {
+    return;
+  }
 
   ToDo.findById(todoId)
   .exec(function(err, todo) {
@@ -48,13 +58,19 @@ module.exports.addTask = function(req, res) {
       utils.sendJSONresponse(res, 500, err);
     } else {
 
+      var newTask = {
+        "text" : req.body.text,
+        "occurrence" : req.body.occurrence,
+        "complete" : false
+      };
+
       todo.tasks.push(newTask);
 
       todo.save(function(err, savedToDo) {
         if(err) {
           utils.sendJSONresponse(res, 500, err);
         } else {
-          utils.sendJSONresponse(res, 200, savedToDo);
+          utils.sendJSONresponse(res, 200, newTask);
         }
       });
 
@@ -66,15 +82,27 @@ module.exports.addTask = function(req, res) {
 //PUT /todos/:todoid/task/:taskid - Update a specific task
 module.exports.updateTask = function(req, res) {
 
-  var todoId = req.body.todoid;
-  var taskId = req.body.taskid;
+  var todoId = req.params.todoid;
+  var taskId = req.params.taskid;
+
+  if (utils.checkParams(req, res, ['todoid', 'taskid'])) {
+    return;
+  }
 
   ToDo.findById(todoId)
   .exec(function(err, todo) {
     if(err) {
       utils.sendJSONresponse(res, 500, err);
     } else {
-      //TODO: find our task and update it with the new data
+
+      index = todo.tasks.indexOf(todo.tasks.id(taskId));
+
+      if(index !== -1) {
+        todo.tasks.set(index, req.body);
+      } else {
+        utils.sendJSONresponse(res, 500, {'message' : "Task with such an id not found"});
+        return;
+      }
 
       todo.save(function(err, savedToDo) {
         if(err) {
@@ -91,8 +119,12 @@ module.exports.updateTask = function(req, res) {
 //DELETE todos/:todoid/task/:taskid - Delete a specific task
 module.exports.deleteTask = function(req, res) {
 
-  var todoId = req.body.todoid;
-  var taskId = req.body.taskid;
+  var todoId = req.params.todoid;
+  var taskId = req.params.taskid;
+
+  if (utils.checkParams(req, res, ['todoid', 'taskid'])) {
+    return;
+  }
 
   ToDo.findById(todoId)
   .exec(function(err, todo) {
