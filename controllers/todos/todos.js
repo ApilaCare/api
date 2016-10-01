@@ -70,7 +70,7 @@ module.exports.addTask = function(req, res) {
         if(err) {
           utils.sendJSONresponse(res, 500, err);
         } else {
-          utils.sendJSONresponse(res, 200, newTask);
+          utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
         }
       });
 
@@ -107,8 +107,9 @@ module.exports.updateTask = function(req, res) {
       todo.save(function(err, savedToDo) {
         if(err) {
           utils.sendJSONresponse(res, 500, err);
+          console.log(err);
         } else {
-          utils.sendJSONresponse(res, 200, savedToDo);
+          utils.sendJSONresponse(res, 200, req.body);
         }
       });
     }
@@ -119,8 +120,8 @@ module.exports.updateTask = function(req, res) {
 //DELETE todos/:todoid/task/:taskid - Delete a specific task
 module.exports.deleteTask = function(req, res) {
 
-  var todoId = req.params.todoid;
-  var taskId = req.params.taskid;
+  var todoId = req.utils.todoid;
+  var taskId = req.utils.taskid;
 
   if (utils.checkParams(req, res, ['todoid', 'taskid'])) {
     return;
@@ -132,6 +133,7 @@ module.exports.deleteTask = function(req, res) {
       utils.sendJSONresponse(res, 500, err);
     } else {
       //TODO: find our task and see if we can delete it
+      todo.tasks.id(taskId).remove();
 
       todo.save(function(err, savedToDo) {
         if(err) {

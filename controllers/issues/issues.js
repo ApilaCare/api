@@ -304,8 +304,6 @@ module.exports.issuesUpdateOne = function(req, res) {
     return;
   }
 
-  console.log("User id " + req.body.modifiedBy);
-
   var updateInfo = {
     "updateBy": req.body.modifiedBy,
     "updateDate": req.body.modifiedDate,

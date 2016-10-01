@@ -13,6 +13,7 @@ var testUser = {
   "email": "first@gmail.com",
   "password": "123456",
   "token" : "",
+  "todoid" : "",
   "community" : {}
 };
 
@@ -48,6 +49,8 @@ function setupData(callback) {
       testUser.token = res.body.token;
       testUser.community = res.body.community;
       testUser.id = res.body.id;
+      console.log("TODO ID: " + res.body.todoid);
+      testUser.todoid = res.body.todoid;
       callback();
     });
 
@@ -69,9 +72,14 @@ function getIssueId(id) {
   return issueid;
 }
 
+function getToDoId() {
+  return testUser.todoid;
+}
+
 exports.server = server;
 exports.setCommunity = setCommunity;
 exports.getTestUser = getTestUser;
 
 exports.setIssueId = setIssueId;
 exports.getIssueId = getIssueId;
+exports.getToDoId = getToDoId;

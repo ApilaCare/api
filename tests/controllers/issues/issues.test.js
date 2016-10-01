@@ -218,7 +218,6 @@ describe('Issues', function() {
           if (err) {
             done(err);
           } else {
-            console.log(res.body);
             assert.deepEqual(finalPlanData, res.body);
             done();
           }

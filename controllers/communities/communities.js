@@ -466,7 +466,7 @@ var getAuthor = function(req, res, callback) {
           utils.sendJSONresponse(res, 404, err);
           return;
         }
-        console.log(user);
+  
         callback(req, res, user._id);
       });
 
