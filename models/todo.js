@@ -20,18 +20,7 @@ var todoItemSchema = new mongoose.Schema({
 
   // automatic
   completeOn: {type: Date},
-  createdOn: {type: Date, default: Date.now}
-  //itemId: {type: Number, required: true},  // maybe have this create a ObjectId("xyz") for the subdocument
-});
-
-var counterSchema = new mongoose.Schema({
-  count: {type: Number, required: true, default: 0},
-  counterItemId: {type: mongoose.Schema.Types.ObjectId, ref: 'todoItemSchema', required: true}, // itemId from todoItemSchema
-});
-
-var todoSchema = new mongoose.Schema({
-
-  tasks: [todoItemSchema],
+  createdOn: {type: Date, default: Date.now},
 
   // visual representation of the counters:
   //
@@ -39,19 +28,21 @@ var todoSchema = new mongoose.Schema({
   //    posted         becomes          item posted
   //    to do          "overdue"        to do again
   //      |---------------|---------------|
-  //      |---------time interval---------|
-
-  // counters
+  //     |---------time interval---------|
   completed: [counterSchema], // completed before certain amount of time
   overDue: [counterSchema], // not completed
   notCompleted: [counterSchema],
+});
 
-  // automatic
-  //NOTE: for easier use in the frontend (having the todoid of that user),
-  //I have added the todo to the user model
-  //createdBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}, // have each todo tied to a user;
-                                                                  // probably automatically create a new document
-                                                                  // when a user registers
+var counterSchema = new mongoose.Schema({
+  count: {type: Number, required: true, default: 0},
+  updatedOn: {type: Date, default: Date.now}
+});
+
+var todoSchema = new mongoose.Schema({
+
+  tasks: [todoItemSchema]
+
 });
 
 mongoose.model('To-Do', todoSchema);

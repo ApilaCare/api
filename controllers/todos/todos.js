@@ -98,7 +98,15 @@ module.exports.updateTask = function(req, res) {
       index = todo.tasks.indexOf(todo.tasks.id(taskId));
 
       if(index !== -1) {
-        todo.tasks.set(index, req.body);
+
+        var task = req.body;
+
+        if(task.complete === true) {
+          task.completed.push({"counter" : 0, updatedOn: new Date()});
+        }
+
+        todo.tasks.set(index, task);
+
       } else {
         utils.sendJSONresponse(res, 500, {'message' : "Task with such an id not found"});
         return;
