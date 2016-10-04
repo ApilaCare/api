@@ -178,13 +178,11 @@ var getFullAppointment = function(req, res, appointId) {
     .populate("residentGoing")
     .exec(function(err, appointment) {
       if (!appointment) {
-        utils.sendJSONresponse(res, 404, {
-          "message": "appointmentid not found (from controller)"
-        });
+        utils.sendJSONresponse(res, 404, {"error_list" : true});
         return;
       } else if (err) {
         console.log(err);
-        utils.sendJSONresponse(res, 404, err);
+        utils.sendJSONresponse(res, 404, {"error_list" : true});
         return;
       }
       utils.sendJSONresponse(res, 200, appointment);
