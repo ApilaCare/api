@@ -45,4 +45,4 @@ var todoSchema = new mongoose.Schema({
 
 });
 
-mongoose.model('To-Do', todoSchema);
+mongoose.model('ToDo', todoSchema);

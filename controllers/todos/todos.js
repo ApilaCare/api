@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var utils = require('../../services/utils');
 
-var ToDo = mongoose.model('To-Do');
+var ToDo = mongoose.model('ToDo');
 
 var _ = require('lodash');
 
