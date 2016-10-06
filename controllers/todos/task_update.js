@@ -1,8 +1,12 @@
 var _ = require('lodash');
 var moment = require('moment');
 
+var fs = require('fs');
+
 var START_WORK_DAY = 8;
 var END_WORK_DAY = 16;
+
+var currentTime = moment();
 
 var occurrence = {
   "EVERY_HOUR" : 0,
@@ -28,6 +32,8 @@ var occurrence = {
 // on what cycle (date) we are
 
 module.exports.updateTasks = function(todo, callback) {
+
+  loadMockTime();
 
   var tasks = todo.tasks;
   var currTime = moment();
@@ -62,7 +68,8 @@ module.exports.updateTasks = function(todo, callback) {
 
 function inNewCycle(task) {
 
-  var currTime = moment();
+  //var currTime = moment();
+  var currTime = currentTime;
   var cycleDate = moment(task.cycleDate);
 
   switch(task.occurrence) {
@@ -134,5 +141,19 @@ function inNewCycle(task) {
 function resetTaskCycle(task) {
   task.current = true;
   task.complete = false;
-  task.cycleDate = new Date();
+  task.cycleDate = currentTime;
+}
+
+
+loadMockTime();
+
+function loadMockTime() {
+  if(process.env.BACK_TO_FUTURE) {
+    fs.readFile("./tools/date.txt", 'UTF8', function(err, data) {
+      currentTime = moment(parseInt(data));
+      console.log(currentTime.format('MMMM Do YYYY, h:mm:ss a'));
+
+    });
+  }
+
 }
