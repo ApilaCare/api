@@ -33,44 +33,49 @@ var occurrence = {
 
 module.exports.updateTasks = function(todo, callback) {
 
-  loadMockTime();
+  loadMockTime(function(currTime) {
+    if(currTime) {
 
-  var tasks = todo.tasks;
-  var currTime = moment();
+      var tasks = todo.tasks;
 
-  _.forEach(tasks, function(task) {
+      _.forEach(tasks, function(task) {
 
-      inNewCycle(task);
+          inNewCycle(task, currTime);
 
-      // if(task.occurrence === occurrence.EVERY_DAY) {
-      //   //if it's past 12 pm it's overdue
-      //   if(currTime.hour() >= 12) {
-      //     console.log('overdue');
-      //     //if we are already have overdue for this cycle dont push it
-      //     task.overDue.push({"counter" : 0, updatedOn: new Date()});
-      //   }
-      // }
+          // if(task.occurrence === occurrence.EVERY_DAY) {
+          //   //if it's past 12 pm it's overdue
+          //   if(currTime.hour() >= 12) {
+          //     console.log('overdue');
+          //     //if we are already have overdue for this cycle dont push it
+          //     task.overDue.push({"counter" : 0, updatedOn: new Date()});
+          //   }
+          // }
 
+
+
+      });
+
+      todo.tasks = tasks;
+
+      todo.save(function(err) {
+        if(err) {
+          callback(false, err);
+        } else {
+          callback(true, err);
+        }});
+    }
   });
-
-  todo.tasks = tasks;
-
-  todo.save(function(err) {
-    if(err) {
-      callback(false, err);
-    } else {
-      callback(true, err);
-    }});
 
 };
 
 //TODO: Monday - Friday??
 
-function inNewCycle(task) {
+function inNewCycle(task, currTime) {
 
   //var currTime = moment();
-  var currTime = currentTime;
   var cycleDate = moment(task.cycleDate);
+
+  console.log("Current time: " + currTime.format('MMMM Do YYYY, h:mm:ss a'));
 
   switch(task.occurrence) {
 
@@ -141,19 +146,20 @@ function inNewCycle(task) {
 function resetTaskCycle(task) {
   task.current = true;
   task.complete = false;
-  task.cycleDate = currentTime;
+  task.cycleDate = new Date();
 }
 
 
-loadMockTime();
 
-function loadMockTime() {
+function loadMockTime(callback) {
   if(process.env.BACK_TO_FUTURE) {
     fs.readFile("./tools/date.txt", 'UTF8', function(err, data) {
       currentTime = moment(parseInt(data));
       console.log(currentTime.format('MMMM Do YYYY, h:mm:ss a'));
-
+      callback(currentTime);
     });
+  } else {
+    callback(null);
   }
 
 }
