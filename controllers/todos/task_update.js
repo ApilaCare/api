@@ -6,6 +6,9 @@ var fs = require('fs');
 var START_WORK_DAY = 8;
 var END_WORK_DAY = 16;
 
+var SATURDAY = 6;
+var SUNDAY = 7;
+
 var currentTime = moment();
 
 var occurrence = {
@@ -74,34 +77,59 @@ function inNewCycle(task, currTime) {
 
   //var currTime = moment();
   var cycleDate = moment(task.cycleDate);
-
-  console.log("Current time: " + currTime.format('MMMM Do YYYY, h:mm:ss a'));
+  var currHour = currTime.hour();
+  var currDay = currTime.weekday();
+  //console.log("Current time: " + currTime.format('MMMM Do YYYY, h:mm:ss a'));
 
   switch(task.occurrence) {
 
     // Every Hour - task should be active between 8 - 16
     case occurrence.EVERY_HOUR:
-        console.log(cycleDate.hour() + "  " + currTime.hour());
-        if(currTime.hour() >= START_WORK_DAY &&
-                currTime.hour() <= END_WORK_DAY && currTime.hour() !== cycleDate.hour()){
+        console.log(cycleDate.hour() + "  " + currHour);
+        if(isInWorkHours(currHour) && currHour !== cycleDate.hour()){
 
+          console.log("Hour task should be updated");
           resetTaskCycle(task);
         }
+
+        if(!isInWorkWeek(currDay) || !isInWorkHours(currHour)) {
+          hideTask(task);
+        } else {
+          showTask(task);
+        }
+
       break;
 
     // midnight and moon
     case occurrence.TWICE_DAY:
 
+
+        if(!isInWorkWeek(currDay)) {
+          hideTask(task);
+        } else {
+          showTask(task);
+        }
       break;
 
     case occurrence.EVERY_DAY:
         if(!currTime.isSame(cycleDate, "day")){
           resetTaskCycle(task);
         }
+
+        if(!isInWorkWeek(currDay)) {
+          hideTask(task);
+        } else {
+          showTask(task);
+        }
       break;
 
     case occurrence.EVERY_OTHER_DAY:
 
+        if(!isInWorkWeek(currDay)) {
+          hideTask(task);
+        } else {
+          showTask(task);
+        }
       break;
 
     case occurrence.TWICE_WEEK:
@@ -143,13 +171,39 @@ function inNewCycle(task, currTime) {
   }
 }
 
+
+function hideTask(task) {
+  task.current = false;
+}
+
+function showTask(task) {
+  if(!task.complete) {
+    task.current = true;
+  }
+}
+
 function resetTaskCycle(task) {
   task.current = true;
   task.complete = false;
   task.cycleDate = new Date();
 }
 
+//checks if we are in the work hours standard shift
+function isInWorkHours(currHour) {
+  if(currHour >= START_WORK_DAY && currHour <= END_WORK_DAY) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
+function isInWorkWeek(currDay) {
+  if(currDay === SATURDAY || currDay === SUNDAY) {
+    return false;
+  } else {
+    return true;
+  }
+}
 
 function loadMockTime(callback) {
   if(process.env.BACK_TO_FUTURE) {
