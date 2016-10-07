@@ -143,8 +143,8 @@ module.exports.updateTask = function(req, res) {
 //DELETE todos/:todoid/task/:taskid - Delete a specific task
 module.exports.deleteTask = function(req, res) {
 
-  var todoId = req.utils.todoid;
-  var taskId = req.utils.taskid;
+  var todoId = req.params.todoid;
+  var taskId = req.params.taskid;
 
   if (utils.checkParams(req, res, ['todoid', 'taskid'])) {
     return;
@@ -155,7 +155,7 @@ module.exports.deleteTask = function(req, res) {
     if(err) {
       utils.sendJSONresponse(res, 500, err);
     } else {
-      //TODO: find our task and see if we can delete it
+
       todo.tasks.id(taskId).remove();
 
       todo.save(function(err, savedToDo) {
