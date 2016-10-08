@@ -6,8 +6,16 @@ var fs = require('fs');
 var START_WORK_DAY = 8;
 var END_WORK_DAY = 16;
 
-var SATURDAY = 6;
-var SUNDAY = 7;
+var day = {
+  "MONDAY" : 1,
+  "TUESDAY" : 2,
+  "WEDNESDAY" : 3,
+  "THURSDAY"  :4,
+  "FRIDAY": 5,
+  "SATURDAY" : 6,
+  "SUNDAY" : 7
+
+};
 
 var currentTime = moment();
 
@@ -78,7 +86,7 @@ function inNewCycle(task, currTime) {
   //var currTime = moment();
   var cycleDate = moment(task.cycleDate);
   var currHour = currTime.hour();
-  var currDay = currTime.weekday();
+  var currDay = currTime.isoWeekday();
   //console.log("Current time: " + currTime.format('MMMM Do YYYY, h:mm:ss a'));
 
   switch(task.occurrence) {
@@ -88,7 +96,6 @@ function inNewCycle(task, currTime) {
         console.log(cycleDate.hour() + "  " + currHour);
         if(isInWorkHours(currHour) && currHour !== cycleDate.hour()){
 
-          console.log("Hour task should be updated");
           resetTaskCycle(task);
         }
 
@@ -100,9 +107,17 @@ function inNewCycle(task, currTime) {
 
       break;
 
-    // midnight and moon
+    // midnight and noon (2 cycles a day)
     case occurrence.TWICE_DAY:
 
+        // if we are in a next day reset
+        if(!currTime.isSame(cycleDate, "day")){
+          resetTaskCycle(task);
+        }
+        // if we last check in the first cycle but now it's time for the second one
+        else if(cycleDate.hour() < 12 && currHour >= 12) {
+          resetTaskCycle(task);
+        }
 
         if(!isInWorkWeek(currDay)) {
           hideTask(task);
@@ -123,17 +138,36 @@ function inNewCycle(task, currTime) {
         }
       break;
 
+    // Monday, Wednesday, Friday
     case occurrence.EVERY_OTHER_DAY:
 
-        if(!isInWorkWeek(currDay)) {
+    if(!currTime.isSame(cycleDate, "day")){
+      if(currDay === day.MONDAY || currDay === day.WEDNESDAY || currDay === day.FRIDAY) {
+        resetTaskCycle(task);
+      }
+    }
+
+    if(currDay !== day.MONDAY || currDay !== day.WEDNESDAY || currDay !== day.FRIDAY) {
+      hideTask(task);
+    } else {
+      showTask(task);
+    }
+      break;
+
+    // Tuesday, Thursday
+    case occurrence.TWICE_WEEK:
+
+        if(!currTime.isSame(cycleDate, "day")){
+          if(currDay === day.TUESDAY || currDay === day.THURSDAY) {
+            resetTaskCycle(task);
+          }
+        }
+
+        if(currDay !== day.TUESDAY || currDay !== day.THURSDAY) {
           hideTask(task);
         } else {
           showTask(task);
         }
-      break;
-
-    case occurrence.TWICE_WEEK:
-
       break;
 
     case occurrence.EVERY_WEEK:
@@ -190,6 +224,7 @@ function resetTaskCycle(task) {
 
 //checks if we are in the work hours standard shift
 function isInWorkHours(currHour) {
+  console.log("HOUR: " + currHour);
   if(currHour >= START_WORK_DAY && currHour <= END_WORK_DAY) {
     return true;
   } else {
@@ -198,7 +233,8 @@ function isInWorkHours(currHour) {
 }
 
 function isInWorkWeek(currDay) {
-  if(currDay === SATURDAY || currDay === SUNDAY) {
+  console.log("DAY: " + currDay);
+  if(currDay === day.SATURDAY || currDay === day.SUNDAY) {
     return false;
   } else {
     return true;
