@@ -119,7 +119,10 @@ module.exports.updateTask = function(req, res) {
           task.cycleDate = new Date();
         }
 
-        console.log(task);
+        // if we switched for everyDay and we had activeDays reset them
+        if(todo.tasks[index].occurrence === 2 && task.occurrence !== 2) {
+          task.activeDays = [true, true, true, true, true];
+        }
 
         todo.tasks.set(index, task);
 
