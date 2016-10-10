@@ -72,6 +72,7 @@ module.exports.addTask = function(req, res) {
         "text" : req.body.text,
         "occurrence" : req.body.occurrence,
         "complete" : false,
+        "activeDays" : req.body.activeDays,
         "cycleDate" : new Date()
       };
 

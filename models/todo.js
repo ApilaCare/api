@@ -8,6 +8,8 @@ var todoItemSchema = new mongoose.Schema({
   cycleDate : {type: Date, default: Date.now},
   occurrence: {type: Number, required: true},
 
+  activeDays: [{type: Boolean}], //if user selected specific days
+
   // automatic
   completeOn: {type: Date},
   createdOn: {type: Date, default: Date.now},

@@ -127,11 +127,11 @@ function inNewCycle(task, currTime) {
       break;
 
     case occurrence.EVERY_DAY:
-        if(!currTime.isSame(cycleDate, "day")){
+        if(!currTime.isSame(cycleDate, "day") && isInActiveDays(task.activeDays, currDay)){
           resetTaskCycle(task);
         }
 
-        if(!isInWorkWeek(currDay)) {
+        if(!isInActiveDays(task.activeDays, currDay)) {
           hideTask(task);
         } else {
           showTask(task);
@@ -205,6 +205,12 @@ function inNewCycle(task, currTime) {
   }
 }
 
+// Checks if the current day is an 'active' (where task can be done) day
+// activeDays represent a week of days true being that day is set
+// currDay a value from 1 - 7, 1 being Monday, 7 being Sunday
+function isInActiveDays(activeDays, currDay) {
+  return activeDays[currDay - 1];
+}
 
 function hideTask(task) {
   task.current = false;
