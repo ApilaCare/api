@@ -67,24 +67,29 @@ module.exports.addTask = function(req, res) {
     if(err) {
       utils.sendJSONresponse(res, 500, err);
     } else {
+      if(todo) {
 
-      var newTask = {
-        "text" : req.body.text,
-        "occurrence" : req.body.occurrence,
-        "complete" : false,
-        "activeDays" : req.body.activeDays,
-        "cycleDate" : new Date()
-      };
+        var newTask = {
+          "text" : req.body.text,
+          "occurrence" : req.body.occurrence,
+          "complete" : false,
+          "activeDays" : req.body.activeDays,
+          "cycleDate" : new Date()
+        };
 
-      todo.tasks.push(newTask);
+        todo.tasks.push(newTask);
 
-      todo.save(function(err, savedToDo) {
-        if(err) {
-          utils.sendJSONresponse(res, 500, err);
-        } else {
-          utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
-        }
-      });
+        todo.save(function(err, savedToDo) {
+          if(err) {
+            utils.sendJSONresponse(res, 500, err);
+          } else {
+            utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
+          }
+        });
+    } else {
+      console.log("ToDo is not created for this user");
+      utils.sendJSONresponse(res, 500, {"message": "ToDo is not created for this user"});
+    }
 
     }
   });
