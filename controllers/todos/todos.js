@@ -74,6 +74,11 @@ module.exports.addTask = function(req, res) {
           "occurrence" : req.body.occurrence,
           "complete" : false,
           "activeDays" : req.body.activeDays,
+          "activeWeeks": req.body.activeWeeks,
+          "activeMonths": req.body.activeMonths,
+          "hourStart": req.body.hourStart,
+          "hourEnd": req.body.hourEnd,
+          "everyWeek": req.body.everyWeek,
           "cycleDate" : new Date()
         };
 

@@ -51,7 +51,7 @@ module.exports.updateTasks = function(todo, callback) {
 
       _.forEach(tasks, function(task) {
 
-          inNewCycle(task, currTime);
+        //  inNewCycle(task, currTime);
 
           // if(task.occurrence === occurrence.EVERY_DAY) {
           //   //if it's past 12 pm it's overdue

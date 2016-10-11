@@ -9,6 +9,12 @@ var todoItemSchema = new mongoose.Schema({
   occurrence: {type: Number, required: true},
 
   activeDays: [{type: Boolean}], //if user selected specific days
+  activeWeeks: [{type: Boolean}],
+  activeMonths: [{type: Boolean}],
+
+  everyWeek: {type: Boolean},
+  hourStart: {type: Number},
+  hourEnd: {type: Number},
 
   // automatic
   completeOn: {type: Date},
