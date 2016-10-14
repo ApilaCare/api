@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var moment = require('moment');
+require('moment-range');
 
 var fs = require('fs');
 
@@ -86,16 +87,37 @@ function inNewCycle(task, currTime) {
           resetTaskCycle(task);
         }
 
-        //we are at some future cycle and task isn't completed
-        if(!currTime.isSame(cycleDate, "day") && !task.complete && isInActiveDays(task.activeDays, currDay)) {
-          task.notCompleted.push({count: 0, updatedOn: new Date()});
-        }
-
         if(!isInActiveDays(task.activeDays, currDay)) {
           hideTask(task);
         } else {
           showTask(task);
         }
+
+        //we are at some future cycle and task isn't completed
+        if(!currTime.isSame(cycleDate, "day") && !task.complete && isInActiveDays(task.activeDays, currDay)) {
+
+          var sinceLastUpdate = moment.range(cycleDate, currentTime);
+
+          sinceLastUpdate.by('days', function(day) {
+            if(isInActiveDays(task.activeDays, day.isoWeekday())) {
+              task.notCompleted.push({count: 0, updatedOn: day.toDate()});
+            }
+          });
+
+          task.cycleDate = currentTime;
+        }
+
+        //overdue cycle
+        if(currTime.isSame(cycleDate, "day") && currHour > 12) {
+            if(!task.overdue) {
+              task.overdue = true;
+
+              task.overDue.push({count: 0, updatedOn: currentTime.toDate()});
+              task.cycleDate = currentTime;
+            }
+
+        }
+
       break;
 
     case occurrence.WEEKLY:
