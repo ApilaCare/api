@@ -79,6 +79,7 @@ module.exports.addTask = function(req, res) {
           "hourStart": req.body.hourStart,
           "hourEnd": req.body.hourEnd,
           "everyWeek": req.body.everyWeek,
+          "everyMonth": req.body.everyMonth,
           "cycleDate" : new Date()
         };
 

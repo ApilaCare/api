@@ -20,19 +20,10 @@ var day = {
 var currentTime = moment();
 
 var occurrence = {
-  "EVERY_HOUR" : 0,
-  "TWICE_DAY" : 1,
-  "EVERY_DAY" : 2,
-  "EVERY_OTHER_DAY" : 3,
-  "TWICE_WEEK" : 4,
-  "EVERY_WEEK" : 5,
-  "EVERY_TWO_WEEKS" : 6,
-  "TWICE_MONTH" : 7,
-  "EVERY_MONTH" : 8,
-  "EVERY_TWO_MONTHS" : 9,
-  "EVERY_QUATER" : 10,
-  "TWICE_YEAR" : 11,
-  "EVERY_YEAR" : 12,
+  "HOURLY": 0,
+  "DAILY": 1,
+  "WEEKLY": 2,
+  "MONTHLY": 3
 };
 
 
@@ -50,20 +41,7 @@ module.exports.updateTasks = function(todo, callback) {
       var tasks = todo.tasks;
 
       _.forEach(tasks, function(task) {
-
-        //  inNewCycle(task, currTime);
-
-          // if(task.occurrence === occurrence.EVERY_DAY) {
-          //   //if it's past 12 pm it's overdue
-          //   if(currTime.hour() >= 12) {
-          //     console.log('overdue');
-          //     //if we are already have overdue for this cycle dont push it
-          //     task.overDue.push({"counter" : 0, updatedOn: new Date()});
-          //   }
-          // }
-
-
-
+        inNewCycle(task, currTime);
       });
 
       todo.tasks = tasks;
@@ -79,21 +57,17 @@ module.exports.updateTasks = function(todo, callback) {
 
 };
 
-//TODO: Monday - Friday??
-
 function inNewCycle(task, currTime) {
 
-  //var currTime = moment();
   var cycleDate = moment(task.cycleDate);
   var currHour = currTime.hour();
   var currDay = currTime.isoWeekday();
-  //console.log("Current time: " + currTime.format('MMMM Do YYYY, h:mm:ss a'));
 
   switch(task.occurrence) {
 
-    // Every Hour - task should be active between 8 - 16
-    case occurrence.EVERY_HOUR:
-        console.log(cycleDate.hour() + "  " + currHour);
+    // Every Hour
+    case occurrence.HOURLY:
+
         if(isInWorkHours(currHour) && currHour !== cycleDate.hour()){
 
           resetTaskCycle(task);
@@ -107,28 +81,14 @@ function inNewCycle(task, currTime) {
 
       break;
 
-    // midnight and noon (2 cycles a day)
-    case occurrence.TWICE_DAY:
-
-        // if we are in a next day reset
-        if(!currTime.isSame(cycleDate, "day")){
-          resetTaskCycle(task);
-        }
-        // if we last check in the first cycle but now it's time for the second one
-        else if(cycleDate.hour() < 12 && currHour >= 12) {
-          resetTaskCycle(task);
-        }
-
-        if(!isInWorkWeek(currDay)) {
-          hideTask(task);
-        } else {
-          showTask(task);
-        }
-      break;
-
-    case occurrence.EVERY_DAY:
+    case occurrence.DAILY:
         if(!currTime.isSame(cycleDate, "day") && isInActiveDays(task.activeDays, currDay)){
           resetTaskCycle(task);
+        }
+
+        //we are at some future cycle and task isn't completed
+        if(!currTime.isSame(cycleDate, "day") && !task.complete && isInActiveDays(task.activeDays, currDay)) {
+          task.notCompleted.push({count: 0, updatedOn: new Date()});
         }
 
         if(!isInActiveDays(task.activeDays, currDay)) {
@@ -138,67 +98,11 @@ function inNewCycle(task, currTime) {
         }
       break;
 
-    // Monday, Wednesday, Friday
-    case occurrence.EVERY_OTHER_DAY:
-
-    if(!currTime.isSame(cycleDate, "day")){
-      if(currDay === day.MONDAY || currDay === day.WEDNESDAY || currDay === day.FRIDAY) {
-        resetTaskCycle(task);
-      }
-    }
-
-    if(currDay !== day.MONDAY || currDay !== day.WEDNESDAY || currDay !== day.FRIDAY) {
-      hideTask(task);
-    } else {
-      showTask(task);
-    }
-      break;
-
-    // Tuesday, Thursday
-    case occurrence.TWICE_WEEK:
-
-        if(!currTime.isSame(cycleDate, "day")){
-          if(currDay === day.TUESDAY || currDay === day.THURSDAY) {
-            resetTaskCycle(task);
-          }
-        }
-
-        if(currDay !== day.TUESDAY || currDay !== day.THURSDAY) {
-          hideTask(task);
-        } else {
-          showTask(task);
-        }
-      break;
-
-    case occurrence.EVERY_WEEK:
+    case occurrence.WEEKLY:
 
       break;
 
-    case occurrence.EVERY_TWO_WEEKS:
-
-      break;
-
-    case occurrence.TWICE_MONTH:
-
-      break;
-
-    case occurrence.EVERY_MONTH:
-
-      break;
-
-    case occurrence.EVERY_TWO_MONTHS:
-
-      break;
-
-    case occurrence.EVERY_QUATER:
-
-      break;
-
-    case occurrence.TWICE_YEAR:
-
-      break;
-
-    case occurrence.EVERY_YEAR:
+    case occurrence.MONTHLY:
 
       break;
 
@@ -230,7 +134,6 @@ function resetTaskCycle(task) {
 
 //checks if we are in the work hours standard shift
 function isInWorkHours(currHour) {
-  console.log("HOUR: " + currHour);
   if(currHour >= START_WORK_DAY && currHour <= END_WORK_DAY) {
     return true;
   } else {
@@ -239,7 +142,6 @@ function isInWorkHours(currHour) {
 }
 
 function isInWorkWeek(currDay) {
-  console.log("DAY: " + currDay);
   if(currDay === day.SATURDAY || currDay === day.SUNDAY) {
     return false;
   } else {
@@ -251,11 +153,10 @@ function loadMockTime(callback) {
   if(process.env.BACK_TO_FUTURE) {
     fs.readFile("./tools/date.txt", 'UTF8', function(err, data) {
       currentTime = moment(parseInt(data));
-      console.log(currentTime.format('MMMM Do YYYY, h:mm:ss a'));
       callback(currentTime);
     });
   } else {
-    callback(null);
+    callback(moment());
   }
 
 }

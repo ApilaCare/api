@@ -12,6 +12,7 @@ var todoItemSchema = new mongoose.Schema({
   activeWeeks: [{type: Boolean}],
   activeMonths: [{type: Boolean}],
 
+  everyMonth: {type: Boolean},
   everyWeek: {type: Boolean},
   hourStart: {type: Number},
   hourEnd: {type: Number},
@@ -36,19 +37,6 @@ var todoSchema = new mongoose.Schema({
 
 });
 
-// scale of 1-13 | 1 = every hour,
-//                 2 = twice a day,
-//                 3 = every day,
-//                 4 = every other day,
-//                 5 = twice a week,
-//                 6 = every week,
-//                 7 = every two weeks,
-//                 8 = twice a month,
-//                 9 = every month,
-//                 10 = every two months,
-//                 11 = every quarter,
-//                 12 = twice a year,
-//                 13 = every year,
 
 // visual representation of the counters:
 //
