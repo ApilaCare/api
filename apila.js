@@ -51,6 +51,7 @@ app.use(function (req, res, next) {
 
 app.use('/api', routesApi);
 app.use('/files', express.static(__dirname + 'upload_storage'));
+app.disable('etag');
 
 app.set('port', process.env.PORT || 3300);
 

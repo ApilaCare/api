@@ -15,8 +15,8 @@ var todoItemSchema = new mongoose.Schema({
 
   everyMonth: {type: Boolean},
   everyWeek: {type: Boolean},
-  hourStart: {type: Number},
-  hourEnd: {type: Number},
+  hourStart: {type: Number, default: 8},
+  hourEnd: {type: Number, default: 16},
 
   // automatic
   completeOn: {type: Date},

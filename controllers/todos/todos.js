@@ -171,7 +171,11 @@ module.exports.deleteTask = function(req, res) {
       utils.sendJSONresponse(res, 500, err);
     } else {
 
-      todo.tasks.id(taskId).remove();
+      if(taskId) {
+        todo.tasks.id(taskId).remove();
+      } else {
+        utils.sendJSONresponse(res, 500, {message: "Invalid task id"});
+      }
 
       todo.save(function(err, savedToDo) {
         if(err) {

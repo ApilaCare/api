@@ -4,9 +4,6 @@ require('moment-range');
 
 var fs = require('fs');
 
-var START_WORK_DAY = 8;
-var END_WORK_DAY = 16;
-
 var day = {
   "MONDAY" : 1,
   "TUESDAY" : 2,
@@ -69,16 +66,23 @@ function inNewCycle(task, currTime) {
     // Every Hour
     case occurrence.HOURLY:
 
-        if(isInWorkHours(currHour) && currHour !== cycleDate.hour()){
+        if(isInWorkHours(task, currHour) && currHour !== cycleDate.hour()){
 
           resetTaskCycle(task);
         }
 
-        if(!isInWorkWeek(currDay) || !isInWorkHours(currHour)) {
+        if(!isInWorkWeek(currDay) || !isInWorkHours(task, currHour)) {
           hideTask(task);
         } else {
           showTask(task);
         }
+
+        //checking if the task is not complete
+
+        //we are on the same day but we are over the cycle end part
+        // if(!isInWorkHours(task, currHour)) {
+        //   task.notCompleted.push({count: 0, updatedOn: day.toDate()});
+        // }
 
       break;
 
@@ -107,15 +111,18 @@ function inNewCycle(task, currTime) {
           task.cycleDate = currentTime;
         }
 
+        //we crate task after 12 it becomes overdue
         //overdue cycle
-        if(currTime.isSame(cycleDate, "day") && currHour > 12) {
-            if(!task.overdue) {
-              task.overdue = true;
+        if(!currTime.isSame(moment(task.createdOn), "day")) {
+          if(currTime.isSame(cycleDate, "day") && currHour > 12) {
+              if(!task.overdue) {
+                task.overdue = true;
 
-              task.overDue.push({count: 0, updatedOn: currentTime.toDate()});
-              task.cycleDate = currentTime;
-            }
+                task.overDue.push({count: 0, updatedOn: currentTime.toDate()});
+                task.cycleDate = currentTime;
+              }
 
+          }
         }
 
       break;
@@ -155,8 +162,8 @@ function resetTaskCycle(task) {
 }
 
 //checks if we are in the work hours standard shift
-function isInWorkHours(currHour) {
-  if(currHour >= START_WORK_DAY && currHour <= END_WORK_DAY) {
+function isInWorkHours(task, currHour) {
+  if(currHour >= task.hourStart && currHour <= task.hourEnd) {
     return true;
   } else {
     return false;
