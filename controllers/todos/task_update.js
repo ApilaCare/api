@@ -64,6 +64,7 @@ function inNewCycle(task, currTime) {
   var currWeek = weekOfMonth(currTime);
   var currMonth = currentTime.month();
 
+  var unchangedTask = JSON.parse(JSON.stringify(task));
 
   switch(task.occurrence) {
 
@@ -85,7 +86,7 @@ function inNewCycle(task, currTime) {
 
         //we are on the same day but we are over the cycle end part
         // if(!isInWorkHours(task, currHour)) {
-        //   task.notCompleted.push({count: 0, updatedOn: day.toDate()});
+        //   task.notCompleted.push({updatedOn: day.toDate()});
         // }
 
       break;
@@ -102,32 +103,35 @@ function inNewCycle(task, currTime) {
         }
 
         //we are at some future cycle and task isn't completed
-        if(!currTime.isSame(cycleDate, "day") && !task.complete && isInActiveDays(task.activeDays, currDay)) {
+        if(!currTime.isSame(cycleDate, "day") && !unchangedTask.complete && isInActiveDays(task.activeDays, currDay)) {
 
           var sinceLastUpdate = moment.range(cycleDate, currentTime);
 
           sinceLastUpdate.by('days', function(day) {
             if(isInActiveDays(task.activeDays, day.isoWeekday())) {
-              task.notCompleted.push({count: 0, updatedOn: day.toDate()});
+              task.notCompleted.push({updatedOn: day.toDate()});
             }
           });
 
-          task.cycleDate = currentTime;
         }
 
         //we crate task after 12 it becomes overdue
         //overdue cycle
+        console.log(currTime.isSame(moment(task.createdOn), "day"));
         if(!currTime.isSame(moment(task.createdOn), "day")) {
           if(currTime.isSame(cycleDate, "day") && currHour > 12) {
               if(!task.overdue) {
                 task.overdue = true;
+                console.log("IN overdue");
 
-                task.overDue.push({count: 0, updatedOn: currentTime.toDate()});
+                task.overDue.push({updatedOn: currentTime.toDate()});
                 task.cycleDate = currentTime;
               }
 
           }
         }
+
+        task.cycleDate = currentTime;
 
       break;
 
@@ -167,7 +171,6 @@ function isInActiveDays(activeDays, currDay) {
 }
 
 function isInActiveMonths(activeMonths, currMonth) {
-  console.log(currMonth);
   return activeMonths[currMonth - 1];
 }
 

@@ -28,7 +28,6 @@ var todoItemSchema = new mongoose.Schema({
 });
 
 var counterSchema = new mongoose.Schema({
-  count: {type: Number, required: true, default: 0},
   updatedOn: {type: Date, default: Date.now}
 });
 

@@ -125,8 +125,9 @@ module.exports.updateTask = function(req, res) {
         var task = req.body;
 
         if(task.complete === true) {
-          task.completed.push({"counter" : 0, updatedOn: new Date()});
+          task.completed.push({updatedOn: new Date()});
           task.current = false;
+          task.overdue = false;
           task.cycleDate = new Date();
         }
 
