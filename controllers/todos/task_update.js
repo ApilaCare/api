@@ -58,8 +58,12 @@ module.exports.updateTasks = function(todo, callback) {
 function inNewCycle(task, currTime) {
 
   var cycleDate = moment(task.cycleDate);
+
   var currHour = currTime.hour();
   var currDay = currTime.isoWeekday();
+  var currWeek = weekOfMonth(currTime);
+  var currMonth = currentTime.month();
+
 
   switch(task.occurrence) {
 
@@ -129,10 +133,27 @@ function inNewCycle(task, currTime) {
 
     case occurrence.WEEKLY:
 
+        if(!currTime.isSame(cycleDate, "week") && isInActiveWeeks(task.activeWeeks, currWeek)){
+          resetTaskCycle(task);
+        }
+
+        if(!isInActiveWeeks(task.activeWeeks, currWeek)) {
+          hideTask(task);
+        } else {
+          showTask(task);
+        }
       break;
 
     case occurrence.MONTHLY:
+        if(!currTime.isSame(cycleDate, "month") && isInActiveMonths(task.activeMonths, currDay)){
+          resetTaskCycle(task);
+        }
 
+        if(!isInActiveMonths(task.activeMonths, currMonth)) {
+          hideTask(task);
+        } else {
+          showTask(task);
+        }
       break;
 
   }
@@ -143,6 +164,19 @@ function inNewCycle(task, currTime) {
 // currDay a value from 1 - 7, 1 being Monday, 7 being Sunday
 function isInActiveDays(activeDays, currDay) {
   return activeDays[currDay - 1];
+}
+
+function isInActiveMonths(activeMonths, currMonth) {
+  console.log(currMonth);
+  return activeMonths[currMonth - 1];
+}
+
+function isInActiveWeeks(activeWeeks, currWeek) {
+  return activeWeeks[currWeek - 1];
+}
+
+function weekOfMonth(m) {
+  return m.week() - moment(m).startOf('month').week() + 1;
 }
 
 function hideTask(task) {
