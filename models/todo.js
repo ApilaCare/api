@@ -3,11 +3,9 @@ var mongoose = require('mongoose');
 var todoItemSchema = new mongoose.Schema({
 
   text: {type: String, required: true},
-  complete: {type: Boolean, required: true, default: false},
-  current: {type: Boolean, default: true}, // if the task is currently ongoing
-  overdue: {type: Boolean},
   cycleDate : {type: Date, default: Date.now},
   occurrence: {type: Number, required: true},
+  state: {type: String, required: true}, //it can be: complete | overdue | current | inactive
 
   activeDays: [{type: Boolean}], //if user selected specific days
   activeWeeks: [{type: Boolean}],

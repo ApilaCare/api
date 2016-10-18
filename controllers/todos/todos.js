@@ -72,7 +72,7 @@ module.exports.addTask = function(req, res) {
         var newTask = {
           "text" : req.body.text,
           "occurrence" : req.body.occurrence,
-          "complete" : false,
+          "state" : "current",
           "activeDays" : req.body.activeDays,
           "activeWeeks": req.body.activeWeeks,
           "activeMonths": req.body.activeMonths,
@@ -124,14 +124,16 @@ module.exports.updateTask = function(req, res) {
 
         var task = req.body;
 
-        if(task.complete === true) {
+        if(task.state === "complete") {
           task.completed.push({updatedOn: new Date()});
-          task.current = false;
-          task.overdue = false;
-          //task.cycleDate = new Date();
+          task.state = "complete";
+
+          TaskService.loadMockTime(function(currentTime) {
+            task.cycleDate = currentTime.toDate();
+          });
         }
 
-        // if we switched for everyDay and we had activeDays reset them
+        // if we switched from everyDay and we had activeDays reset them
         if(todo.tasks[index].occurrence === 2 && task.occurrence !== 2) {
           task.activeDays = [true, true, true, true, true];
         }

@@ -82,55 +82,53 @@ function inNewCycle(task, currTime) {
           showTask(task);
         }
 
-        //checking if the task is not complete
-
-        //we are on the same day but we are over the cycle end part
-        // if(!isInWorkHours(task, currHour)) {
-        //   task.notCompleted.push({updatedOn: day.toDate()});
-        // }
 
       break;
 
     case occurrence.DAILY:
-        console.log("Is the cycle and current the same day: " + currTime.isSame(cycleDate, "day"));
+        //console.log("Is the cycle and current the same day: " + currTime.isSame(cycleDate, "day"));
+
         if(!currTime.isSame(cycleDate, "day") && isInActiveDays(task.activeDays, currDay)){
+          console.log("Cycled reset");
           resetTaskCycle(task);
         }
 
         if(!isInActiveDays(task.activeDays, currDay)) {
+          console.log("Hide tasks");
           hideTask(task);
         } else {
+          console.log("Show tasks");
           showTask(task);
         }
 
-        //we are at some future cycle and task isn't completed
-        if(!currTime.isSame(cycleDate, "day") && !unchangedTask.complete && isInActiveDays(task.activeDays, currDay)) {
-
-          var sinceLastUpdate = moment.range(cycleDate, currentTime);
-
-          sinceLastUpdate.by('days', function(day) {
-            if(isInActiveDays(task.activeDays, day.isoWeekday())) {
-              task.notCompleted.push({updatedOn: day.toDate()});
-            }
-          });
-
-        }
-
-        //we crate task after 12 it becomes overdue
-        //overdue cycle
-        console.log(currHour);
-        if(!currTime.isSame(moment(task.createdOn), "day")) {
-          if(currTime.isSame(cycleDate, "day") && currHour > 12) {
-              if(!task.overdue) {
-                task.overdue = true;
-                console.log("IN overdue");
-
-                task.overDue.push({updatedOn: currentTime.toDate()});
-                task.cycleDate = currentTime;
-              }
-
-          }
-        }
+        // //we are at some future cycle and task isn't completed
+        // if(!currTime.isSame(cycleDate, "day") && unchangedtask.state !== "complete" && isInActiveDays(task.activeDays, currDay)) {
+        //
+        //   var sinceLastUpdate = moment.range(cycleDate, currentTime);
+        //
+        //   sinceLastUpdate.by('days', function(day) {
+        //     if(isInActiveDays(task.activeDays, day.isoWeekday())) {
+        //       task.notCompleted.push({updatedOn: day.toDate()});
+        //     }
+        //   });
+        //
+        // }
+        //
+        // //we crate task after 12 it becomes overdue
+        // //overdue cycle
+        // console.log(currHour);
+        // if(!currTime.isSame(moment(task.createdOn), "day")) {
+        //   if(currTime.isSame(cycleDate, "day") && currHour > 12) {
+        //       if(task.state !== "overdue") {
+        //         task.state = "overdue";
+        //         console.log("IN overdue");
+        //
+        //         task.overDue.push({updatedOn: currentTime.toDate()});
+        //         task.cycleDate = currentTime;
+        //       }
+        //
+        //   }
+        // }
 
         task.cycleDate = currentTime;
 
@@ -138,6 +136,7 @@ function inNewCycle(task, currTime) {
 
     case occurrence.WEEKLY:
 
+        console.log("Same week: " + currTime.isSame(cycleDate, "week"));
         if(!currTime.isSame(cycleDate, "week") && isInActiveWeeks(task.activeWeeks, currWeek)){
           resetTaskCycle(task);
         }
@@ -150,7 +149,8 @@ function inNewCycle(task, currTime) {
       break;
 
     case occurrence.MONTHLY:
-        if(!currTime.isSame(cycleDate, "month") && isInActiveMonths(task.activeMonths, currDay)){
+    console.log(isInActiveMonths(task.activeMonths, currMonth));
+        if(!currTime.isSame(cycleDate, "month") && isInActiveMonths(task.activeMonths, currMonth)){
           resetTaskCycle(task);
         }
 
@@ -172,7 +172,7 @@ function isInActiveDays(activeDays, currDay) {
 }
 
 function isInActiveMonths(activeMonths, currMonth) {
-  return activeMonths[currMonth - 1];
+  return activeMonths[currMonth];
 }
 
 function isInActiveWeeks(activeWeeks, currWeek) {
@@ -184,18 +184,17 @@ function weekOfMonth(m) {
 }
 
 function hideTask(task) {
-  task.current = false;
+  task.state = "inactive";
 }
 
 function showTask(task) {
-  if(!task.complete) {
-    task.current = true;
+  if(task.state !== 'complete') {
+    task.state = 'current';
   }
 }
 
 function resetTaskCycle(task) {
-  task.current = true;
-  task.complete = false;
+  task.state = "current";
   task.cycleDate = new Date();
 }
 
@@ -227,3 +226,5 @@ function loadMockTime(callback) {
   }
 
 }
+
+module.exports.loadMockTime = loadMockTime;
