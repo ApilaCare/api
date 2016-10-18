@@ -3,26 +3,9 @@ var moment = require('moment');
 require('moment-range');
 
 var fs = require('fs');
-
-var day = {
-  "MONDAY" : 1,
-  "TUESDAY" : 2,
-  "WEDNESDAY" : 3,
-  "THURSDAY"  :4,
-  "FRIDAY": 5,
-  "SATURDAY" : 6,
-  "SUNDAY" : 7
-
-};
+const constants = require('../../services/constants');
 
 var currentTime = moment();
-
-var occurrence = {
-  "HOURLY": 0,
-  "DAILY": 1,
-  "WEEKLY": 2,
-  "MONTHLY": 3
-};
 
 
 //if the task is current = true, show it in the current list of todoSchema
@@ -69,7 +52,7 @@ function inNewCycle(task, currTime) {
   switch(task.occurrence) {
 
     // Every Hour
-    case occurrence.HOURLY:
+    case constants.occurrence.HOURLY:
 
         if(isInWorkHours(task, currHour) && currHour !== cycleDate.hour()){
 
@@ -85,8 +68,7 @@ function inNewCycle(task, currTime) {
 
       break;
 
-    case occurrence.DAILY:
-        //console.log("Is the cycle and current the same day: " + currTime.isSame(cycleDate, "day"));
+    case constants.occurrence.DAILY:
 
         if(!currTime.isSame(cycleDate, "day") && isInActiveDays(task.activeDays, currDay)){
           console.log("Cycled reset");
@@ -101,18 +83,23 @@ function inNewCycle(task, currTime) {
           showTask(task);
         }
 
-        // //we are at some future cycle and task isn't completed
-        // if(!currTime.isSame(cycleDate, "day") && unchangedtask.state !== "complete" && isInActiveDays(task.activeDays, currDay)) {
-        //
-        //   var sinceLastUpdate = moment.range(cycleDate, currentTime);
-        //
-        //   sinceLastUpdate.by('days', function(day) {
-        //     if(isInActiveDays(task.activeDays, day.isoWeekday())) {
-        //       task.notCompleted.push({updatedOn: day.toDate()});
-        //     }
-        //   });
-        //
-        // }
+        //we are at some future cycle and task isn't completed
+        if(!currTime.isSame(cycleDate, "day") && task.state !== "complete" && isInActiveDays(task.activeDays, currDay)) {
+
+          var sinceLastUpdate = moment.range(cycleDate, currentTime);
+
+          sinceLastUpdate.by('days', function(day) {
+            if(isInActiveDays(task.activeDays, day.isoWeekday())) {
+
+
+              if(!isInNotCompleted(task, currTime)) {
+                task.notCompleted.push({updatedOn: day.toDate()});
+              }
+            }
+
+          });
+
+        }
         //
         // //we crate task after 12 it becomes overdue
         // //overdue cycle
@@ -134,9 +121,8 @@ function inNewCycle(task, currTime) {
 
       break;
 
-    case occurrence.WEEKLY:
+    case constants.occurrence.WEEKLY:
 
-        console.log("Same week: " + currTime.isSame(cycleDate, "week"));
         if(!currTime.isSame(cycleDate, "week") && isInActiveWeeks(task.activeWeeks, currWeek)){
           resetTaskCycle(task);
         }
@@ -146,10 +132,12 @@ function inNewCycle(task, currTime) {
         } else {
           showTask(task);
         }
+
+        //if the current week is up and the task is not inactive
+
       break;
 
-    case occurrence.MONTHLY:
-    console.log(isInActiveMonths(task.activeMonths, currMonth));
+    case constants.occurrence.MONTHLY:
         if(!currTime.isSame(cycleDate, "month") && isInActiveMonths(task.activeMonths, currMonth)){
           resetTaskCycle(task);
         }
@@ -162,6 +150,18 @@ function inNewCycle(task, currTime) {
       break;
 
   }
+}
+
+function isInNotCompleted(task, day) {
+  var isInList = _.find(task.notCompleted, function(value) {
+      if(moment(value.updatedOn).isSame(day, "day")) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+  return isInList ? true: false;
 }
 
 // Checks if the current day is an 'active' (where task can be done) day
@@ -208,7 +208,7 @@ function isInWorkHours(task, currHour) {
 }
 
 function isInWorkWeek(currDay) {
-  if(currDay === day.SATURDAY || currDay === day.SUNDAY) {
+  if(currDay === constants.day.SATURDAY || currDay === constants.day.SUNDAY) {
     return false;
   } else {
     return true;

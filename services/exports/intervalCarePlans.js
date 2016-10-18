@@ -293,7 +293,7 @@ module.exports.exportCarePlan = function(data) {
 
       // pain line
       doc.fillColor(244, 67, 54);
-      doc.moveTo(0, 0159 + offset2).lineTo(650, 159 + offset2).stroke();
+      doc.moveTo(0, 159 + offset2).lineTo(650, 159 + offset2).stroke();
       doc.text("PAIN", 300, 162 + offset2);
 
       if (data.hasPain == true) {
