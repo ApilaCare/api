@@ -128,7 +128,7 @@ module.exports.updateTask = function(req, res) {
           task.completed.push({updatedOn: new Date()});
           task.current = false;
           task.overdue = false;
-          task.cycleDate = new Date();
+          //task.cycleDate = new Date();
         }
 
         // if we switched for everyDay and we had activeDays reset them

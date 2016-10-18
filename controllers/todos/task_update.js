@@ -92,6 +92,7 @@ function inNewCycle(task, currTime) {
       break;
 
     case occurrence.DAILY:
+        console.log("Is the cycle and current the same day: " + currTime.isSame(cycleDate, "day"));
         if(!currTime.isSame(cycleDate, "day") && isInActiveDays(task.activeDays, currDay)){
           resetTaskCycle(task);
         }
@@ -117,7 +118,7 @@ function inNewCycle(task, currTime) {
 
         //we crate task after 12 it becomes overdue
         //overdue cycle
-        console.log(currTime.isSame(moment(task.createdOn), "day"));
+        console.log(currHour);
         if(!currTime.isSame(moment(task.createdOn), "day")) {
           if(currTime.isSame(cycleDate, "day") && currHour > 12) {
               if(!task.overdue) {
