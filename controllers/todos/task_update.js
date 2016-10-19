@@ -70,6 +70,23 @@ function inNewCycle(task, currTime) {
 
     case constants.occurrence.DAILY:
 
+        //we are at some future cycle and task isn't completed
+        if(!currTime.isSame(cycleDate, "day") && isInActiveDays(task.activeDays, currDay)) {
+          if(task.state !== "complete" || task.state !== "overdue") {
+            var sinceLastUpdate = moment.range(cycleDate, currentTime);
+
+            sinceLastUpdate.by('days', function(day) {
+              if(isInActiveDays(task.activeDays, day.isoWeekday())) {
+
+                if(!isInNotCompleted(task, currTime)) {
+                  task.notCompleted.push({updatedOn: day.toDate()});
+                }
+              }
+
+            });
+          }
+        }
+
         if(!currTime.isSame(cycleDate, "day") && isInActiveDays(task.activeDays, currDay)){
           console.log("Cycled reset");
           resetTaskCycle(task);
@@ -82,40 +99,6 @@ function inNewCycle(task, currTime) {
           console.log("Show tasks");
           showTask(task);
         }
-
-        //we are at some future cycle and task isn't completed
-        if(!currTime.isSame(cycleDate, "day") && task.state !== "complete" && isInActiveDays(task.activeDays, currDay)) {
-
-          var sinceLastUpdate = moment.range(cycleDate, currentTime);
-
-          sinceLastUpdate.by('days', function(day) {
-            if(isInActiveDays(task.activeDays, day.isoWeekday())) {
-
-
-              if(!isInNotCompleted(task, currTime)) {
-                task.notCompleted.push({updatedOn: day.toDate()});
-              }
-            }
-
-          });
-
-        }
-        //
-        // //we crate task after 12 it becomes overdue
-        // //overdue cycle
-        // console.log(currHour);
-        // if(!currTime.isSame(moment(task.createdOn), "day")) {
-        //   if(currTime.isSame(cycleDate, "day") && currHour > 12) {
-        //       if(task.state !== "overdue") {
-        //         task.state = "overdue";
-        //         console.log("IN overdue");
-        //
-        //         task.overDue.push({updatedOn: currentTime.toDate()});
-        //         task.cycleDate = currentTime;
-        //       }
-        //
-        //   }
-        // }
 
         task.cycleDate = currentTime;
 

@@ -6,6 +6,7 @@ var TaskService = require('./task_update');
 
 var _ = require('lodash');
 var moment = require('moment');
+const constants = require('../../services/constants');
 
 // creates an empty todo object called when a user is registered
 module.exports.createEmptyToDo = function(callback) {
@@ -111,26 +112,28 @@ module.exports.updateTask = function(req, res) {
   if (utils.checkParams(req, res, ['todoid', 'taskid'])) {
     return;
   }
-
+  TaskService.loadMockTime(function(currentTime) {
   ToDo.findById(todoId)
   .exec(function(err, todo) {
     if(err) {
       utils.sendJSONresponse(res, 500, err);
     } else {
 
-      index = todo.tasks.indexOf(todo.tasks.id(taskId));
+      let index = todo.tasks.indexOf(todo.tasks.id(taskId));
+      let task = req.body;
 
       if(index !== -1) {
 
-        var task = req.body;
-
         if(task.state === "complete") {
-          task.completed.push({updatedOn: new Date()});
           task.state = "complete";
+          task.cycleDate = currentTime.toDate();
 
-          TaskService.loadMockTime(function(currentTime) {
-            task.cycleDate = currentTime.toDate();
-          });
+          if(!isOverdue(task, currentTime)) {
+            task.completed.push({updatedOn: currentTime.toDate()});
+          } else {
+            task.overDue.push({updatedOn: currentTime.toDate()});
+          }
+
         }
 
         // if we switched from everyDay and we had activeDays reset them
@@ -150,10 +153,11 @@ module.exports.updateTask = function(req, res) {
           utils.sendJSONresponse(res, 500, err);
           console.log(err);
         } else {
-          utils.sendJSONresponse(res, 200, req.body);
+          utils.sendJSONresponse(res, 200, task);
         }
       });
     }
+  });
   });
 
 };
@@ -191,3 +195,43 @@ module.exports.deleteTask = function(req, res) {
   });
 
 };
+
+
+//////////////////////////// HELPER FUNCTION /////////////////////////////////
+
+function isOverdue(task, currTime) {
+  let overdue = false;
+
+  switch(task.occurrence) {
+
+    case constants.occurrence.HOURLY:
+      if(currTime.minutes() >= 30) {
+        overdue = true;
+      }
+    break;
+
+    case constants.occurrence.DAILY:
+      if(currTime.hour() >= 12) {
+        overdue = true;
+      }
+    break;
+
+    case constants.occurrence.WEEKLY:
+      if(currTime.day() > 2) {
+        overdue = true;
+      }
+    break;
+
+    case constants.occurrence.MONTHLY:
+      if(currTime.date() > (currTime.date() / 2)) {
+        overdue = true;
+      }
+    break;
+
+    default:
+      overdue = false;
+  }
+
+  return overdue;
+
+}
