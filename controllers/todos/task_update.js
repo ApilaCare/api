@@ -47,12 +47,30 @@ function inNewCycle(task, currTime) {
   var currWeek = weekOfMonth(currTime);
   var currMonth = currentTime.month();
 
+  let sinceLastUpdate = moment.range(cycleDate, currentTime);
+
   var unchangedTask = JSON.parse(JSON.stringify(task));
+
+  let activeCycle = isInActiveCycle(currTime, task);
 
   switch(task.occurrence) {
 
     // Every Hour
     case constants.occurrence.HOURLY:
+
+        //if the current hour is up and the task is not complete
+        if(!currTime.isSame(cycleDate, "hour") && task.state !== "complete" && isInWorkHours(task, currHour)) {
+
+            sinceLastUpdate.by('hours', function(hour) {
+              if(isInWorkHours(task, hour.hour())) {
+
+                if(!isInNotCompleted(task, currTime)) {
+                  task.notCompleted.push({updatedOn: hour.toDate()});
+                }
+              }
+
+            });
+        }
 
         if(isInWorkHours(task, currHour) && currHour !== cycleDate.hour()){
 
@@ -72,8 +90,7 @@ function inNewCycle(task, currTime) {
 
         //we are at some future cycle and task isn't completed
         if(!currTime.isSame(cycleDate, "day") && isInActiveDays(task.activeDays, currDay)) {
-          if(task.state !== "complete" || task.state !== "overdue") {
-            var sinceLastUpdate = moment.range(cycleDate, currentTime);
+          if(task.state !== "complete") {
 
             sinceLastUpdate.by('days', function(day) {
               if(isInActiveDays(task.activeDays, day.isoWeekday())) {
@@ -88,23 +105,32 @@ function inNewCycle(task, currTime) {
         }
 
         if(!currTime.isSame(cycleDate, "day") && isInActiveDays(task.activeDays, currDay)){
-          console.log("Cycled reset");
           resetTaskCycle(task);
         }
 
         if(!isInActiveDays(task.activeDays, currDay)) {
-          console.log("Hide tasks");
           hideTask(task);
         } else {
-          console.log("Show tasks");
           showTask(task);
         }
-
-        task.cycleDate = currentTime;
 
       break;
 
     case constants.occurrence.WEEKLY:
+
+        //if the current week is up and the task is not complete
+        if(!currTime.isSame(cycleDate, "week") && task.state !== "complete" && isInActiveWeeks(task.activeWeeks, currWeek)) {
+
+            sinceLastUpdate.by('weeks', function(week) {
+              if(isInActiveWeeks(task.activeWeeks, week.isoWeekday())) {
+
+                if(!isInNotCompleted(task, currTime)) {
+                  task.notCompleted.push({updatedOn: week.toDate()});
+                }
+              }
+
+            });
+        }
 
         if(!currTime.isSame(cycleDate, "week") && isInActiveWeeks(task.activeWeeks, currWeek)){
           resetTaskCycle(task);
@@ -116,11 +142,24 @@ function inNewCycle(task, currTime) {
           showTask(task);
         }
 
-        //if the current week is up and the task is not inactive
-
       break;
 
     case constants.occurrence.MONTHLY:
+
+        //if the current month is up and the task is not complete
+        if(!currTime.isSame(cycleDate, "month") && task.state !== "complete" && isInActiveMonths(task.activeMonths, currMonth)) {
+
+            sinceLastUpdate.by('months', function(month) {
+              if(isInActiveMonths(task.activeMonths, month.month())) {
+
+                if(!isInNotCompleted(task, currTime)) {
+                  task.notCompleted.push({updatedOn: month.toDate()});
+                }
+              }
+
+            });
+        }
+
         if(!currTime.isSame(cycleDate, "month") && isInActiveMonths(task.activeMonths, currMonth)){
           resetTaskCycle(task);
         }
@@ -133,6 +172,21 @@ function inNewCycle(task, currTime) {
       break;
 
   }
+
+  task.cycleDate = currentTime;
+}
+
+function loopThroughCycle(cycle, currTime) {
+
+  sinceLastUpdate.by('days', function(day) {
+    if(isInActiveDays(task.activeDays, day.isoWeekday())) {
+
+      if(!isInNotCompleted(task, currTime)) {
+        task.notCompleted.push({updatedOn: day.toDate()});
+      }
+    }
+
+  });
 }
 
 function isInNotCompleted(task, day) {
@@ -166,6 +220,36 @@ function weekOfMonth(m) {
   return m.week() - moment(m).startOf('month').week() + 1;
 }
 
+//checks if we are in the work hours standard shift
+function isInWorkHours(task, currHour) {
+  if(currHour >= task.hourStart && currHour <= task.hourEnd) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function isInActiveCycle(currTime, task) {
+
+  let currHour = currTime.hour();
+  let currDay = currTime.isoWeekday();
+  let currWeek = weekOfMonth(currTime);
+  let currMonth = currentTime.month();
+
+  return function(cycle) {
+    if(cycle === "hour") {
+      return (currHour >= task.hourStart && currHour <= task.hourEnd);
+    } else if(cycle === "day") {
+      return task.activeDays[currDay - 1];
+    } else if(cycle === "week") {
+      return task.activeWeeks[currWeek - 1];
+    } else if(cycle === "month") {
+      return task.activeMonths[currMonth];
+    }
+  };
+
+}
+
 function hideTask(task) {
   task.state = "inactive";
 }
@@ -179,15 +263,6 @@ function showTask(task) {
 function resetTaskCycle(task) {
   task.state = "current";
   task.cycleDate = new Date();
-}
-
-//checks if we are in the work hours standard shift
-function isInWorkHours(task, currHour) {
-  if(currHour >= task.hourStart && currHour <= task.hourEnd) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 function isInWorkWeek(currDay) {
