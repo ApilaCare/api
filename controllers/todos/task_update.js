@@ -8,12 +8,6 @@ const constants = require('../../services/constants');
 var currentTime = moment();
 
 
-//if the task is current = true, show it in the current list of todoSchema
-// when we set overudue/notcomplete we set current = false
-
-// when a new day(cycle) rolls up we set current = true, so we need to remember
-// on what cycle (date) we are
-
 module.exports.updateTasks = function(todo, callback) {
 
   loadMockTime(function(currTime) {
@@ -111,7 +105,7 @@ function inNewCycle(task, currTime) {
 
 function checkIfCompleted(task, currTime, cycleDate, cycle) {
 
-  let cycleWithoutS = cycle.slice(1, -1);
+  let cycleWithoutS = cycle.slice(0, -1);
   let currTimeCycle = isInActiveCycle(task, currTime);
   let sinceLastUpdate = moment.range(cycleDate, currentTime);
 
@@ -121,7 +115,7 @@ function checkIfCompleted(task, currTime, cycleDate, cycle) {
       let inCycle = isInActiveCycle(task, day);
       if(inCycle(cycle)) {
 
-        if(!isInNotCompleted(task, currTime)) {
+        if(!isInNotCompleted(task, currTime) && !currTime.isSame(day, cycleWithoutS)) {
           task.notCompleted.push({updatedOn: day.toDate()});
         }
       }
