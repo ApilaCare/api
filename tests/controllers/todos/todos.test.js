@@ -86,8 +86,8 @@ describe('Todos', function() {
 
       var taskData = {
         "text" : "Go walk the dog and the cat, dont forget the cat",
-        "occurrence" : 2, // 1 = twice a day
-        "completed" : false
+        "occurrence" : 1,
+        "state" : "current"
       };
 
       utils.server
@@ -100,7 +100,7 @@ describe('Todos', function() {
             done(err);
           } else {
             assert.equal(res.body.text, taskData.text, "Check if we updateted the text");
-            assert.equal(res.body.occurrence, taskData.occurrence, "Check if updated occuerence");
+            assert.equal(res.body.occurrence, taskData.occurrence, "Check if updated occurrence");
             done();
           }
       });
