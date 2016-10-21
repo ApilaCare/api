@@ -7,7 +7,6 @@ const constants = require('../../services/constants');
 
 var currentTime = moment();
 
-
 module.exports.updateTasks = function(todo, callback) {
 
   loadMockTime(function(currTime) {
@@ -16,7 +15,7 @@ module.exports.updateTasks = function(todo, callback) {
       var tasks = todo.tasks;
 
       _.forEach(tasks, function(task) {
-        inNewCycle(task, currTime);
+        updateTask(task, currTime);
       });
 
       todo.tasks = tasks;
@@ -32,7 +31,7 @@ module.exports.updateTasks = function(todo, callback) {
 
 };
 
-function inNewCycle(task, currTime) {
+function updateTask(task, currTime) {
 
   var cycleDate = moment(task.cycleDate);
 
@@ -127,7 +126,7 @@ function checkIfCompleted(task, currTime, cycleDate, cycle) {
 
 function isInNotCompleted(task, day) {
   var isInList = _.find(task.notCompleted, function(value) {
-      if(moment(value.updatedOn).isSame(day, "day")) {
+      if(moment(value.updatedOn).isSame(day, "day") || task.occurrence === constants.occurrence.HOURLY) {
         return true;
       } else {
         return false;
