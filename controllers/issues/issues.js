@@ -33,6 +33,42 @@ module.exports.issuesCreate = function(req, res) {
   });
 };
 
+//PUT /issues/:issueid/finalplan - Adds a final plan item to an issue
+module.exports.addFinalPlan = function(req, res) {
+
+  var issueid = req.params.issueid;
+
+  if (utils.checkParams(req, res, ['issueid'])) {
+    return;
+  }
+
+  Iss.findById(issueid)
+     .exec(function(err, issue) {
+
+       if(err) {
+         utils.sendJSONresponse(res, 404, {'message' : 'Issue not found to add a final plan'});
+       } else {
+
+         var finalPlan = {
+           "text" : req.body.text,
+           "checklist" : req.body.checklist,
+           "author" : req.body.author
+         };
+
+         issue.finalPlan.push(finalPlan);
+
+         issue.save(function(err, issue) {
+           if(err) {
+             utils.sendJSONresponse(res, 404,
+               {'message' : 'Unable to save issue while adding final plan'});
+           } else {
+             utils.sendJSONresponse(res, 200, finalPlan);
+           }
+         });
+       }
+
+     });
+};
 
 //GET /issues/count/:userid/id/:communityid - Number of open issues asigned to an user
 module.exports.issuesOpenCount = function(req, res) {
@@ -56,6 +92,26 @@ module.exports.issuesOpenCount = function(req, res) {
     }
 
   });
+};
+
+// GET /issues/:issueid/updateinfo - Returns all updateInfo populated for an issue
+module.exports.issueUpdateInfo = function(req, res) {
+  var issueid = req.params.issueid;
+
+  if (utils.checkParams(req, res, ['issueid'])) {
+    return;
+  }
+
+  Iss.findById(issueid)
+     .populate('updateInfo.updateBy', 'email name userImage')
+     .exec(function(err, issue) {
+       if(err) {
+         utils.sendJSONresponse(res, 404, {'message' : err});
+       } else {
+           utils.sendJSONresponse(res, 200, issue.updateInfo);
+       }
+     });
+
 };
 
 // GET /issues/issuescount/:communityid - Number of open isues for a community
@@ -107,6 +163,7 @@ module.exports.issuesList = function(req, res) {
     "idLabels": "$idLabels",
     "idAttachmentCover": "$idAttachmentCover",
     "attachments": "$attachments",
+    "finalPlan": "$finalPlan",
     "labels": "$labels",
     "checklists": "$checklists",
     "_id": "$_id",
@@ -138,10 +195,13 @@ module.exports.issuesList = function(req, res) {
     function(err, issues) {
 
       //Populate user model so we have responsibleParty name and not just the _id
-      User.populate(issues, {
+      User.populate(issues, [{
         path: '_id',
         model: 'User'
-      }, function(err) {
+      },{
+        path: 'updateInfo.updateBy',
+        model: 'User'
+      }], function(err) {
         if (err) {
           utils.sendJSONresponse(res, 404, {
             'message': err
@@ -275,7 +335,7 @@ module.exports.issuesUpdateOne = function(req, res) {
 
         issue.checklists = req.body.checklists;
         issue.labels = req.body.labels;
-        issue.updateInfo = req.body.updateInfo;
+        //issue.updateInfo = req.body.updateInfo;
         issue.shelvedDate = req.body.shelvedDate;
 
         if (req.body.deletedMember !== undefined) {
@@ -296,9 +356,12 @@ module.exports.issuesUpdateOne = function(req, res) {
 
         issue.save(function(err, issue) {
           if (err) {
+            console.log(err);
             utils.sendJSONresponse(res, 404, err);
           } else {
-            utils.sendJSONresponse(res, 200, issue);
+            Iss.populate(issue.updateField, {'path' : 'updateBy'}, function(err, iss) {
+                    utils.sendJSONresponse(res, 200, iss);
+            });
           }
         });
       }

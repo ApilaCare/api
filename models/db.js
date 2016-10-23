@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var gracefulShutdown;
 
-var dbURI = "mongodb://localhost/apila"
+var dbURI = "mongodb://localhost/apila";
 
 if (process.env.NODE_ENV === 'production') {
     dbURI = process.env.MONGODB_URI;
@@ -56,7 +56,8 @@ require('./issues');
 require('./appointments');
 require('./users');
 require('./residents');
-require('./community')
+require('./community');
+require('./todo');
 
 /*
 

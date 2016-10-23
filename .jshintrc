@@ -10,5 +10,6 @@
   "maxlen": 100,
   "eqnull": true,
   "funcscope": true,
-  "node": true
+  "node": true,
+  "esversion": 6
 }

@@ -87,8 +87,7 @@ module.exports.userCommunity = function(req, res) {
           "message": "Error while finding user"
         });
       } else {
-
-        if (user.community) {
+        if (user) {
           Community.findById(user.community)
             .populate("communityMembers pendingMembers directors minions creator boss communityMembers.recovery", "-salt -hash")
             .exec(function(err, community) {

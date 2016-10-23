@@ -4,8 +4,7 @@ var utils = require('../../services/utils');
 var Iss = mongoose.model('Issue');
 var User = mongoose.model('User');
 
-/* POST a new checklist, providing a issueid */
-/* /api/issues/:issueid/checklists/new */
+//POST /issues/:issueid/checklists/new - creates a new checklist, providing a issueid
 module.exports.issueChecklistsCreate = function(req, res) {
 
   if (utils.checkParams(req, res, ['issueid'])) {
@@ -22,7 +21,6 @@ module.exports.issueChecklistsCreate = function(req, res) {
             if (err) {
               utils.sendJSONresponse(res, 400, err);
             } else {
-
               doAddChecklist(req, res, issue, userName);
             }
           }
@@ -35,7 +33,7 @@ module.exports.issueChecklistsCreate = function(req, res) {
   });
 };
 
-
+// PUT /issues/:issueid/checklists/newitem/:listid - Adds a new checkitem to a checklist
 module.exports.issueChecklistAddItem = function(req, res) {
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
@@ -51,64 +49,7 @@ module.exports.issueChecklistAddItem = function(req, res) {
 
 };
 
-var getAuthor = function(req, res, callback) {
-  console.log("Finding author with email " + req.payload.email);
-  if (req.payload.email) {
-    User
-      .findOne({
-        email: req.payload.email
-      })
-      .exec(function(err, user) {
-        if (!user) {
-          utils.sendJSONresponse(res, 404, {
-            "message": "User not found"
-          });
-          return;
-        } else if (err) {
-          console.log(err);
-          utils.sendJSONresponse(res, 404, err);
-          return;
-        }
-        console.log(user);
-        callback(req, res, user.name);
-      });
-
-  } else {
-    utils.sendJSONresponse(res, 404, {
-      "message": "User not found"
-    });
-    return;
-  }
-};
-
-var doAddChecklist = function(req, res, issue, username) {
-
-  console.log("Adding checklist, max kek");
-
-  if (!issue) {
-    utils.sendJSONresponse(res, 404, "issueid not found");
-  } else {
-    issue.checklists.push({
-      author: req.payload.name,
-      checklistName: req.body.checklistName,
-      // needs the checkItems as the mixed mongoose schema
-    });
-
-    issue.updateInfo.push(req.body.updateInfo);
-
-    issue.save(function(err, issue) {
-      var thisChecklist;
-      if (err) {
-        utils.sendJSONresponse(res, 400, err);
-      } else {
-        thisChecklist = issue.checklists[issue.checklists.length - 1];
-        utils.sendJSONresponse(res, 201, thisChecklist);
-      }
-    });
-  }
-};
-
-
+// PUT /issues/:issueid/checklists/:checklistid - Update a checklist
 module.exports.issueChecklistsUpdateOne = function(req, res) {
 
   if (utils.checkParams(req, res, ['issueid', 'checklistid'])) {
@@ -120,17 +61,12 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
     .exec(
       function(err, issue) {
 
-
         var thisChecklist;
-        if (!issue) {
-          utils.sendJSONresponse(res, 404, {
-            "message": "issueid not found"
-          });
-          return;
-        } else if (err) {
-          utils.sendJSONresponse(res, 400, err);
+
+        if(issueHasError(res, err, issue)){
           return;
         }
+
         if (issue.checklists && issue.checklists.length > 0) {
           thisChecklist = issue.checklists.id(req.params.checklistid);
 
@@ -168,56 +104,7 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
     );
 };
 
-module.exports.issueChecklistsReadOne = function(req, res) {
-  console.log("Getting single checklist");
-  if (req.params && req.params.issueid && req.params.checklistid) {
-    Iss
-      .findById(req.params.issueid)
-      .select('title checklists')
-      .exec(
-        function(err, issue) {
-          console.log(issue);
-          var response, checklist;
-          if (!issue) {
-            utils.sendJSONresponse(res, 404, {
-              "message": "issueid not found"
-            });
-            return;
-          } else if (err) {
-            utils.sendJSONresponse(res, 400, err);
-            return;
-          }
-          if (issue.checklists && issue.checklists.length > 0) {
-            checklist = issue.checklists.id(req.params.checklistid);
-            if (!checklist) {
-              utils.sendJSONresponse(res, 404, {
-                "message": "checklist not found"
-              });
-            } else {
-              response = {
-                issue: {
-                  title: issue.title,
-                  id: req.params.issueid
-                },
-                checklist: checklist
-              };
-              utils.sendJSONresponse(res, 200, response);
-            }
-          } else {
-            utils.sendJSONresponse(res, 404, {
-              "message": "No checklists found"
-            });
-          }
-        }
-      );
-  } else {
-    utils.sendJSONresponse(res, 404, {
-      "message": "Not found, issueid and checklistid are both required"
-    });
-  }
-};
-
-// app.delete('/api/issues/:issueid/checklists/:checklistid'
+//DELETE /issues/:issueid/labels/:labelid - Delete an checklist
 module.exports.issueChecklistsDeleteOne = function(req, res) {
 
   if (utils.checkParams(req, res, ['issueid', 'checklistid'])) {
@@ -229,15 +116,11 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
     .select('checklists updateInfo')
     .exec(
       function(err, issue) {
-        if (!issue) {
-          utils.sendJSONresponse(res, 404, {
-            "message": "issueid not found"
-          });
-          return;
-        } else if (err) {
-          utils.sendJSONresponse(res, 400, err);
+
+        if(issueHasError(res, err, issue)){
           return;
         }
+
         if (issue.checklists && issue.checklists.length > 0) {
           if (!issue.checklists.id(req.params.checklistid)) {
             utils.sendJSONresponse(res, 404, {
@@ -245,19 +128,8 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
             });
           } else {
 
-            var updateInfo = {};
-
-            updateInfo.updateBy = req.payload.name;
-            updateInfo.updateDate = new Date();
-            updateInfo.updateField = [];
-            updateInfo.updateField.push({
-              "field": "checkitem",
-              "new": "",
-              "old": issue.checklists.id(req.params.checklistid).checklistName
-            });
-
+            var updateInfo = formatUpdateInfo(req, issue);
             issue.updateInfo.push(updateInfo);
-
 
             issue.checklists.id(req.params.checklistid).remove();
             issue.save(function(err) {
@@ -276,3 +148,89 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
       }
     );
 };
+
+//////////////////////// HELPER FUNCTIONS //////////////////////////////
+
+var getAuthor = function(req, res, callback) {
+  if (req.payload.email) {
+    User
+      .findOne({
+        email: req.payload.email
+      })
+      .exec(function(err, user) {
+        if (!user) {
+          utils.sendJSONresponse(res, 404, {
+            "message": "User not found"
+          });
+          return;
+        } else if (err) {
+          console.log(err);
+          utils.sendJSONresponse(res, 404, err);
+          return;
+        }
+        console.log(user);
+        callback(req, res, user.name);
+      });
+
+  } else {
+    utils.sendJSONresponse(res, 404, {
+      "message": "User not found"
+    });
+    return;
+  }
+};
+
+var doAddChecklist = function(req, res, issue, username) {
+
+  if (!issue) {
+    utils.sendJSONresponse(res, 404, "issueid not found");
+  } else {
+    issue.checklists.push({
+      author: req.payload.name,
+      checklistName: req.body.checklistName,
+      // needs the checkItems as the mixed mongoose schema
+    });
+
+    issue.updateInfo.push(req.body.updateInfo);
+
+    issue.save(function(err, issue) {
+      var thisChecklist;
+      if (err) {
+        utils.sendJSONresponse(res, 400, err);
+      } else {
+        thisChecklist = issue.checklists[issue.checklists.length - 1];
+        utils.sendJSONresponse(res, 201, thisChecklist);
+      }
+    });
+  }
+};
+
+function issueHasError(res, err, issue) {
+
+  if (!issue) {
+    utils.sendJSONresponse(res, 404, {
+      "message": "issueid not found"
+    });
+    return true;
+  } else if (err) {
+    utils.sendJSONresponse(res, 400, err);
+    return true;
+  }
+
+  return false;
+}
+
+function formatUpdateInfo(req, issue) {
+  var updateInfo = {};
+
+  updateInfo.updateBy = req.payload.name;
+  updateInfo.updateDate = new Date();
+  updateInfo.updateField = [];
+  updateInfo.updateField.push({
+    "field": "checkitem",
+    "new": "",
+    "old": issue.checklists.id(req.params.checklistid).checklistName
+  });
+
+  return updateInfo;
+}

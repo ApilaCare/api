@@ -86,15 +86,28 @@ module.exports.addPendingMember = function(req, res) {
     Community
       .findById(req.params.communityid)
       .exec(function(err, community) {
-        community.pendingMembers.push(userId);
 
-        community.save(function(err, community) {
-          if (err) {
-            utils.sendJSONresponse(res, 404, err);
-          } else {
-            utils.sendJSONresponse(res, 200, community);
+        if(err) {
+          utils.sendJSONresponse(res, 404, err);
+        } else {
+
+          //The user is already pending for this community
+          if(community.pendingMembers.indexOf(userId) !== -1) {
+            utils.sendJSONresponse(res, 404, {"exists" : true});
+            return;
           }
-        });
+
+          community.pendingMembers.push(userId);
+
+          community.save(function(err, community) {
+            if (err) {
+              utils.sendJSONresponse(res, 404, err);
+            } else {
+              utils.sendJSONresponse(res, 200, community);
+            }
+          });
+        }
+
       });
   });
 
@@ -453,7 +466,7 @@ var getAuthor = function(req, res, callback) {
           utils.sendJSONresponse(res, 404, err);
           return;
         }
-        console.log(user);
+  
         callback(req, res, user._id);
       });
 

@@ -13,8 +13,12 @@ var testUser = {
   "email": "first@gmail.com",
   "password": "123456",
   "token" : "",
+  "todoid" : "",
   "community" : {}
 };
+
+var issueid = '';
+
 var server = supertest.agent("http://localhost:" + process.env.PORT);
 
 before(function(done) {
@@ -45,6 +49,8 @@ function setupData(callback) {
       testUser.token = res.body.token;
       testUser.community = res.body.community;
       testUser.id = res.body.id;
+      console.log("TODO ID: " + res.body.todoid);
+      testUser.todoid = res.body.todoid;
       callback();
     });
 
@@ -58,6 +64,22 @@ function setCommunity(id) {
   testUser.communityid = id;
 }
 
+function setIssueId(id) {
+  issueid = id;
+}
+
+function getIssueId(id) {
+  return issueid;
+}
+
+function getToDoId() {
+  return testUser.todoid;
+}
+
 exports.server = server;
 exports.setCommunity = setCommunity;
 exports.getTestUser = getTestUser;
+
+exports.setIssueId = setIssueId;
+exports.getIssueId = getIssueId;
+exports.getToDoId = getToDoId;

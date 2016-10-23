@@ -4,7 +4,10 @@ var Resid = mongoose.model('Resident');
 var User = mongoose.model('User');
 var moment = require('moment');
 
-//TODO: birthday method needed?
+var _ = require('lodash');
+var fs = require('fs');
+var imageUploadService = require('../../services/imageUpload');
+
 
 // POST /residents/new - Creates a new resident
 module.exports.residentsCreate = function(req, res) {
@@ -40,17 +43,20 @@ module.exports.residentsList = function(req, res) {
   }
 
   Resid.find({
-    'community': community
-  }, function(err, residents) {
-    if (err) {
-      utils.sendJSONresponse(res, 404, {
-        'message': 'Error listing residents'
-      });
-    } else {
-      utils.sendJSONresponse(res, 200, residents);
-    }
+      'community': community
+    })
+    .populate('updateInfo.updateBy', 'email name userImage')
+    .exec(function(err, residents) {
+      if (err) {
+        utils.sendJSONresponse(res, 404, {
+          'message': 'Error listing residents'
+        });
+        console.log(err);
+      } else {
+        utils.sendJSONresponse(res, 200, residents);
+      }
 
-  });
+    });
 };
 
 // GET /residents/count/:communityid - Number of residents in building
@@ -183,25 +189,89 @@ module.exports.residentById = function(req, res) {
       });
 };
 
-// GET /residents/birthday/:communityid - Get residents of a communities (birthdays)
-module.exports.residentBirthday = function(req, res) {
+//POST /residents/:residentid/contact - Adds a new contact to the list
+module.exports.addContact = function(req, res) {
 
-  if (utils.checkParams(req, res, ['communityid'])) {
+  var residentid = req.params.residentid;
+
+  if (utils.checkParams(req, res, ['residentid'])) {
     return;
   }
 
-  Resid.find({
-      "community": req.params.communityid
-    })
-    .exec(function(err, residents) {
-      if (res) {
-        utils.sendJSONresponse(res, 200, residents);
-      } else {
-        utils.sendJSONresponse(res, 404, null);
-      }
+  Resid.findById(residentid)
+  .exec(function(err, resident) {
+    if(err) {
+      utils.sendJSONresponse(res, 404, {'message' : err});
+    } else {
+      resident.residentContacts.push(req.body);
 
+      resident.updateInfo.push({
+        "updateField": [{
+          "field" : "create-contact",
+          "new" : req.body.firstName + " " + req.body.lastName,
+          "old" : ""
+        }],
+        "updateDate" : new Date(),
+        "updateBy" : req.body.submitBy
+      });
+
+      resident.save(function(err, resid) {
+        if(err) {
+          utils.sendJSONresponse(res, 404, {'message' : err});
+        } else {
+          utils.sendJSONresponse(res, 200, resid.residentContacts);
+        }
+      });
+    }
+  });
+
+};
+
+// PUT /residents/:residentid/listitem - Removes a list item from resident info like foodLikes...
+module.exports.updateListItem = function(req, res) {
+
+  var residentid = req.params.residentid;
+
+  Resid.findById(residentid)
+    .populate('updateInfo.updateBy', 'email name userImage')
+    .exec(function(err, resident) {
+      if (err) {
+        utils.sendJSONresponse(res, 404, {'message' : err });
+      } else {
+
+        var oldValue = "";
+        var newValue = "";
+
+        if(req.body.operation === "remove") {
+          resident[req.body.type].pull(req.body.selectedItem);
+          oldValue = req.body.selectedItem;
+        } else {
+          resident[req.body.type].push(req.body.selectedItem);
+          newValue = req.body.selectedItem;
+        }
+
+        resident.updateInfo.push({
+          "updateField": [{
+            "field" : req.body.type,
+            "new" : newValue,
+            "old" : oldValue
+          }],
+          "updateDate" : new Date(),
+          "updateBy" : req.body.updateBy
+        });
+
+        resident.save(function(err, r) {
+          if(err) {
+            utils.sendJSONresponse(res, 404, {'message' : err});
+          } else {
+            utils.sendJSONresponse(res, 200, r);
+          }
+        });
+
+      }
     });
 };
+
 
 // PUT /api/residents/update/:residentid
 module.exports.residentsUpdateOne = function(req, res) {
@@ -210,13 +280,18 @@ module.exports.residentsUpdateOne = function(req, res) {
     return;
   }
 
+  var communicatedWith = setCommunicatedWithField(req);
+
   var updateInfo = {
     "updateBy": req.body.modifiedBy,
     "updateDate": req.body.modifiedDate,
-    "updateField": req.body.updateField
+    "updateField": req.body.updateField,
+    "communicatedWith": communicatedWith
   };
 
-  req.body.updateInfo.push(updateInfo);
+  if(req.body.updateField) {
+    req.body.updateInfo.push(updateInfo);
+  }
 
   var isValidData = true;
 
@@ -235,26 +310,74 @@ module.exports.residentsUpdateOne = function(req, res) {
   addToArray(req.body.internationalNormalizedRatio, req.body.newinternationalNormalizedRatio, "Vitals");
   addToArray(req.body.weight, req.body.newweight, "Vitals");
 
-  addToArray(req.body.foodAllergies, req.body.newfoodAllergies, "");
-  addToArray(req.body.medicationAllergies, req.body.newmedicationAllergies, "");
+  req.body.foodAllergies = req.body.newfoodAllergies;
+  req.body.medicationAllergies = req.body.newmedicationAllergies;
 
-  //addToArray(req.body.psychosocialStatus, req.body.newpsychosocialStatus, "");
   req.body.psychosocialStatus = req.body.newpsychosocialStatus;
+  req.body.shopping = req.body.newShoppingStatus;
+  req.body.painManagedBy = req.body.newPainManagedBy;
 
-  addToArray(req.body.foodLikes, req.body.newfoodLikes, "");
-  addToArray(req.body.foodDislikes, req.body.newfoodDislikes, "");
+  req.body.foodLikes = req.body.newfoodLikes;
+  req.body.foodDislikes = req.body.newfoodDislikes;
 
   Resid.findOneAndUpdate({
-      _id: req.params.residentid
-    }, req.body,
-    function(err, resident) {
-      if (err) {
-        utils.sendJSONresponse(res, 404, err);
-      } else {
-        utils.sendJSONresponse(res, 200, resident);
-      }
+    _id: req.params.residentid
+  }, req.body)
+  .populate('updateInfo.updateBy', 'email name userImage')
+  .exec(function(err, resident) {
+    if (err) {
+      console.log(err);
+      utils.sendJSONresponse(res, 404, err);
+    } else {
 
+      utils.sendJSONresponse(res, 200, resident);
+    }
+
+  });
+
+};
+
+//POST /residents/:residentid/upload - uploads assessment files to aws
+module.exports.uploadOutsideAgencyAssesment = function(req, res) {
+  var residentid = req.params.residentid;
+
+  if (utils.checkParams(req, res, ['residentid'])) {
+    return;
+  }
+
+  var file = req.files.file;
+
+  var stream = fs.createReadStream(file.path);
+
+  var params = {
+    Key: file.originalFilename,
+    Body: stream
+  };
+
+  imageUploadService.upload(params, file.path, function() {
+    var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
+      imageUploadService.getBucket() + "/" + escape(file.originalFilename);
+
+    fs.unlinkSync(file.path);
+
+    Resid.findById(residentid)
+    .exec(function(err, resident) {
+      if(err) {
+        utils.sendJSONresponse(res, 404, {"message" : err});
+      } else {
+        resident.outsideAgencyFile.push(fullUrl);
+
+        resident.save(function(err) {
+          if(err) {
+            utils.sendJSONresponse(res, 404, {"message" : err});
+          } else {
+            utils.sendJSONresponse(res, 200, fullUrl);
+          }
+        });
+      }
     });
+
+  });
 
 };
 
@@ -314,7 +437,25 @@ function addToArray(arr, value, type) {
       }
 
     }
-
   }
 
+}
+
+
+function setCommunicatedWithField(req) {
+  var communicatedWith = [];
+
+  if(req.body.communicatedWithResident === true) {
+    communicatedWith.push("resident");
+  }
+
+  if(req.body.communicatedWithPrimaryContact === true) {
+    communicatedWith.push("primary");
+  }
+
+  if(req.body.communicatedWithTrustedPerson === true) {
+    communicatedWith.push("trusted");
+  }
+
+  return communicatedWith;
 }

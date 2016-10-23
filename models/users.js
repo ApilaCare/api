@@ -15,6 +15,7 @@ var userSchema = new mongoose.Schema({
         required: true
     },
     userImage: {type: String},
+    todoid: {type: mongoose.Schema.Types.ObjectId, ref: 'To-Do'},
     community: {type: mongoose.Schema.Types.ObjectId, ref: 'Community'}, // _id of community that user is part of
     prevCommunity: {type: mongoose.Schema.Types.ObjectId, ref: 'Community'}, // we need to store previous community when switching between test -> real community
     recovery: {type: String},
@@ -50,6 +51,7 @@ userSchema.methods.generateJwt = function() {
         _id: this._id,
         email: this.email,
         name: this.name,
+        todoid: this.todoid,
         // include expiration as unix time in seconds
         exp: parseInt(expiry.getTime() / 1000),
         // send secret for hashing algorithim to use

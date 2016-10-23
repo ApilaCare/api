@@ -197,6 +197,36 @@ describe('Issues', function() {
     });
   });
 
+  describe('#add final plan', function() {
+    it('Should add a new final plan to the issue', function(done) {
+
+      var user = utils.getTestUser();
+
+      var finalPlanData = {
+        "text": 'This is the solution to all of your problems use it wisely',
+        "checklist" : false,
+        "author" : user.id
+      };
+
+      utils.server
+        .put('/api/issues/' + issueid + '/finalplan')
+        .set('Accept', 'application/json')
+        .set('Authorization', 'Bearer ' + user.token)
+        .send(finalPlanData)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            done(err);
+          } else {
+            assert.deepEqual(finalPlanData, res.body);
+            done();
+          }
+
+        });
+
+    });
+  });
+
   describe('#dueIssuesList', function() {
     it('List of issues that are due in a community', function(done) {
 
