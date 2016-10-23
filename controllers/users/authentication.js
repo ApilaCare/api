@@ -5,6 +5,7 @@ var User = mongoose.model('User');
 var communityCtrl = require('../communities/communities');
 var utils = require('../../services/utils');
 
+
 // POST /register - User registration
 module.exports.register = function(req, res) {
 
