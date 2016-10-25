@@ -16,6 +16,7 @@ module.exports.saveCreditCard = function(req, res) {
     return;
   }
 
+  //TODO: clean up call back hell
   User.findById(user).exec(function(err, user) {
     if (user) {
 

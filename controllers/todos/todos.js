@@ -219,28 +219,30 @@ module.exports.deleteTask = function(req, res) {
 function isOverdue(task, currTime) {
   let overdue = false;
 
+  let createdOn = moment(task.createdOn);
+
   switch(task.occurrence) {
 
     case cons.occurrence.HOURLY:
-      if(currTime.minutes() >= 30) {
+      if(currTime.minutes() >= 30 && !currTime.isSame(createdOn, "hour")) {
         overdue = true;
       }
     break;
 
     case cons.occurrence.DAILY:
-      if(currTime.hour() >= 12) {
+      if(currTime.hour() >= 12 && !currTime.isSame(createdOn, "day")) {
         overdue = true;
       }
     break;
 
     case cons.occurrence.WEEKLY:
-      if(currTime.day() > 2) {
+      if(currTime.day() > 2 && !currTime.isSame(createdOn, "week")) {
         overdue = true;
       }
     break;
 
     case cons.occurrence.MONTHLY:
-      if(currTime.date() > (currTime.date() / 2)) {
+      if((currTime.date() > (currTime.date() / 2)) && !currTime.isSame(createdOn, "month")) {
         overdue = true;
       }
     break;
@@ -253,7 +255,7 @@ function isOverdue(task, currTime) {
 
 }
 
-////////////////////////// HELPER FUNCTIONS ////////////////////////////
+
 function setToDefault(task, activeCycles) {
   _.forEach(activeCycles, function(cycle) {
     switch(cycle) {
