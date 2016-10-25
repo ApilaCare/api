@@ -110,13 +110,21 @@ function checkIfCompleted(task, currTime, cycleDate, cycle) {
 
   if(!currTime.isSame(cycleDate, cycleWithoutS) && task.state !== "complete" && currTimeCycle(cycle)) {
 
-    sinceLastUpdate.by(cycle, (day) => {
-      let inCycle = isInActiveCycle(task, day);
+    sinceLastUpdate.by(cycle, (currCycle) => {
+
+      let inCycle = isInActiveCycle(task, currCycle);
       if(inCycle(cycle)) {
 
-        if(!isInNotCompleted(task, currTime) && !currTime.isSame(day, cycleWithoutS)) {
-          task.notCompleted.push({updatedOn: day.toDate()});
+        if(task.occurrence !== cons.occurrence.HOURLY) {
+          if(!isInNotCompleted(task, currTime) && !currTime.isSame(currCycle, cycleWithoutS)) {
+            task.notCompleted.push({updatedOn: currCycle.toDate()});
+          }
+        } else {
+          if(!currTime.isSame(currCycle, cycleWithoutS)) {
+            task.notCompleted.push({updatedOn: currCycle.toDate()});
+          }
         }
+
       }
 
     });
@@ -126,7 +134,7 @@ function checkIfCompleted(task, currTime, cycleDate, cycle) {
 
 function isInNotCompleted(task, day) {
   var isInList = _.find(task.notCompleted, (value) => {
-      if(moment(value.updatedOn).isSame(day, "day") || task.occurrence === cons.occurrence.HOURLY) {
+      if(moment(value.updatedOn).isSame(day, "day")) {
         return true;
       } else {
         return false;
@@ -179,7 +187,7 @@ function resetTaskCycle(task) {
 
 function loadMockTime(callback) {
   if(process.env.BACK_TO_FUTURE) {
-    fs.readFile("./tools/date.txt", 'UTF8', function(err, data) {
+    fs.readFile("./tools/date.txt", 'UTF8', (err, data) => {
       currentTime = moment(parseInt(data));
       callback(currentTime);
     });
