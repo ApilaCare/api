@@ -57,48 +57,46 @@ module.exports.listTasks = function(req, res) {
 //POST /todos/:todoid/task/:taskid - Creates a new task (todo item)
 module.exports.addTask = function(req, res) {
 
-  var todoId = req.params.todoid;
+  let todoId = req.params.todoid;
 
   if (utils.checkParams(req, res, ['todoid'])) {
     return;
   }
 
-  ToDo.findById(todoId)
-  .exec(function(err, todo) {
-    if(err) {
-      utils.sendJSONresponse(res, 500, err);
-    } else {
-      if(todo) {
+  let newTask = {
+    "text" : req.body.text,
+    "occurrence" : req.body.occurrence,
+    "state" : "current",
+    "activeDays" : req.body.activeDays,
+    "activeWeeks": req.body.activeWeeks,
+    "activeMonths": req.body.activeMonths,
+    "hourStart": req.body.hourStart,
+    "hourEnd": req.body.hourEnd,
+    "everyWeek": req.body.everyWeek,
+    "everyMonth": req.body.everyMonth,
+    "cycleDate" : new Date()
+  };
 
-        var newTask = {
-          "text" : req.body.text,
-          "occurrence" : req.body.occurrence,
-          "state" : "current",
-          "activeDays" : req.body.activeDays,
-          "activeWeeks": req.body.activeWeeks,
-          "activeMonths": req.body.activeMonths,
-          "hourStart": req.body.hourStart,
-          "hourEnd": req.body.hourEnd,
-          "everyWeek": req.body.everyWeek,
-          "everyMonth": req.body.everyMonth,
-          "cycleDate" : new Date()
-        };
+  let todo = ToDo.findById(todoId).exec();
 
+  todo.then(todo => {
+    if(todo) {
         todo.tasks.push(newTask);
-
-        todo.save(function(err, savedToDo) {
-          if(err) {
-            utils.sendJSONresponse(res, 500, err);
-          } else {
-            utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
-          }
-        });
+        return todo;
     } else {
-      console.log("ToDo is not created for this user");
       utils.sendJSONresponse(res, 500, {"message": "ToDo is not created for this user"});
     }
-
-    }
+  }, err => {
+    utils.sendJSONresponse(res, 500, err);
+  })
+  .then(todo => {
+    todo.save(function(err, savedToDo) {
+      if(err) {
+        utils.sendJSONresponse(res, 500, err);
+      } else {
+        utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
+      }
+    });
   });
 
 };
@@ -168,9 +166,8 @@ module.exports.updateTask = function(req, res) {
       todo.save(function(err, savedToDo) {
         if(err) {
           utils.sendJSONresponse(res, 500, err);
-          console.log(err);
         } else {
-          utils.sendJSONresponse(res, 200, task);
+          utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
         }
       });
     }
@@ -195,10 +192,13 @@ module.exports.deleteTask = function(req, res) {
       utils.sendJSONresponse(res, 500, err);
     } else {
 
-      if(taskId) {
-        todo.tasks.id(taskId).remove();
+      let task = todo.tasks.id(taskId);
+
+      if(task) {
+        task.remove();
       } else {
         utils.sendJSONresponse(res, 500, {message: "Invalid task id"});
+        return;
       }
 
       todo.save(function(err, savedToDo) {
