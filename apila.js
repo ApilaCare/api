@@ -10,6 +10,8 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var cors = require('cors');
 
+require('./services/activities.service')(io);
+
 require('./models/db');
 require('./config/passport');
 

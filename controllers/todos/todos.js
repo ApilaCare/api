@@ -7,6 +7,7 @@ var TaskService = require('./task_update');
 var _ = require('lodash');
 var moment = require('moment');
 const cons = require('../../services/constants');
+const activitiesService = require('../../services/activities.service');
 
 // creates an empty todo object called when a user is registered
 module.exports.createEmptyToDo = function(callback) {
@@ -94,6 +95,8 @@ module.exports.addTask = function(req, res) {
       if(err) {
         utils.sendJSONresponse(res, 500, err);
       } else {
+        activitiesService.addActivity(newTask.text, "", "add-task");
+
         utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
       }
     });

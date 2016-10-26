@@ -58,6 +58,7 @@ require('./users');
 require('./residents');
 require('./community');
 require('./todo');
+require('./activities');
 
 /*
 
