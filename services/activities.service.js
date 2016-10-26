@@ -5,6 +5,18 @@ let io = null;
 
 module.exports = function(socketConn) {
   io = socketConn;
+
+  io.on('connection', function(socket) {
+    socket.on('get-activities', (data) => {
+      
+      activityCtrl.recentActivities().then((activities) => {
+        socket.emit('recent-activities', activities);
+      }, err => {
+        console.log(err);
+      });
+    });
+  });
+
 };
 
 module.exports.addActivity = function(text, author, type) {

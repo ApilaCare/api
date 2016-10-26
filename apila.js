@@ -58,10 +58,6 @@ app.disable('etag');
 
 app.set('port', process.env.PORT || 3300);
 
-io.on('connection', function(socket){
-  console.log('a user connected');
-});
-
 
 var server = http.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + server.address().port);
