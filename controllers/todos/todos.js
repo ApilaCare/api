@@ -97,7 +97,7 @@ module.exports.addTask = function(req, res) {
       if(err) {
         utils.sendJSONresponse(res, 500, err);
       } else {
-        activitiesService.addActivity(" created a task " + newTask.text, userId, "task-create");
+        activitiesService.addActivity(" created a task " + newTask.text, userId, "task-create", req.body.communityId);
 
         utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
       }
