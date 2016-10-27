@@ -8,7 +8,7 @@ module.exports = function(socketConn) {
 
   io.on('connection', function(socket) {
     socket.on('get-activities', (data) => {
-      
+
       activityCtrl.recentActivities().then((activities) => {
         socket.emit('recent-activities', activities);
       }, err => {
@@ -19,16 +19,21 @@ module.exports = function(socketConn) {
 
 };
 
-module.exports.addActivity = function(text, author, type) {
+module.exports.addActivity = function(text, userId, type) {
 
   let activity = {
     "type": type,
     "createdOn": moment().toDate(),
     "text": text,
-    "author": author
+    "userId": userId
   };
 
-  activityCtrl.addActivity(activity);
+  activityCtrl.addActivity(activity, (err, populatedActivity) => {
+    if(populatedActivity) {
+      io.emit("add-activity", populatedActivity);
+    } else {
+      console.log(err);
+    }
+  });
 
-  io.emit("add-activity", activity);
 };

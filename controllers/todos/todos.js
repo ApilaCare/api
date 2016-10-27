@@ -64,6 +64,8 @@ module.exports.addTask = function(req, res) {
     return;
   }
 
+  let userId = req.payload._id;
+
   let newTask = {
     "text" : req.body.text,
     "occurrence" : req.body.occurrence,
@@ -95,7 +97,7 @@ module.exports.addTask = function(req, res) {
       if(err) {
         utils.sendJSONresponse(res, 500, err);
       } else {
-        activitiesService.addActivity(newTask.text, "", "task-create");
+        activitiesService.addActivity(" created a task " + newTask.text, userId, "task-create");
 
         utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
       }
