@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Iss = mongoose.model('Issue');
 var User = mongoose.model('User');
 var utils = require('../../services/utils');
+const activitiesService = require('../../services/activities.service');
 
 //TODO: careful when populating user info exclude hash and stuff
 
@@ -25,6 +26,10 @@ module.exports.issuesCreate = function(req, res) {
       User.populate(issue, {
         path: 'responsibleParty'
       }, function(err, populatedIssue) {
+
+        activitiesService.addActivity(" created issue " + req.body.title, req.body.responsibleParty,
+                                        "issue-create", req.body.community._id);
+
         utils.sendJSONresponse(res, 200, populatedIssue);
       });
 

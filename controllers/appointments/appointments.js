@@ -4,6 +4,8 @@ var User = mongoose.model('User');
 
 var utils = require('../../services/utils');
 
+const activitiesService = require('../../services/activities.service');
+
 // POST /api/appointments/new - Creates a new appointment
 module.exports.appointmentsCreate = function(req, res) {
 
@@ -26,7 +28,26 @@ module.exports.appointmentsCreate = function(req, res) {
       console.log(err);
       utils.sendJSONresponse(res, 400, err);
     } else {
-      getFullAppointment(req, res, appointment._id);
+
+      appointment.populate(
+        {path: "residentGoing"},
+        (err, appoint) => {
+          if(err) {
+            utils.sendJSONresponse(res, 500, err);
+          } else {
+
+            let text = " created " + appoint.residentGoing.firstName + " " + appoint.residentGoing.lastName +
+                                 " to " + appoint.locationName;
+            activitiesService.addActivity(text, req.payload._id,
+                                            "appointment-create", req.body.community._id);
+
+            utils.sendJSONresponse(res, 200, appoint);
+          }
+
+
+        });
+
+      //getFullAppointment(req, res, appointment._id);
     }
   });
 };
@@ -178,6 +199,7 @@ var getFullAppointment = function(req, res, appointId) {
     .populate("residentGoing")
     .exec(function(err, appointment) {
       if (!appointment) {
+
         utils.sendJSONresponse(res, 404, {"error_list" : true});
         return;
       } else if (err) {
@@ -185,6 +207,12 @@ var getFullAppointment = function(req, res, appointId) {
         utils.sendJSONresponse(res, 404, {"error_list" : true});
         return;
       }
+
+      let text = " created " + appointment.residentGoing.firstName + " " + appointment.residentGoing.lastName +
+                           " to " + appointment.locationName;
+      activitiesService.addActivity(text, req.payload._id,
+                                      "appointment-create", req.body.community._id);
+
       utils.sendJSONresponse(res, 200, appointment);
     });
 };

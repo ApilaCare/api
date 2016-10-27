@@ -3,7 +3,7 @@ var gracefulShutdown;
 
 var dbURI = "mongodb://localhost/apila";
 
-if (process.env.NODE_ENV === 'production' || 'staging') {
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
     dbURI = process.env.MONGODB_URI;
 }
 

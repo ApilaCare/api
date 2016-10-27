@@ -16,7 +16,6 @@ module.exports = function(socketConn) {
       socket.on('get-activities', (community) => {
 
         activityCtrl.recentActivities(community._id).then((activities) => {
-          console.log(activities);
           io.sockets.to(community._id).emit('recent-activities', activities);
         }, err => {
           console.log(err);
