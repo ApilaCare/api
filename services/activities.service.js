@@ -1,4 +1,5 @@
 const moment = require('moment');
+const socketioJwt = require('socketio-jwt');
 const activityCtrl = require('../controllers/activities/activities');
 
 let io = null;
@@ -6,12 +7,14 @@ let io = null;
 module.exports = function(socketConn) {
   io = socketConn;
 
-  io.on('connection', function(socket) {
+  io.on('connection', socketioJwt.authorize({
+    secret: process.env.JWT_SECRET,
+    timeout: 15000
+  }))
+  .on('authenticated', (socket) => {
 
     socket.on('join-community', (community) => {
       socket.join(community._id);
-
-      console.log("Joined community: " + community._id);
 
       socket.on('get-activities', (community) => {
 
@@ -21,7 +24,6 @@ module.exports = function(socketConn) {
           console.log(err);
         });
       });
-
     });
 
   });

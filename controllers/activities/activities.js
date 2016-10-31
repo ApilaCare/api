@@ -1,9 +1,12 @@
 require('../../models/activities');
+require('../../models/users');
+
 const mongoose = require('mongoose');
 let Activity = mongoose.model('Activity');
+let User = mongoose.model('User');
 
 module.exports.recentActivities = (communityId) => {
-  console.log(communityId);
+
   return Activity.find({"communityId": communityId})
         .populate("userId", "name userImage community")
         .sort("-createdOn")
@@ -19,4 +22,9 @@ module.exports.addActivity = (data, callback) => {
       activity.populate({path: "userId", select: "name userImage community"}, callback);
     }
   });
+};
+
+
+module.exports.checkIfInCommunity = (userId, communityId) => {
+  return User.find({"_id": userId, "community": communityId}).exec();
 };
