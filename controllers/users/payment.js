@@ -101,24 +101,18 @@ module.exports.getCustomer = function(req, res) {
     return;
   }
 
+
   User.findById(user).exec(function(err, user) {
     if (user) {
       if (user.stripeCustomer) {
         stripeService.getCustomer(user.stripeCustomer, function(status, customer) {
-          if (status) {
             utils.sendJSONresponse(res, 200, {
               status: true,
               "customer": customer
             });
-          } else {
-            utils.sendJSONresponse(res, 404, {
-              status: false,
-              "customer": null
-            });
-          }
         });
       } else {
-        utils.sendJSONresponse(res, 404, {
+        utils.sendJSONresponse(res, 200, {
           status: false
         });
       }
