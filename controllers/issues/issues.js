@@ -15,7 +15,7 @@ module.exports.issuesCreate = function(req, res) {
     resolutionTimeframe: req.body.resolutionTimeframe,
     description: req.body.description,
     confidential: req.body.confidential,
-    submitBy: req.payload.name,
+    submitBy: req.payload._id,
     community: req.body.community._id
   }, function(err, issue) {
     if (err) {
@@ -24,7 +24,7 @@ module.exports.issuesCreate = function(req, res) {
     } else {
 
       User.populate(issue, {
-        path: 'responsibleParty'
+        path: 'responsibleParty submitBy'
       }, function(err, populatedIssue) {
 
         activitiesService.addActivity(" created issue " + req.body.title, req.body.responsibleParty,
@@ -205,6 +205,9 @@ module.exports.issuesList = function(req, res) {
         model: 'User'
       },{
         path: 'updateInfo.updateBy',
+        model: 'User'
+      },{
+        path: 'submitBy',
         model: 'User'
       }], function(err) {
         if (err) {

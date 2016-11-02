@@ -14,64 +14,12 @@ module.exports.issueAttachmentsCreate = function(req, res) {
     return;
   }
 
-  getAuthor(req, res, function(req, res, userName) {
-    if (req.params.issueid) {
-      Iss
-        .findById(req.params.issueid)
-        .exec(
-          function(err, issue) {
-            if (err) {
-              utils.sendJSONresponse(res, 400, err);
-            } else {
+  let issue = Iss.findById(req.params.issueid).exec();
 
-              doAddAttachment(req, res, issue, userName);
-            }
-          }
-        );
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        "message": "Not found, issueid required"
-      });
-    }
-  });
-};
-
-var doAddAttachment = function(req, res, issue, username) {
-
-  var file = req.files.file;
-
-  var stream = fs.createReadStream(file.path);
-
-  var params = {
-    Key: file.originalFilename,
-    Body: stream
-  };
-
-  imageUploadService.upload(params, file.path, function() {
-    var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
-               imageUploadService.getBucket() + "/" + escape(file.originalFilename);
-
-    issue.attachments.push({
-      uploader: req.payload.name,
-      name: file.originalFilename,
-      source: file.path,
-      url: fullUrl,
-      type: file.type,
-    });
-
-    issue.updateInfo.push(req.body.updateInfo);
-
-    fs.unlinkSync(file.path);
-
-    issue.save(function(err, issue) {
-      var thisAttachment;
-      if (err) {
-        utils.sendJSONresponse(res, 400, err);
-      } else {
-        thisAttachment = issue.attachments[issue.attachments.length - 1];
-        utils.sendJSONresponse(res, 201, thisAttachment);
-      }
-    });
+  issue.then((issue) => {
+    doAddAttachment(req, res, issue);
+  }, (err) => {
+    utils.sendJSONresponse(res, 400, err);
   });
 
 };
@@ -125,33 +73,45 @@ module.exports.issueAttachmentsDeleteOne = function(req, res) {
 };
 
 /////////////////////////// HELPER FUNCTIONS ////////////////////////////
-var getAuthor = function(req, res, callback) {
-  if (req.payload.email) {
-    User
-      .findOne({
-        email: req.payload.email
-      })
-      .exec(function(err, user) {
-        if (!user) {
-          utils.sendJSONresponse(res, 404, {
-            "message": "User not found"
-          });
-          return;
-        } else if (err) {
-          console.log(err);
-          utils.sendJSONresponse(res, 404, err);
-          return;
-        }
-        console.log(user);
-        callback(req, res, user.name);
-      });
 
-  } else {
-    utils.sendJSONresponse(res, 404, {
-      "message": "User not found"
+var doAddAttachment = function(req, res, issue) {
+
+  var file = req.files.file;
+
+  var stream = fs.createReadStream(file.path);
+
+  var params = {
+    Key: file.originalFilename,
+    Body: stream
+  };
+
+  imageUploadService.upload(params, file.path, function() {
+    var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
+               imageUploadService.getBucket() + "/" + escape(file.originalFilename);
+
+    issue.attachments.push({
+      uploader: req.payload._id,
+      name: file.originalFilename,
+      source: file.path,
+      url: fullUrl,
+      type: file.type,
     });
-    return;
-  }
+
+    issue.updateInfo.push(req.body.updateInfo);
+
+    fs.unlinkSync(file.path);
+
+    issue.save(function(err, issue) {
+      var thisAttachment;
+      if (err) {
+        utils.sendJSONresponse(res, 400, err);
+      } else {
+        thisAttachment = issue.attachments[issue.attachments.length - 1];
+        utils.sendJSONresponse(res, 201, thisAttachment);
+      }
+    });
+  });
+
 };
 
 function formatUpdateIssue(req, attch) {

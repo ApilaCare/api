@@ -11,25 +11,15 @@ module.exports.issueChecklistsCreate = function(req, res) {
     return;
   }
 
-  getAuthor(req, res, function(req, res, userName) {
-    if (req.params.issueid) {
-      Iss
-        .findById(req.params.issueid)
-        .select('checklists updateInfo')
-        .exec(
-          function(err, issue) {
-            if (err) {
-              utils.sendJSONresponse(res, 400, err);
-            } else {
-              doAddChecklist(req, res, issue, userName);
-            }
-          }
-        );
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        "message": "Not found, issueid required"
-      });
-    }
+  let issue = Iss.findById(req.params.issueid)
+     .select('checklists updateInfo')
+     .exec();
+
+  issue.then((issue) => {
+    doAddChecklist(req, res, issue);
+
+  }, (err) => {
+    utils.sendJSONresponse(res, 400, err);
   });
 };
 
@@ -151,42 +141,13 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
 
 //////////////////////// HELPER FUNCTIONS //////////////////////////////
 
-var getAuthor = function(req, res, callback) {
-  if (req.payload.email) {
-    User
-      .findOne({
-        email: req.payload.email
-      })
-      .exec(function(err, user) {
-        if (!user) {
-          utils.sendJSONresponse(res, 404, {
-            "message": "User not found"
-          });
-          return;
-        } else if (err) {
-          console.log(err);
-          utils.sendJSONresponse(res, 404, err);
-          return;
-        }
-        console.log(user);
-        callback(req, res, user.name);
-      });
-
-  } else {
-    utils.sendJSONresponse(res, 404, {
-      "message": "User not found"
-    });
-    return;
-  }
-};
-
-var doAddChecklist = function(req, res, issue, username) {
+var doAddChecklist = function(req, res, issue) {
 
   if (!issue) {
     utils.sendJSONresponse(res, 404, "issueid not found");
   } else {
     issue.checklists.push({
-      author: req.payload.name,
+      author: req.payload._id,
       checklistName: req.body.checklistName,
       // needs the checkItems as the mixed mongoose schema
     });

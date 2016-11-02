@@ -11,25 +11,14 @@ module.exports.issueLabelsCreate = function(req, res) {
       return;
     }
 
-    getAuthor(req, res, function(req, res, userName) {
-        if (req.params.issueid) {
-            Iss
-                .findById(req.params.issueid)
-                .exec(
-                    function(err, issue) {
-                        if (err) {
-                            utils.sendJSONresponse(res, 400, err);
-                        } else {
-                            doAddLabel(req, res, issue, userName);
-                        }
-                    }
-                );
-        } else {
-            utils.sendJSONresponse(res, 404, {
-                "message": "Not found, issueid required"
-            });
-        }
+    let issue = Iss.findById(req.params.issueid).exec();
+
+    issue.then((issue) => {
+      doAddLabel(req, res, issue);
+    }, (err) => {
+      utils.sendJSONresponse(res, 400, err);
     });
+
 };
 
 // PUT /issues/:issueid/labels/:labelid - Updates the label
@@ -62,7 +51,7 @@ module.exports.issueLabelsUpdateOne = function(req, res) {
                             "message": "labelid not found"
                         });
                     } else {
-                        thisLabel.author = req.body.author;
+
                         thisLabel.name = req.body.name;
                         thisLabel.color = req.body.color;
                         issue.save(function(err, issue) {
@@ -137,35 +126,6 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
 };
 
 //////////////////////////// HELPER FUNCTIONS /////////////////////////////
-var getAuthor = function(req, res, callback) {
-
-    if (req.payload.email) {
-        User
-            .findOne({
-                email: req.payload.email
-            })
-            .exec(function(err, user) {
-                if (!user) {
-                    utils.sendJSONresponse(res, 404, {
-                        "message": "User not found"
-                    });
-                    return;
-                } else if (err) {
-                    console.log(err);
-                    utils.sendJSONresponse(res, 404, err);
-                    return;
-                }
-
-                callback(req, res, user.name);
-            });
-
-    } else {
-        utils.sendJSONresponse(res, 404, {
-            "message": "User not found"
-        });
-        return;
-    }
-};
 
 function formatUpdateInfo(req, label) {
   var updateInfo = {};
@@ -183,13 +143,12 @@ function formatUpdateInfo(req, label) {
 
 }
 
-var doAddLabel = function(req, res, issue, username) {
+var doAddLabel = function(req, res, issue) {
 
     if (!issue) {
         utils.sendJSONresponse(res, 404, "issueid not found");
     } else {
         issue.labels.push({
-            author: req.payload.name, // I dont think we need to track which users created a label
             name: req.body.name,
             color: req.body.color
         });
