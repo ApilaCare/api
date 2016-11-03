@@ -233,10 +233,9 @@ module.exports.issuesListByStatus = function(req, res) {
     return;
   }
 
-  Iss.find({
-    status: status,
-    community: communityid
-  }, function(err, issues) {
+  Iss.find({status: status, community: communityid})
+      .populate("submitBy", "name _id")
+      .exec(function(err, issues) {
     if (err) {
       utils.sendJSONresponse(res, 404, {
         'message': err
