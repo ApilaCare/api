@@ -3,8 +3,7 @@ var Iss = mongoose.model('Issue');
 var User = mongoose.model('User');
 var utils = require('../../services/utils');
 const activitiesService = require('../../services/activities.service');
-
-//TODO: careful when populating user info exclude hash and stuff
+const ToDo = mongoose.model('ToDo');
 
 // POST /issues/new - Creates a new issue
 module.exports.issuesCreate = function(req, res) {
@@ -41,38 +40,47 @@ module.exports.issuesCreate = function(req, res) {
 //PUT /issues/:issueid/finalplan - Adds a final plan item to an issue
 module.exports.addFinalPlan = function(req, res) {
 
-  var issueid = req.params.issueid;
+  let issueid = req.params.issueid;
+  let todoId = req.body.todoid;
 
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
   }
 
-  Iss.findById(issueid)
-     .exec(function(err, issue) {
+  if(!req.body.checklist) {
 
-       if(err) {
-         utils.sendJSONresponse(res, 404, {'message' : 'Issue not found to add a final plan'});
-       } else {
+    let todo = ToDo.findById(todoId).exec();
 
-         var finalPlan = {
-           "text" : req.body.text,
-           "checklist" : req.body.checklist,
-           "author" : req.body.author
-         };
+    todo
+    .then((todo) => {
 
-         issue.finalPlan.push(finalPlan);
+      todo.tasks.push({
+        "text" : req.body.text,
+        "occurrence" : 1,
+        "state" : "current",
+        "activeDays" : [true, true, true, true, true, false, false],
+        "activeWeeks": [false, false, false, false, false],
+        "activeMonths": [false, false, false, false, false,false, false, false, false, false,false, false, false, false, false],
+        "cycleDate" : new Date(),
+        "issueName": req.body.issueName
+      });
 
-         issue.save(function(err, issue) {
-           if(err) {
-             utils.sendJSONresponse(res, 404,
-               {'message' : 'Unable to save issue while adding final plan'});
-           } else {
-             utils.sendJSONresponse(res, 200, finalPlan);
-           }
-         });
-       }
+      return todo;
+    })
+    .then((todo) => {
+      todo.save((err, todo) => {
+          return todo.tasks[todo.tasks.length-1]._id;
+      });
+    })
+    .then((taskId) => {
+      finalPlan(req, res, taskId);
+    });
 
-     });
+  } else {
+    finalPlan(req, res);
+  }
+
+
 };
 
 //GET /issues/count/:userid/id/:communityid - Number of open issues asigned to an user
@@ -402,3 +410,37 @@ module.exports.issuesDeleteOne = function(req, res) {
     });
   }
 };
+
+//////////////////////// HELPER FUNCTIONS ////////////////////////////
+function finalPlan(req, res, taskid) {
+  Iss.findById(req.params.issueid)
+     .exec(function(err, issue) {
+
+       if(err) {
+         utils.sendJSONresponse(res, 404, {'message' : 'Issue not found to add a final plan'});
+       } else {
+
+         let finalPlan = {
+           "text" : req.body.text,
+           "checklist" : req.body.checklist,
+           "author" : req.body.author
+         };
+
+         if(taskid) {
+           finalPlan.task = taskid;
+         }
+
+         issue.finalPlan.push(finalPlan);
+
+         issue.save(function(err, issue) {
+           if(err) {
+             utils.sendJSONresponse(res, 404,
+               {'message' : 'Unable to save issue while adding final plan'});
+           } else {
+             utils.sendJSONresponse(res, 200, finalPlan);
+           }
+         });
+       }
+
+     });
+}

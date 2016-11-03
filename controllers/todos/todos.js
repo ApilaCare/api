@@ -64,8 +64,6 @@ module.exports.addTask = function(req, res) {
     return;
   }
 
-  let userId = req.payload._id;
-
   let newTask = {
     "text" : req.body.text,
     "occurrence" : req.body.occurrence,
@@ -80,29 +78,7 @@ module.exports.addTask = function(req, res) {
     "cycleDate" : new Date()
   };
 
-  let todo = ToDo.findById(todoId).exec();
-
-  todo.then(todo => {
-    if(todo) {
-        todo.tasks.push(newTask);
-        return todo;
-    } else {
-      utils.sendJSONresponse(res, 500, {"message": "ToDo is not created for this user"});
-    }
-  }, err => {
-    utils.sendJSONresponse(res, 500, err);
-  })
-  .then(todo => {
-    todo.save(function(err, savedToDo) {
-      if(err) {
-        utils.sendJSONresponse(res, 500, err);
-      } else {
-        activitiesService.addActivity(" created a task " + newTask.text, userId, "task-create", req.body.communityId);
-
-        utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
-      }
-    });
-  });
+  createTask(req, res, todoId);
 
 };
 
@@ -260,6 +236,34 @@ function isOverdue(task, currTime) {
 
 }
 
+function createTask(req, res, task) {
+
+  let userId = req.payload._id;
+
+  let todo = ToDo.findById(todoId).exec();
+
+  todo.then(todo => {
+    if(todo) {
+        todo.tasks.push(newTask);
+        return todo;
+    } else {
+      utils.sendJSONresponse(res, 500, {"message": "ToDo is not created for this user"});
+    }
+  }, err => {
+    utils.sendJSONresponse(res, 500, err);
+  })
+  .then(todo => {
+    todo.save(function(err, savedToDo) {
+      if(err) {
+        utils.sendJSONresponse(res, 500, err);
+      } else {
+        activitiesService.addActivity(" created a task " + newTask.text, userId, "task-create", req.body.communityId);
+
+        utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
+      }
+    });
+  });
+}
 
 function setToDefault(task, activeCycles) {
   _.forEach(activeCycles, function(cycle) {

@@ -6,6 +6,7 @@ var todoItemSchema = new mongoose.Schema({
   cycleDate : {type: Date, default: Date.now},
   occurrence: {type: Number, required: true},
   state: {type: String, required: true}, //it can be: complete | overdue | current | inactive
+  issueName: {type: String},
 
   activeDays: [{type: Boolean}], //if user selected specific days
   activeWeeks: [{type: Boolean}],
