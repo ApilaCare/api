@@ -31,6 +31,46 @@ module.exports.issueCommentsCreate = function(req, res) {
   }
 };
 
+module.exports.issueCommentsUpdate = function(req, res) {
+
+  let commentId = req.params.commentid;
+
+  if (utils.checkParams(req, res, ['issueid'])) {
+    return;
+  }
+
+  let issue = Iss.findById(req.params.issueid).exec();
+
+  issue.then((issue) => {
+
+    let index = issue.comments.indexOf(issue.comments.id(req.body._id));
+    let comment = req.body;
+
+    console.log(req.body);
+    console.log(index);
+
+    if(index !== -1) {
+      issue.comments.set(index, comment);
+
+      issue.save((err, iss) => {
+        if(err) {
+          utils.sendJSONresponse(res, 400, err);
+        } else {
+          utils.sendJSONresponse(res, 200, comment);
+        }
+      });
+
+    } else {
+      utils.sendJSONresponse(res, 400, err);
+    }
+
+  }, (err) => {
+    utils.sendJSONresponse(res, 404, err);
+  });
+
+
+};
+
 // GET /issues/:issueid/comments - Lists all the comments for an issue
 module.exports.issueCommentsList = function(req, res) {
 

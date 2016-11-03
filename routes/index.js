@@ -79,6 +79,7 @@ router.delete('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesDeleteO
 
 // issue comments
 router.post('/issues/:issueid/comments/new', sanitizeInput , auth, ctrlIssueComments.issueCommentsCreate);
+router.put('/issues/:issueid/comments/update', sanitizeInput, auth, ctrlIssueComments.issueCommentsUpdate);
 router.get('/issues/:issueid/comments/', sanitizeInput, auth, ctrlIssueComments.issueCommentsList);
 
 // issue checklists
