@@ -33,21 +33,20 @@ module.exports.issueCommentsCreate = function(req, res) {
 
 module.exports.issueCommentsUpdate = function(req, res) {
 
-  let commentId = req.params.commentid;
+  let commentId = req.body._id;
 
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
   }
 
+  console.log("ID: " + commentId);
+
   let issue = Iss.findById(req.params.issueid).exec();
 
   issue.then((issue) => {
 
-    let index = issue.comments.indexOf(issue.comments.id(req.body._id));
+    let index = issue.comments.indexOf(issue.comments.id(commentId));
     let comment = req.body;
-
-    console.log(req.body);
-    console.log(index);
 
     if(index !== -1) {
       issue.comments.set(index, comment);

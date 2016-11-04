@@ -84,7 +84,6 @@ router.get('/issues/:issueid/comments/', sanitizeInput, auth, ctrlIssueComments.
 
 // issue checklists
 router.post('/issues/:issueid/checklists/new', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistsCreate);
-router.put('/issues/:issueid/checklists/newitem/:listid', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistAddItem);
 router.put('/issues/:issueid/checklists/:checklistid', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistsUpdateOne);
 router.delete('/issues/:issueid/checklists/:checklistid', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistsDeleteOne);
 

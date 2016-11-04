@@ -23,22 +23,6 @@ module.exports.issueChecklistsCreate = function(req, res) {
   });
 };
 
-// PUT /issues/:issueid/checklists/newitem/:listid - Adds a new checkitem to a checklist
-module.exports.issueChecklistAddItem = function(req, res) {
-  if (utils.checkParams(req, res, ['issueid'])) {
-    return;
-  }
-
-  Iss
-    .findById(req.params.issueid)
-    .select('title checklists')
-    .exec(
-      function(err, issue) {
-        doAddChecklistItem(req, res, issue);
-      });
-
-};
-
 // PUT /issues/:issueid/checklists/:checklistid - Update a checklist
 module.exports.issueChecklistsUpdateOne = function(req, res) {
 

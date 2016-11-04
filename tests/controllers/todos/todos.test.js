@@ -76,7 +76,7 @@ describe('Todos', function() {
           if(err) {
             done(err);
           } else {
-            assert.equal(res.body.length, 1, "We have one todo task we listed out");
+            assert.equal(res.body.length, 2, "We have two todo task we listed out");
             done();
           }
       });
@@ -180,7 +180,7 @@ describe('Todos', function() {
           if(err) {
             done(err);
           } else {
-            assert.equal(res.body.tasks.length, 0, "There should be zero tasks now");
+            assert.equal(res.body.tasks.length, 1, "There should be one tasks now");
             done();
           }
       });
