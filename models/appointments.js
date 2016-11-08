@@ -8,7 +8,7 @@ var appointmentCommentSchema = new mongoose.Schema({
 
 var appointmentSchema = new mongoose.Schema({
     reason: {type: String},
-    locationName: {type: String, required: true},
+    locationName: {type: mongoose.Schema.Types.Mixed, required: true},
     locationDoctor: {type: String, default: ''},
     residentGoing: {type: mongoose.Schema.Types.ObjectId, ref: 'Resident'},
     appointmentDate : {type: Date},

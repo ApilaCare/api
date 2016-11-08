@@ -369,6 +369,8 @@ module.exports.issuesUpdateOne = function(req, res) {
 
         }
 
+        console.log(issue);
+
         issue.save(function(err, issue) {
           if (err) {
             console.log(err);
