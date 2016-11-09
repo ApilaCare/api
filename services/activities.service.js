@@ -14,16 +14,20 @@ module.exports = function(socketConn) {
   .on('authenticated', (socket) => {
 
     socket.on('join-community', (community) => {
-      socket.join(community._id);
 
-      socket.on('get-activities', (community) => {
+      if(community) {
+        socket.join(community._id);
 
-        activityCtrl.recentActivities(community._id).then((activities) => {
-          io.sockets.to(community._id).emit('recent-activities', activities);
-        }, err => {
-          console.log(err);
+        socket.on('get-activities', (community) => {
+
+          activityCtrl.recentActivities(community._id).then((activities) => {
+            io.sockets.to(community._id).emit('recent-activities', activities);
+          }, err => {
+            console.log(err);
+          });
         });
-      });
+      }
+
     });
 
   });
