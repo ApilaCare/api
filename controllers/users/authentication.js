@@ -9,6 +9,8 @@ var emailService = require('../../services/email');
 
 const crypto = require('crypto');
 
+const cons = require('../../services/constants');
+
 // POST /register - User registration
 module.exports.register = function(req, res) {
 
@@ -81,7 +83,7 @@ function saveUser(user, todoid, res) {
 
   var tokenVerify = generateToken(user.email);
 
-  emailService.sendVerificationEmail("supprot@apila.com", "nesa993@gmail.com", tokenVerify)
+  emailService.sendVerificationEmail(cons.APILA_EMAIL, user.email, tokenVerify)
   .then(() => {
     user.verifyToken = tokenVerify;
   })

@@ -58,7 +58,15 @@
     mailOptions.from = from;
     mailOptions.to = to;
 
-    var link = "http://localhost:3000/auth/verify/" + token;
+    var link = "https://apilatest.herokuapp.com/auth/verify/" + token;
+
+    if(process.env.NODE_ENV === 'production') {
+      link = "https://apila.care/auth/verify/" + token;
+    } else if(process.env.NODE_ENV === 'staging') {
+      link = "https://apila.us/auth/verify/" + token;
+    } else if(process.env.NODE_ENV === 'development') {
+      link = "http://localhost:3000/auth/verify/" + token;
+    }
 
     mailOptions.subject = "Verify email to use Apila Care";
     mailOptions.text = "Thanks for registring with Apila Care, to create your own communities" +
