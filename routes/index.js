@@ -122,6 +122,7 @@ router.get('/users/:userid/image', ctrlUsers.userImage);
 router.post('/users/:userid/upload', sanitizeInput , auth, multipartyMiddleware, ctrlUsers.uploadImage);
 router.post('/users/forgotpassowrd/:email', ctrlUsers.forgotPassword);
 router.post('/users/reset/:token', ctrlUsers.resetPassword);
+router.post('/users/verify/:token', ctrlUsers.verifyEmail);
 router.put('/users/change/:userid', sanitizeInput , auth, ctrlUsers.updateUsername);
 
 //users payment

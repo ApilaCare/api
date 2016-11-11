@@ -15,6 +15,8 @@ var userSchema = new mongoose.Schema({
         required: true
     },
     userImage: {type: String},
+    active: {type: Boolean, default: false},
+    verifyToken: {type: String},
     todoid: {type: mongoose.Schema.Types.ObjectId, ref: 'To-Do'},
     community: {type: mongoose.Schema.Types.ObjectId, ref: 'Community'}, // _id of community that user is part of
     prevCommunity: {type: mongoose.Schema.Types.ObjectId, ref: 'Community'}, // we need to store previous community when switching between test -> real community
