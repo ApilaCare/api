@@ -44,7 +44,7 @@
 
     mailOptions.from = from;
     mailOptions.to = to;
-    mailOptions.subject = "Password reset for ApilaCare";
+    mailOptions.subject = "Password reset for Apila";
     mailOptions.text = 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
           'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
           resetUrl + token + '\n\n' +
@@ -68,9 +68,9 @@
       link = "http://localhost:3000/auth/verify/" + token;
     }
 
-    mailOptions.subject = "Verify email to use Apila Care";
-    mailOptions.text = "Thanks for registring with Apila Care, to create your own communities" +
-    " and continue to use the service please confrim your email by going to the following link: " + link;
+    mailOptions.subject = "Verify email to use Apila";
+    mailOptions.text = "Thanks for registering with Apila Care, to create your own communities" +
+    " and continue to use the service please confirm your email by going to the following link: " + link;
 
     return transporter.sendMail(mailOptions);
 
