@@ -85,7 +85,7 @@
         },
     ];
     mailOptions.subject = "Recovered confidetial issues for " + recoveredUser;
-    mailOptions.text = 'You have recovored condifential issues for member' + recoveredUser + "\n" +
+    mailOptions.text = 'You have recovered confidential issues for member' + recoveredUser + "\n" +
                 "In the attachment confidential.pdf you can see all the confidential issues from the user";
 
     transporter.sendMail(mailOptions, callback);
