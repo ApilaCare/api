@@ -169,7 +169,7 @@ describe('Issues', function() {
         "description": 'Some description',
         "confidential": false,
         "community": user.community,
-        "submitBy" : user.name,
+        "submitBy" : user.id,
         "status": "Open",
         "due" : new Date(),
         "updateField" : {
@@ -204,8 +204,7 @@ describe('Issues', function() {
 
       var finalPlanData = {
         "text": 'This is the solution to all of your problems use it wisely',
-        "checklist" : false,
-        "author" : user.id
+        "checklist" : true
       };
 
       utils.server
@@ -226,6 +225,38 @@ describe('Issues', function() {
 
     });
   });
+
+  describe('#add final plan as a todo item', function() {
+    it('Should add a new todo item as a part of an issue', function(done) {
+
+      var user = utils.getTestUser();
+
+      var finalPlanData = {
+        "text": 'This is the solution to all of your problems use it wisely',
+        "checklist" : false,
+        "author": user.id,
+        "issueid": issueid,
+        "todoid": user.todoid
+      };
+
+      utils.server
+        .put('/api/issues/' + issueid + '/finalplan')
+        .set('Accept', 'application/json')
+        .set('Authorization', 'Bearer ' + user.token)
+        .send(finalPlanData)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            done(err);
+          } else {
+            done();
+          }
+
+        });
+
+    });
+  });
+
 
   describe('#dueIssuesList', function() {
     it('List of issues that are due in a community', function(done) {

@@ -6,6 +6,8 @@ var utils = require('../../services/utils');
 
 var async = require('async');
 
+const activitiesService = require('../../services/activities.service');
+
 // POST /communities/new - Creates an empty community
 module.exports.communitiesCreate = function(req, res) {
 
@@ -103,6 +105,10 @@ module.exports.addPendingMember = function(req, res) {
             if (err) {
               utils.sendJSONresponse(res, 404, err);
             } else {
+
+              let text = " wants to join " + community.name + " community";
+              activitiesService.addActivity(text, userId, "community-join", community._id);
+
               utils.sendJSONresponse(res, 200, community);
             }
           });
@@ -466,7 +472,7 @@ var getAuthor = function(req, res, callback) {
           utils.sendJSONresponse(res, 404, err);
           return;
         }
-  
+
         callback(req, res, user._id);
       });
 

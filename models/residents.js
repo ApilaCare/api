@@ -241,7 +241,7 @@ var residentSchema = new mongoose.Schema({
     rightEye: {type: String}, // adequate, adequate with aid, poor, none
     leftEye: {type: String}, // adequate, adequate with aid, poor, none
     visionAbility: {type: Number}, // number scale 0 through 10
-    visionAssist: {type: String}, // full, independent, reminder
+    visionAssist: {type: String}, // full, independent, reminder, none
     visionNotes: {type: String},
 
     // teeth

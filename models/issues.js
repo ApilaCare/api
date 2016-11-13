@@ -4,6 +4,7 @@ var finalPlanSchema = new mongoose.Schema({
   text: {type: String},
   checklist: {type: Boolean},
   author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+  task: {type: mongoose.Schema.Types.ObjectId, ref: 'Task'},
   createdOn: {type: Date, default: Date.now}
 });
 
@@ -14,7 +15,7 @@ var issueCommentSchema = new mongoose.Schema({
 });
 
 var issueChecklistSchema = new mongoose.Schema({
-    author: {type: String, required: true},
+    author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     createdOn: {type: Date, default: Date.now},
     checklistName: {type: String, required: true},
     checkItemsChecked: {type: Number, required: true, default: 0},
@@ -35,7 +36,7 @@ var issueAttachmentsSchema = new mongoose.Schema({
     source: {type: String, required: true},
     url: {type: String, required: true},
     uploadedOn: {type: Date, default: Date.now},
-    uploader: {type: String, required: true},
+    uploader: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     type: {type: String, required: true}
 });
 
@@ -65,7 +66,7 @@ var issueSchema = new mongoose.Schema({
     resolutionTimeframe: {type: String, required: true},
     submitDate: {type: Date, default: Date.now},
     shelvedDate: {type: Date},
-    submitBy: {type: String, required: true},
+    submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     description: {type: String, required: true},
     status: {type: String, required: true, default: "Open"}, // choose from ["Open", "Shelved", "Closed"]
     checklists: [issueChecklistSchema],

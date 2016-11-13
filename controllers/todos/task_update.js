@@ -1,15 +1,15 @@
-var _ = require('lodash');
-var moment = require('moment');
+const _ = require('lodash');
+const moment = require('moment');
 require('moment-range');
 
-var fs = require('fs');
-const constants = require('../../services/constants');
+const fs = require('fs');
+const cons = require('../../services/constants');
 
 var currentTime = moment();
 
 module.exports.updateTasks = function(todo, callback) {
 
-  loadMockTime(function(currTime) {
+  loadMockTime((currTime) => {
     if(currTime) {
 
       var tasks = todo.tasks;
@@ -20,7 +20,7 @@ module.exports.updateTasks = function(todo, callback) {
 
       todo.tasks = tasks;
 
-      todo.save(function(err) {
+      todo.save((err) => {
         if(err) {
           callback(false, err);
         } else {
@@ -47,7 +47,7 @@ function updateTask(task, currTime) {
   switch(task.occurrence) {
 
     // Every Hour
-    case constants.occurrence.HOURLY:
+    case cons.occurrence.HOURLY:
 
         checkIfCompleted(task, currTime, cycleDate, "hours");
 
@@ -61,7 +61,7 @@ function updateTask(task, currTime) {
 
       break;
 
-    case constants.occurrence.DAILY:
+    case cons.occurrence.DAILY:
 
         checkIfCompleted(task, currTime, cycleDate, "days");
 
@@ -73,7 +73,7 @@ function updateTask(task, currTime) {
 
       break;
 
-    case constants.occurrence.WEEKLY:
+    case cons.occurrence.WEEKLY:
 
         checkIfCompleted(task, currTime, cycleDate, "weeks");
 
@@ -85,7 +85,7 @@ function updateTask(task, currTime) {
 
       break;
 
-    case constants.occurrence.MONTHLY:
+    case cons.occurrence.MONTHLY:
 
         checkIfCompleted(task, currTime, cycleDate, "months");
 
@@ -110,13 +110,21 @@ function checkIfCompleted(task, currTime, cycleDate, cycle) {
 
   if(!currTime.isSame(cycleDate, cycleWithoutS) && task.state !== "complete" && currTimeCycle(cycle)) {
 
-    sinceLastUpdate.by(cycle, function(day) {
-      let inCycle = isInActiveCycle(task, day);
+    sinceLastUpdate.by(cycle, (currCycle) => {
+
+      let inCycle = isInActiveCycle(task, currCycle);
       if(inCycle(cycle)) {
 
-        if(!isInNotCompleted(task, currTime) && !currTime.isSame(day, cycleWithoutS)) {
-          task.notCompleted.push({updatedOn: day.toDate()});
+        if(task.occurrence !== cons.occurrence.HOURLY) {
+          if(!isInNotCompleted(task, currTime) && !currTime.isSame(currCycle, cycleWithoutS)) {
+            task.notCompleted.push({updatedOn: currCycle.toDate()});
+          }
+        } else {
+          if(!currTime.isSame(currCycle, cycleWithoutS)) {
+            task.notCompleted.push({updatedOn: currCycle.toDate()});
+          }
         }
+
       }
 
     });
@@ -125,8 +133,8 @@ function checkIfCompleted(task, currTime, cycleDate, cycle) {
 }
 
 function isInNotCompleted(task, day) {
-  var isInList = _.find(task.notCompleted, function(value) {
-      if(moment(value.updatedOn).isSame(day, "day") || task.occurrence === constants.occurrence.HOURLY) {
+  var isInList = _.find(task.notCompleted, (value) => {
+      if(moment(value.updatedOn).isSame(day, "day")) {
         return true;
       } else {
         return false;
@@ -179,7 +187,7 @@ function resetTaskCycle(task) {
 
 function loadMockTime(callback) {
   if(process.env.BACK_TO_FUTURE) {
-    fs.readFile("./tools/date.txt", 'UTF8', function(err, data) {
+    fs.readFile("./tools/date.txt", 'UTF8', (err, data) => {
       currentTime = moment(parseInt(data));
       callback(currentTime);
     });

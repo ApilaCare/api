@@ -7,27 +7,24 @@ var moment = require('moment');
 var _ = require('lodash');
 var fs = require('fs');
 var imageUploadService = require('../../services/imageUpload');
+const activitiesService = require('../../services/activities.service');
 
 
 // POST /residents/new - Creates a new resident
 module.exports.residentsCreate = function(req, res) {
 
-  Resid.create({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    birthDate: req.body.birthDate,
-    maidenName: req.body.maidenName,
-    admissionDate: req.body.admissionDate,
-    buildingStatus: req.body.buildingStatus,
-    sex: req.body.sex,
-    submitBy: req.payload.name,
-    community: req.body.community._id,
-    administrativeNotes: req.body.administrativeNotes,
-    movedFrom: req.body.movedFrom
-  }, function(err, resident) {
+  let residentData = req.body;
+  residentData.submitBy = req.payload.name;
+  residentData.community = req.body.community._id;
+
+  Resid.create(residentData, function(err, resident) {
     if (err) {
       utils.sendJSONresponse(res, 400, err);
     } else {
+
+      let text = " created resident " + req.body.firstName + " " + req.body.lastName;
+      activitiesService.addActivity(text, req.payload._id, "resident-create", req.body.community._id);
+
       utils.sendJSONresponse(res, 200, resident);
     }
   });
@@ -329,6 +326,9 @@ module.exports.residentsUpdateOne = function(req, res) {
       console.log(err);
       utils.sendJSONresponse(res, 404, err);
     } else {
+
+      let text = " updated resident " + req.body.firstName + " " + req.body.lastName;
+      activitiesService.addActivity(text, req.payload._id, "resident-update", req.body.community._id);
 
       utils.sendJSONresponse(res, 200, resident);
     }

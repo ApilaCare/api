@@ -1,11 +1,16 @@
 require('dotenv').load();
 var debug = require('debug')('Express4');
 var express = require('express');
+var app = express();
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var cors = require('cors');
+
+require('./services/activities.service')(io);
 
 require('./models/db');
 require('./config/passport');
@@ -15,8 +20,6 @@ require('./controllers/residents/resident_schedule');
 // (commented out because routes in the server are not used)
 // var routes = require('./app_server/routes/index');
 var routesApi = require('./routes/index');
-
-var app = express();
 
 app.use(cors());
 app.use(logger('dev'));
@@ -55,8 +58,10 @@ app.disable('etag');
 
 app.set('port', process.env.PORT || 3300);
 
-var server = app.listen(app.get('port'), function() {
+
+var server = http.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + server.address().port);
 });
+
 
 module.exports = app;

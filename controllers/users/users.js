@@ -257,6 +257,35 @@ module.exports.updateUsername = function(req, res) {
     });
 };
 
+//POST
+module.exports.verifyEmail = function(req, res) {
+  let token = req.params.token;
+
+  User.findOne({verifyToken: token}).exec((err, user) => {
+
+    if(err) {
+      utils.sendJSONresponse(res, 500, err);
+    } else {
+      if(!user) {
+        utils.sendJSONresponse(res, 200, {status: false});
+      } else {
+        user.active = true;
+
+        user.save((err) => {
+          if(err) {
+            utils.sendJSONresponse(res, 500, err);
+          } else {
+            utils.sendJSONresponse(res, 200, {status: true});
+          }
+        });
+      }
+
+    }
+
+  });
+
+};
+
 // HELPER FUNCTIONS
 
 function doSendPasswordForget(req, res, token) {

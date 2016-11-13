@@ -20,7 +20,7 @@
       callback(false);
     });
 
-  }
+  };
 
   // retunts customer information by it's id
   exports.getCustomer = function(customer, callback) {
@@ -34,7 +34,7 @@
         }
       }
     );
-  }
+  };
 
 
   //given the stripes customerId, charge the user, specify amout in cents
@@ -50,7 +50,7 @@
     .catch(function(charge) {
       callback(false);
     });
-  }
+  };
 
   // gets customers stripe id and subscrips him to out standard plan
   exports.subscribeToPlan = function(customerid, callback) {
@@ -65,7 +65,7 @@
         }
       }
     );
-  }
+  };
 
   // returns standard plan information
   exports.getStandardPlan = function(callback) {
@@ -107,7 +107,7 @@
         }
       }
     );
-  }
+  };
 
   exports.updateCustomer = function(customerid, token, callback) {
     stripe.customers.update(customerid, {
@@ -119,7 +119,7 @@
           callback(customer);
         }
     });
-  }
+  };
 
 
 })();

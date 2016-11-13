@@ -4,6 +4,7 @@ var assert = require('assert');
 describe('Issue Comments', function() {
 
   var issueid = '';
+  var commentId = '';
 
   describe('#create', function() {
     it('Creates a new issue', function(done) {
@@ -58,7 +59,40 @@ describe('Issue Comments', function() {
           if (err) {
             done(err);
           } else {
-            console.log(res);
+            commentId = res.body._id;
+            assert.equal('This is a very good test good job buddy', res.body.commentText, "Same text");
+            done();
+          }
+
+        });
+
+    });
+  });
+
+  describe('#update', function() {
+    it('Update issue comment', function(done) {
+
+      var user = utils.getTestUser();
+
+      var commentData = {
+        "author": user.id,
+        "commentText": "This isn't a very good test, shame on you.",
+        "_id" : commentId
+      };
+
+      //this.timeout(5000);
+
+      utils.server
+        .put('/api/issues/' + issueid +  '/comments/update')
+        .set('Accept', 'application/json')
+        .set('Authorization', 'Bearer ' + user.token)
+        .send(commentData)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            done(err);
+          } else {
+            assert.equal("This isn't a very good test, shame on you.", res.body.commentText, "Same text");
             done();
           }
 
