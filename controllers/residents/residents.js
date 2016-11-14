@@ -14,7 +14,7 @@ const activitiesService = require('../../services/activities.service');
 module.exports.residentsCreate = function(req, res) {
 
   let residentData = req.body;
-  residentData.submitBy = req.payload.name;
+  residentData.submitBy = req.payload._id;
   residentData.community = req.body.community._id;
 
   Resid.create(residentData, function(err, resident) {

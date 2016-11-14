@@ -80,7 +80,7 @@ var residentSchema = new mongoose.Schema({
     assessmentIntervalFile: [String],
     updateInfo: [updateInfoSchema],
     submitDate: {type: Date, default: Date.now},
-    submitBy: {type: String, required: true},
+    submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     community: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Community'

@@ -20,7 +20,7 @@ var appointmentSchema = new mongoose.Schema({
     cancel: {type: Boolean, default: false},
     appointmentComment: [appointmentCommentSchema],
     submitDate: {type: Date, default: Date.now, required: true},
-    submitBy: {type: String, required: true},
+    submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     community: {type: mongoose.Schema.Types.ObjectId, ref: 'Community'},
     updateInfo: [mongoose.Schema.Types.Mixed],
 });

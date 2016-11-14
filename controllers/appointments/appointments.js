@@ -20,7 +20,7 @@ module.exports.appointmentsCreate = function(req, res) {
     minutes: req.body.minutes,
     timezone: req.body.timezone,
     isAm: req.body.isAm,
-    submitBy: req.payload.name,
+    submitBy: req.payload._id,
     transportation: req.body.transportation,
     community: req.body.community._id
   }, function(err, appointment) {
