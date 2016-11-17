@@ -40,6 +40,8 @@ after(function() {
 //HELPER FUNCTIONS
 function setupData(callback) {
 
+  console.log("Registring a user");
+
   server
     .post('/api/register')
     .set('Accept', 'application/json')
