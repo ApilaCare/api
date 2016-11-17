@@ -257,6 +257,7 @@ module.exports.updateListItem = function(req, res) {
           "updateDate" : new Date(),
           "updateBy" : req.body.updateBy
         });
+        console.log(`UPDATE BY ${req.body.updateBy}`);
 
         resident.save(function(err, r) {
           if(err) {
