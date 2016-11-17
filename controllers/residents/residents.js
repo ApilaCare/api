@@ -8,6 +8,7 @@ var _ = require('lodash');
 var fs = require('fs');
 var imageUploadService = require('../../services/imageUpload');
 const activitiesService = require('../../services/activities.service');
+const carePoints = require('./care_points');
 
 
 // POST /residents/new - Creates a new resident
@@ -316,6 +317,8 @@ module.exports.residentsUpdateOne = function(req, res) {
 
   req.body.foodLikes = req.body.newfoodLikes;
   req.body.foodDislikes = req.body.newfoodDislikes;
+
+  req.body.carePoints = carePoints.calculateCarePoints(req.body);
 
   Resid.findOneAndUpdate({
     _id: req.params.residentid

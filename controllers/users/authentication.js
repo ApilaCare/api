@@ -22,6 +22,8 @@ module.exports.register = function(req, res) {
     return;
   }
 
+  console.log(req.body);
+
   //create a new user instance and set name and email
   var user = new User();
 
