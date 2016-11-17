@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var residentContactSchema = new mongoose.Schema({
-    firstName: {type: String},
+    firstName: {type: String, required: true},
     lastName: {type: String},
     primaryPhoneNumber: {type: String},
     secondaryPhoneNumber: {type: String},
@@ -9,7 +9,7 @@ var residentContactSchema = new mongoose.Schema({
     physicalAddress: {type: String},
     primaryContact: {type: Boolean, default: false},
     trustedPerson: {type: Boolean, default: false},
-    relation: {type: String},
+    relation: {type: String, required: true},
     medicalPowerOfAttorney: {type: Boolean, default: false},
     financialPowerOfAttorney: {type: Boolean, default: false},
     conservator: {type: Boolean, default: false},
@@ -47,7 +47,7 @@ var residentSchema = new mongoose.Schema({
     socialSecurityNumber: {type: Number},
 
     // location
-    buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out
+    buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out, out of building
       movedOutDescribe: {type: String}, // conditional if moved out selected | open field
       movedOutTo: {type: String}, // conditional if moved out is selected | Nursing Home, Home, Another AL
     movedFrom: {
