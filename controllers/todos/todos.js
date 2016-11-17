@@ -6,7 +6,9 @@ var TaskService = require('./task_update');
 
 var _ = require('lodash');
 var moment = require('moment');
-const cons = require('../../services/constants');
+
+const occurrence = require('../../services/constants').occurrence;
+const taskState = require('../../services/constants').taskState;
 const activitiesService = require('../../services/activities.service');
 
 // creates an empty todo object called when a user is registered
@@ -127,7 +129,7 @@ module.exports.updateTask = function(req, res) {
 
       if(index !== -1) {
 
-        if(task.state === "complete") {
+        if(task.state === taskState.COMPLETE) {
 
           task.cycleDate = currentTime.toDate();
 
@@ -142,19 +144,19 @@ module.exports.updateTask = function(req, res) {
         // if we switched occurrence, reset other active set fields
         if(todo.tasks[index].occurrence !== task.occurrence) {
           switch(task.occurrence) {
-            case cons.occurrence.HOURLY:
+            case occurrence.HOURLY:
               setToDefault(task, ["daily", "weekly", "monthly"]);
             break;
 
-            case cons.occurrence.DAILY:
+            case occurrence.DAILY:
               setToDefault(task, ["hourly", "weekly", "monthly"]);
             break;
 
-            case cons.occurrence.WEEKLY:
+            case occurrence.WEEKLY:
               setToDefault(task, ["daily", "hourly", "monthly"]);
             break;
 
-            case cons.occurrence.MONTHLY:
+            case occurrence.MONTHLY:
               setToDefault(task, ["daily", "weekly", "hourly"]);
             break;
           }
@@ -228,25 +230,25 @@ function isOverdue(task, currTime) {
 
   switch(task.occurrence) {
 
-    case cons.occurrence.HOURLY:
+    case occurrence.HOURLY:
       if(currTime.minutes() >= 30 && !currTime.isSame(createdOn, "hour")) {
         overdue = true;
       }
     break;
 
-    case cons.occurrence.DAILY:
+    case occurrence.DAILY:
       if(currTime.hour() >= 12 && !currTime.isSame(createdOn, "day")) {
         overdue = true;
       }
     break;
 
-    case cons.occurrence.WEEKLY:
+    case occurrence.WEEKLY:
       if(currTime.day() > 2 && !currTime.isSame(createdOn, "week")) {
         overdue = true;
       }
     break;
 
-    case cons.occurrence.MONTHLY:
+    case occurrence.MONTHLY:
       if((currTime.date() > (currTime.date() / 2)) && !currTime.isSame(createdOn, "month")) {
         overdue = true;
       }

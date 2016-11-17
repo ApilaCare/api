@@ -3,6 +3,12 @@ module.exports.STANDARD_PLAN_ID = "9n89gbusdfds";
 
 module.exports.APILA_EMAIL = "supprot@apila.com";
 
+const taskState = {
+  "CURRENT" : "current",
+  "COMPLETE" : "complete",
+  "INACTIVE" : "inactive"
+};
+
 const day = {
   "MONDAY" : 1,
   "TUESDAY" : 2,
@@ -23,3 +29,4 @@ const occurrence = {
 
 module.exports.day = day;
 module.exports.occurrence = occurrence;
+module.exports.taskState = taskState;

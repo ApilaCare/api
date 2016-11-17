@@ -1,0 +1,20 @@
+{
+  "typeOfBathing": {
+    "Shower": 0,
+    "Bathtub": 1,
+    "Spit Bath": 2
+  },
+  "easilyUnderstood": {
+    "false": 0,
+    "true": 1
+  },
+  "frequencyOfBathing": {
+    "0": 0, "1": 1, "2": 2, "3": 3, "4": 4
+  },
+  "bathingAssist": {
+    "Independent": 0,
+    "Standby": 1,
+    "Partial Assistance": 2,
+    "Full Assistance": 3
+  }
+}

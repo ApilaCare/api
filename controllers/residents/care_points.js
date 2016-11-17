@@ -1,3 +1,5 @@
+const carePointMap = require('./care_points_map.json');
+
 
 module.exports.calculateCarePoints = function(resident) {
   let sum = 0;
@@ -20,30 +22,5 @@ function getCarePoint(field, value) {
      return NaN;
    }
 
-   console.log(`field: ${field}  value: ${value}`);
-
    return carePointMap[field][value];
 }
-
-
-// Care Point maping which field has what care point value
-const carePointMap = {
-  typeOfBathing: {
-    "Shower": 0,
-    "Bathtub": 1,
-    "Spit Bath": 2
-  },
-  easilyUnderstood: {
-    "false": 0,
-    "true": 1
-  },
-  frequencyOfBathing: {
-    "0": 0, "1": 1, "2": 2, "3": 3, "4": 4
-  },
-  bathingAssist: {
-    "Independent": 0,
-    "Standby": 1,
-    "Partial Assistance": 2,
-    "Full Assistance": 3
-  }
-};
