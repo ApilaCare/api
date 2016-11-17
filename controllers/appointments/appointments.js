@@ -61,7 +61,9 @@ module.exports.appointmentsList = function(req, res) {
 
   Appoint.find({
     "community": req.params.communityid
-  }).populate("residentGoing").exec(function(err, appointments) {
+  }).populate("residentGoing")
+    .populate("appointmentComment.author", "name _id")
+    .exec(function(err, appointments) {
     if (err) {
       utils.sendJSONresponse(res, 404, {
         'message': 'Error while listing appointements'
