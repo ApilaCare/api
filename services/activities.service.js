@@ -36,6 +36,8 @@ module.exports = function(socketConn) {
 
 module.exports.addActivity = function(text, userId, type, communityId) {
 
+  console.log(`CommunityId for activity: ${communityId}`);
+
   let activity = {
     "type": type,
     "createdOn": moment().toDate(),
@@ -47,7 +49,6 @@ module.exports.addActivity = function(text, userId, type, communityId) {
 
   activityCtrl.addActivity(activity, (err, populatedActivity) => {
     if(populatedActivity) {
-      console.log("Emitting to " + communityId);
       io.emit("add-activity", populatedActivity);
     } else {
       console.log(err);
