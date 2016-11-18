@@ -19,7 +19,7 @@ module.exports.issuesCreate = function(req, res) {
   }, function(err, issue) {
     if (err) {
       console.log(err);
-      utils.sendJSONresponseresponse(res, 400, err);
+      utils.sendJSONresponse(res, 400, err);
     } else {
 
       User.populate(issue, {
