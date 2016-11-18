@@ -1,12 +1,48 @@
 {
+  "supportGroup": {
+    "false": 0,
+    "true": 1
+  },
+  "outsideAgency": {
+    "Hospice": 0,
+    "Home Health": 1,
+    "Home Care": 2,
+    "Social Worker": 3,
+    "Private Duty": 3,
+    "Other": 3
+  },
+  "easilyUnderstood": {
+    "false": 0,
+    "true": 1
+  },
+  "englishFirstLanguage": {
+    "false": 0,
+    "true": 1
+  },
+  "heatingPad": {
+    "false": 0,
+    "true": 1
+  },
+  "microwave": {
+    "false": 0,
+    "true": 1
+  },
+  "extensionCord": {
+    "false": 0,
+    "true": 1
+  },
   "typeOfBathing": {
     "Shower": 0,
     "Bathtub": 1,
     "Spit Bath": 2
   },
-  "easilyUnderstood": {
-    "false": 0,
-    "true": 1
+  "timeOfBathing": {
+    "Morning": 0,
+    "Evening": 1,
+    "Before Breakfast": 2,
+    "After Breakfast": 1,
+    "Before Supper": 1,
+    "After Supper": 1
   },
   "frequencyOfBathing": {
     "0": 0, "1": 1, "2": 2, "3": 3, "4": 4
@@ -16,5 +52,11 @@
     "Standby": 1,
     "Partial Assistance": 2,
     "Full Assistance": 3
+  },
+  "acceptanceOfBathing": {
+    "Likes": 0,
+    "Dislikes": 1,
+    "Refuses": 2,
+    "Indifferent": 3
   }
 }
