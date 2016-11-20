@@ -69,7 +69,7 @@
     }
 
     mailOptions.subject = "Verify email to use Apila";
-    mailOptions.text = "Thanks for registering with Apila Care, to create your own communities" +
+    mailOptions.text = "Thanks for registering with Apila, to create your own communities" +
     " and continue to use the service please confirm your email by going to the following link: " + link;
 
     return transporter.sendMail(mailOptions);

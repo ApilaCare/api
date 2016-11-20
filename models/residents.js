@@ -38,9 +38,9 @@ var residentSchema = new mongoose.Schema({
     middleName: {type: String},
     lastName: {type: String, required: true},
     room: {type: Number},
-    birthDate: {type: Date, required: true},
+    birthDate: {type: Date},
     admissionDate: {type: Date},
-    sex: {type: String, required: true}, // male, female, other
+    sex: {type: String}, // male, female, other
       maidenName: {type: String}, // if female | open field
     maritalStatus: {type: String}, // single, divorced, widowed, married, single never married
     veteran: {type: Boolean, default: false},
