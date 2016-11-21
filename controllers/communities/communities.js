@@ -11,33 +11,55 @@ const GooglePlaces = require('node-googleplaces');
 
 const places = new GooglePlaces(process.env.GOOGLE_PLACE_API);
 
-// places.textSearch({query: "The Bridge at Alamosa"}, (err, data) => {
-//   const result = data.body.results[0];
-//
-//   if(result) {
-//     console.log(result);
-//
-//
-//
-//   }
-//
-// });
+function searchPlace(name) {
+ return places.textSearch({query: name}).then((data) => {
+    return data.body.results[0].place_id;
+  });
+}
 
-// POST /communities/new - Creates an empty community
-module.exports.communitiesCreate = function(req, res) {
+function placeDetail(id) {
+  return places.details({placeid: id}).then((details) => {
+    return details.body;
+  });
+}
 
-  Community.create({
-    name: req.body.name,
-    communityMembers: req.body.communityMembers,
-    pendingMembers: req.body.pendingMembers
+function getDetails(data) {
+  let details = data.result;
 
-  }, function(err, community) {
+  return {
+    phone: details.formatted_phone_number,
+    website: details.website,
+    fax: details.international_phone_number,
+    address: details.formatted_address
+  };
+}
+
+function createCommunity(req, res) {
+  Community.create(req.body, function(err, community) {
     if (err) {
       utils.sendJSONresponse(res, 400, err);
     } else {
       addUserToCommunity(req, res, community);
     }
   });
+}
+
+// POST /communities/new - Creates an empty community
+module.exports.communitiesCreate = function(req, res) {
+
+  searchPlace(req.body.name)
+  .then(placeDetail)
+  .then((details) => {
+    let {phone, website, fax, address} = getDetails(details);
+
+    req.body.phone = phone;
+    req.body.website = website;
+    req.body.fax = fax;
+    req.body.address = address;
+
+    createCommunity(req, res);
+  });
+
 };
 
 // POST - /communites/:communityid/role/:userid - Switches or adds a user role
@@ -332,6 +354,33 @@ module.exports.hasCanceledCommunity = function(req, res) {
         });
       }
     });
+};
+
+//PUT
+module.exports.updateContactInfo = function(req, res) {
+
+  Community.findOne({"_id": req.params.communityid})
+   .exec((err, community) => {
+
+     if(err) {
+       utils.sendJSONresponse(res, 500, err);
+     } else {
+       community.phone = req.body.phone;
+       community.website = req.body.website;
+       community.fax = req.body.fax;
+       community.address = req.body.address;
+
+       community.save((err, com) => {
+         if(err) {
+           utils.sendJSONresponse(res, 500, err);
+         } else {
+           utils.sendJSONresponse(res, 200, com);
+         }
+       });
+     }
+
+  });
+
 };
 
 module.exports.communitiesDeleteOne = function(req, res) {

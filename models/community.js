@@ -21,10 +21,10 @@ var communitySchema = new mongoose.Schema({
     testCommunity: {type: Boolean, default: false},
 
     website: {type: String},
-    phoneNumber: {type: Number},
+    phone: {type: String},
     address: {type: String},
     logo: {type: String},
-    faxNumber: {type: Number},
+    fax: {type: String},
     floors: [Number],
     rooms: {type: Number},
     roomStyle: [roomStyleSchema]

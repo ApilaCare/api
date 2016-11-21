@@ -60,6 +60,7 @@ router.post('/communites/:communityid/restore/:userid', sanitizeInput , auth, ct
 router.put('/communities/accept/:communityid/', sanitizeInput , auth, ctrlCommunities.acceptMember);
 router.put('/communities/decline/:communityid/', sanitizeInput , auth, ctrlCommunities.declineMember);
 router.put('/communities/pending/:communityid/', sanitizeInput , auth, ctrlCommunities.addPendingMember);
+router.put('/communities/:communityid/contactinfo', sanitizeInput, auth, ctrlCommunities.updateContactInfo);
 router.put('/communities/update/:communityid/', sanitizeInput , auth, ctrlCommunities.communitiesUpdateOne);
 router.delete('/communites/:communityid/user/:userid/', sanitizeInput , auth, ctrlCommunities.removeMember);
 router.delete('/communities/:communityid/', sanitizeInput , auth, ctrlCommunities.communitiesDeleteOne);
