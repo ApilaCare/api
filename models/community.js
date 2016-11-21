@@ -27,7 +27,7 @@ var communitySchema = new mongoose.Schema({
     faxNumber: {type: Number},
     floors: [Number],
     rooms: {type: Number},
-    roomStyle: [roomyStyleSchema]
+    roomStyle: [roomStyleSchema]
 });
 
 mongoose.model('Community', communitySchema);
