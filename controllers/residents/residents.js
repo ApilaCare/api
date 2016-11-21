@@ -96,11 +96,15 @@ module.exports.getAverageAge = function(req, res) {
     },
     function(err, residents) {
       if (residents) {
-        var averageAge = 0;
+        let averageAge = 0;
 
-        for (var i = 0; i < residents.length; ++i) {
-          var age = moment().diff(residents[i].birthDate, 'years');
-          averageAge += age;
+        for (let i = 0; i < residents.length; ++i) {
+          if(residents[i].birthDate) {
+            let age = moment().diff(residents[i].birthDate, 'years');
+            if(age < 0) {age = 0;}
+            averageAge += age;
+          }
+
         }
 
         averageAge = averageAge / residents.length;
@@ -127,11 +131,14 @@ module.exports.averageStayTime = function(req, res) {
     },
     function(err, residents) {
       if (residents) {
-        var averageStay = 0;
+        let averageStay = 0;
 
-        for (var i = 0; i < residents.length; ++i) {
-          var stay = moment().diff(residents[i].admissionDate, "days");
-          averageStay += stay;
+        for (let i = 0; i < residents.length; ++i) {
+          if(residents[i].admissionDate) {
+            let stay = moment().diff(residents[i].admissionDate, "days");
+            if(stay < 0) {stay = 0;}
+            averageStay += stay;
+          }
         }
 
         averageStay = averageStay / residents.length;
