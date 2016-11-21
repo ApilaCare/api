@@ -7,6 +7,21 @@ var utils = require('../../services/utils');
 var async = require('async');
 
 const activitiesService = require('../../services/activities.service');
+const GooglePlaces = require('node-googleplaces');
+
+const places = new GooglePlaces(process.env.GOOGLE_PLACE_API);
+
+// places.textSearch({query: "The Bridge at Alamosa"}, (err, data) => {
+//   const result = data.body.results[0];
+//
+//   if(result) {
+//     console.log(result);
+//
+//
+//
+//   }
+//
+// });
 
 // POST /communities/new - Creates an empty community
 module.exports.communitiesCreate = function(req, res) {
