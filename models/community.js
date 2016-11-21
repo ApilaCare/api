@@ -1,5 +1,15 @@
 var mongoose = require('mongoose');
 
+var roomStyleSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    area: {type: Number},
+    areaUnit: {type: Boolean, default: true}, // if true: feet^2 | if false: meter^2
+    rooms: [Number],
+
+    submitOn: {type: Date, "default": Date.now},
+    submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+});
+
 var communitySchema = new mongoose.Schema({
     name: {type: String, required: true},
     communityMembers: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
@@ -9,17 +19,15 @@ var communitySchema = new mongoose.Schema({
     directors: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     minions: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     testCommunity: {type: Boolean, default: false},
-    /*canceled: {type: Boolean, default: false}
-     not used yet fields
 
+    website: {type: String},
     phoneNumber: {type: Number},
     address: {type: String},
-    logo: {type: buffer},
+    logo: {type: String},
     faxNumber: {type: Number},
     floors: [Number],
-    rooms: [Number],
-
-    */
+    rooms: {type: Number},
+    roomStyle: [roomyStyleSchema]
 });
 
 mongoose.model('Community', communitySchema);
