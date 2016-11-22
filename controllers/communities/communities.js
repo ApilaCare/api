@@ -341,6 +341,10 @@ module.exports.hasCanceledCommunity = function(req, res) {
     });
 };
 
+module.exports.createRoom = function(req, res) {
+
+};
+
 //PUT /communities/:communityid/contactinfo - Updates community Info of a community
 module.exports.updateContactInfo = function(req, res) {
 

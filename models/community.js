@@ -25,7 +25,7 @@ var communitySchema = new mongoose.Schema({
     address: {type: String},
     logo: {type: String},
     fax: {type: String},
-    floors: [Number],
+    floors: {type: Number},
     rooms: {type: Number},
     roomStyle: [roomStyleSchema]
 });
