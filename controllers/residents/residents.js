@@ -107,7 +107,9 @@ module.exports.getAverageAge = function(req, res) {
 
         }
 
-        averageAge = averageAge / residents.length;
+        if(residents.length !== 0) {
+          averageAge = averageAge / residents.length;
+        }
 
         utils.sendJSONresponse(res, 200, averageAge);
       } else {
@@ -141,8 +143,10 @@ module.exports.averageStayTime = function(req, res) {
           }
         }
 
-        averageStay = averageStay / residents.length;
-
+        if(residents.length !== 0) {
+          averageStay = averageStay / residents.length;
+        }
+        
         utils.sendJSONresponse(res, 200, averageStay);
       } else {
         utils.sendJSONresponse(res, 404, {

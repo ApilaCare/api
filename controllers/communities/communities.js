@@ -11,29 +11,6 @@ const GooglePlaces = require('node-googleplaces');
 
 const places = new GooglePlaces(process.env.GOOGLE_PLACE_API);
 
-function searchPlace(name) {
- return places.textSearch({query: name}).then((data) => {
-    return data.body.results[0].place_id;
-  });
-}
-
-function placeDetail(id) {
-  return places.details({placeid: id}).then((details) => {
-    return details.body;
-  });
-}
-
-function getDetails(data) {
-  let details = data.result;
-
-  return {
-    phone: details.formatted_phone_number,
-    website: details.website,
-    fax: details.international_phone_number,
-    address: details.formatted_address
-  };
-}
-
 function createCommunity(req, res) {
   Community.create(req.body, function(err, community) {
     if (err) {
@@ -50,12 +27,20 @@ module.exports.communitiesCreate = function(req, res) {
   searchPlace(req.body.name)
   .then(placeDetail)
   .then((details) => {
-    let deets = getDetails(details);
 
-    req.body.phone = deets.phone;
-    req.body.website = deets.website;
-    req.body.fax = deets.fax;
-    req.body.address = deets.address;
+    if(details) {
+      let deets = getDetails(details);
+
+      req.body.phone = deets.phone;
+      req.body.website = deets.website;
+      req.body.fax = deets.fax;
+      req.body.address = deets.address;
+    }
+
+    createCommunity(req, res);
+  }) //if things go wrong you gonna catch dem hands
+  .catch((demHands) => {
+    console.log(demHands);
 
     createCommunity(req, res);
   });
@@ -356,7 +341,7 @@ module.exports.hasCanceledCommunity = function(req, res) {
     });
 };
 
-//PUT
+//PUT /communities/:communityid/contactinfo - Updates community Info of a community
 module.exports.updateContactInfo = function(req, res) {
 
   Community.findOne({"_id": req.params.communityid})
@@ -570,4 +555,39 @@ function removeCommunityFromUser(res, userid, callback) {
         });
       }
     });
+}
+
+
+//Given a name try to find it from google place api and return place id
+function searchPlace(name) {
+ return places.textSearch({query: name}).then((data) => {
+     if(data.body.results[0]){
+       return data.body.results[0].place_id;
+     } else {
+       return null;
+     }
+  });
+}
+
+// Get google place details from a provided api
+function placeDetail(id) {
+  if(!id) {
+    return null;
+  }
+
+  return places.details({placeid: id}).then((details) => {
+    return details.body;
+  });
+}
+
+// Extracts the details from google place details object
+function getDetails(data) {
+  let details = data.result || {};
+
+  return {
+    phone: details.formatted_phone_number,
+    website: details.website,
+    fax: details.international_phone_number,
+    address: details.formatted_address
+  };
 }
