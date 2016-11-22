@@ -50,12 +50,12 @@ module.exports.communitiesCreate = function(req, res) {
   searchPlace(req.body.name)
   .then(placeDetail)
   .then((details) => {
-    let {phone, website, fax, address} = getDetails(details);
+    let deets = getDetails(details);
 
-    req.body.phone = phone;
-    req.body.website = website;
-    req.body.fax = fax;
-    req.body.address = address;
+    req.body.phone = deets.phone;
+    req.body.website = deets.website;
+    req.body.fax = deets.fax;
+    req.body.address = deets.address;
 
     createCommunity(req, res);
   });
