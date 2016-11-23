@@ -341,7 +341,35 @@ module.exports.hasCanceledCommunity = function(req, res) {
     });
 };
 
-//PUT
+
+module.exports.updateRoomStyle = function(req, res) {
+  Community.findOne({"_id": req.params.communityid})
+   .exec((err, community) => {
+     if(!err) {
+
+       let roomStyleId = community.roomStyle.id(req.params.roomId);
+       let index = community.roomStyle.indexOf(roomStyleId);
+       let roomStyle = req.body;
+
+       if(index !== -1) {
+         community.roomStyle.set(index, roomStyle);
+       }
+
+       community.save((err, comm) => {
+         if(!err) {
+           utils.sendJSONresponse(res, 200, {});
+         } else {
+           utils.sendJSONresponse(res, 500, err);
+         }
+       });
+
+     } else {
+       utils.sendJSONresponse(res, 500, err);
+     }
+   });
+};
+
+//POST
 module.exports.createRoomStyle = function(req, res) {
   Community.findOne({"_id": req.params.communityid})
    .exec((err, community) => {

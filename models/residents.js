@@ -37,7 +37,7 @@ var residentSchema = new mongoose.Schema({
     aliasName: {type: String},
     middleName: {type: String},
     lastName: {type: String, required: true},
-    room: {type: Number},
+    room: {type: String},
     birthDate: {type: Date},
     admissionDate: {type: Date},
     sex: {type: String}, // male, female, other
