@@ -341,12 +341,32 @@ module.exports.hasCanceledCommunity = function(req, res) {
     });
 };
 
-module.exports.createRoom = function(req, res) {
+//PUT
+module.exports.createRoomStyle = function(req, res) {
+  Community.findOne({"_id": req.params.communityid})
+   .exec((err, community) => {
+     if(!err) {
 
+       let newRoomStyle = req.body;
+
+       community.roomStyle.push(newRoomStyle);
+
+       community.save((err, comm) => {
+         if(!err) {
+           utils.sendJSONresponse(res, 200, comm.roomStyle[comm.roomStyle.length - 1]);
+         } else {
+           utils.sendJSONresponse(res, 500, err);
+         }
+       });
+
+     } else {
+       utils.sendJSONresponse(res, 500, err);
+     }
+   });
 };
 
 //PUT /communities/:communityid/contactinfo - Updates community Info of a community
-module.exports.updateContactInfo = function(req, res) {
+module.exports.updateContactAndRoomInfo = function(req, res) {
 
   Community.findOne({"_id": req.params.communityid})
    .exec((err, community) => {
@@ -358,6 +378,9 @@ module.exports.updateContactInfo = function(req, res) {
        community.website = req.body.website;
        community.fax = req.body.fax;
        community.address = req.body.address;
+
+       community.floors = req.body.floors || 0;
+       community.rooms = req.body.rooms || 0;
 
        community.save((err, com) => {
          if(err) {
