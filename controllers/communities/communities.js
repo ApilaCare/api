@@ -347,12 +347,16 @@ module.exports.updateRoomStyle = function(req, res) {
    .exec((err, community) => {
      if(!err) {
 
-       let roomStyleId = community.roomStyle.id(req.params.roomId);
+       let roomStyleId = community.roomStyle.id(req.params.roomid);
+
        let index = community.roomStyle.indexOf(roomStyleId);
        let roomStyle = req.body;
 
        if(index !== -1) {
          community.roomStyle.set(index, roomStyle);
+       } else {
+         utils.sendJSONresponse(res, 500, {message: "Room not found"});
+         return;
        }
 
        community.save((err, comm) => {
