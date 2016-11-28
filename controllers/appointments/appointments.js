@@ -36,8 +36,11 @@ module.exports.appointmentsCreate = function(req, res) {
             utils.sendJSONresponse(res, 500, err);
           } else {
 
+            let location = appoint.locationName.name || appoint.locationName;
+
             let text = " created " + appoint.residentGoing.firstName + " " + appoint.residentGoing.lastName +
-                                 " to " + appoint.locationName;
+                                 " to " + location;
+
             activitiesService.addActivity(text, req.payload._id,
                                             "appointment-create", req.body.community._id);
 
