@@ -217,12 +217,16 @@ module.exports.issuesList = function(req, res) {
       },{
         path: 'submitBy',
         model: 'User'
+      },{
+        path: 'responsibleParty',
+        model: 'User'
       }], function(err) {
         if (err) {
           utils.sendJSONresponse(res, 404, {
             'message': err
           });
         } else {
+          console.log(issues);
           utils.sendJSONresponse(res, 200, issues);
         }
 
@@ -243,6 +247,7 @@ module.exports.issuesListByStatus = function(req, res) {
 
   Iss.find({status: status, community: communityid})
       .populate("submitBy", "name _id")
+      .populate("responsibleParty", "name _id")
       .exec(function(err, issues) {
     if (err) {
       utils.sendJSONresponse(res, 404, {
