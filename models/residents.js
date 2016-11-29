@@ -6,7 +6,7 @@ var residentContactSchema = new mongoose.Schema({
     primaryPhoneNumber: {type: String},
     secondaryPhoneNumber: {type: String},
     email: {type: String},
-    physicalAddress: {type: String},
+    physicalAddress: {type: mongoose.Schema.Types.Mixed},
     primaryContact: {type: Boolean, default: false},
     trustedPerson: {type: Boolean, default: false},
     relation: {type: String, required: true},
