@@ -221,6 +221,35 @@ module.exports.deleteTask = function(req, res) {
 };
 
 
+//TODO: count using mongo functions
+// GET /todos/:todoid/activecount - Gets the number of active tasks
+module.exports.activeTasksCount = (req, res) => {
+
+  let todoid = req.params.todoid;
+
+  let tasks = ToDo.find({'_id': todoid})
+                  .exec();
+
+  tasks.then((todo) => {
+
+    if(!todo[0]) {
+      utils.sendJSONresponse(res, 200, 0);
+    }
+
+     let tasks = _.filter(todo[0].tasks, function(d) {
+      if(d.state === "current"){
+        return true;
+      }
+    });
+
+    utils.sendJSONresponse(res, 200, tasks.length);
+  }, (err) => {
+    console.log(err);
+  });
+
+};
+
+
 //////////////////////////// HELPER FUNCTION /////////////////////////////////
 
 function isOverdue(task, currTime) {

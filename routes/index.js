@@ -140,6 +140,7 @@ router.post('/login', ctrlAuth.login);
 
 // todos
 router.get('/todos/:todoid', sanitizeInput, auth, ctrlToDos.listTasks);
+router.get('/todos/:todoid/activecount', sanitizeInput, auth, ctrlToDos.activeTasksCount);
 router.post('/todos/:todoid', sanitizeInput, auth, ctrlToDos.addTask);
 router.put('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.updateTask);
 router.delete('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.deleteTask);
