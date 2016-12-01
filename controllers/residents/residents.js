@@ -340,6 +340,8 @@ module.exports.residentsUpdateOne = function(req, res) {
 
   req.body.carePoints = carePoints.calculateCarePoints(req.body);
 
+  console.log(`${req.body.timeOfBathing}  | ${req.body.typeOfBathing}  | ${req.body.frequencyOfBathing}`);
+
   Resid.findOneAndUpdate({
     _id: req.params.residentid
   }, req.body)
@@ -354,6 +356,8 @@ module.exports.residentsUpdateOne = function(req, res) {
 
       let text = ` updated resident  ${req.body.firstName} ${req.body.lastName}`;
       activitiesService.addActivity(text, req.payload._id, "resident-update", community);
+
+        console.log(resident);
 
       utils.sendJSONresponse(res, 200, resident);
     }
