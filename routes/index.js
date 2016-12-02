@@ -74,6 +74,7 @@ router.get('/issues/count/:userid/id/:communityid', sanitizeInput , auth, ctrlIs
 router.get('/issues/issuescount/:communityid', sanitizeInput , auth, ctrlIssues.issuesCount);
 router.get('/issues/due/:communityid', sanitizeInput , auth, ctrlIssues.dueIssuesList);
 router.get('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesReadOne);
+router.get('/issues/:issueid/populate', sanitizeInput, auth, ctrlIssues.issuesPopulateOne);
 router.get('/issues/:issueid/updateinfo', sanitizeInput, auth, ctrlIssues.issueUpdateInfo);
 router.post('/issues/new', sanitizeInput , auth, ctrlIssues.issuesCreate);
 router.put('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesUpdateOne);

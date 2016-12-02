@@ -285,6 +285,24 @@ module.exports.dueIssuesList = function(req, res) {
     });
 };
 
+module.exports.issuesPopulateOne = (req, res) => {
+
+  Iss.findById(req.params.issueid)
+      .populate("checklists.author")
+      .exec((err, issue) => {
+
+        if(!err) {
+          console.log(issue);
+
+          utils.sendJSONresponse(res, 200, issue);
+        } else {
+          utils.sendJSONresponse(res, 404, err);
+        }
+
+      });
+
+};
+
 // GET /issues/:issueid - Reads issue info by id
 module.exports.issuesReadOne = function(req, res) {
 
