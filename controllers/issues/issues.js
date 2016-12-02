@@ -288,7 +288,8 @@ module.exports.dueIssuesList = function(req, res) {
 module.exports.issuesPopulateOne = (req, res) => {
 
   Iss.findById(req.params.issueid)
-      .populate("checklists.author")
+      .populate("checklists.author", "name _id")
+      .populate("finalPlan.author", "name _id")
       .exec((err, issue) => {
 
         if(!err) {
@@ -399,7 +400,8 @@ module.exports.issuesUpdateOne = function(req, res) {
             console.log(err);
             utils.sendJSONresponse(res, 404, err);
           } else {
-            Iss.populate(issue.updateField, [{'path' : 'updateBy'}, {'path' : 'submitBy'}], function(err, iss) {
+            Iss.populate(issue.updateField, [{'path' : 'updateBy'}, {'path' : 'submitBy'}, {'path' : 'checklists.author'}],
+            function(err, iss) {
                     utils.sendJSONresponse(res, 200, iss);
             });
           }

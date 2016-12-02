@@ -10,7 +10,7 @@
   },
   "private": true,
   "scripts": {
-    "start": "node ./apila.js",
+    "start": "nodemon ./apila.js --exec babel-node --presets es2015,stage-2",
     "test": "mocha tests --recursive -R spec --ui bdd --timeout 5000"
   },
   "engines": {
