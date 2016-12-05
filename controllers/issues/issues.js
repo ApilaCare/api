@@ -364,8 +364,6 @@ module.exports.issuesUpdateOne = function(req, res) {
           return;
         }
 
-        console.log(req.body.idMembers);
-
         issue.title = req.body.title;
         issue.responsibleParty = req.body.responsibleParty._id || req.body.responsibleParty;
         issue.resolutionTimeframe = req.body.resolutionTimeframe;

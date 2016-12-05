@@ -201,6 +201,8 @@ module.exports.acceptMember = function(req, res) {
           if (err) {
             utils.sendJSONresponse(res, 404, err);
           } else {
+            activitiesService.acceptedMember({id: req.body.member, communityName: community.name});
+
             utils.sendJSONresponse(res, 200, community);
           }
         });

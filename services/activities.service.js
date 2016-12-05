@@ -4,7 +4,7 @@ const activityCtrl = require('../controllers/activities/activities');
 
 let io = null;
 
-module.exports = function(socketConn) {
+module.exports = (socketConn) => {
   io = socketConn;
 
   io.on('connection', socketioJwt.authorize({
@@ -34,7 +34,11 @@ module.exports = function(socketConn) {
 
 };
 
-module.exports.addActivity = function(text, userId, type, communityId) {
+module.exports.acceptedMember = (data) => {
+  io.emit('member-accepted', data);
+};
+
+module.exports.addActivity = (text, userId, type, communityId) => {
 
   console.log(`CommunityId for activity: ${communityId}`);
 
