@@ -290,6 +290,7 @@ module.exports.issuesPopulateOne = (req, res) => {
   Iss.findById(req.params.issueid)
       .populate("checklists.author", "name _id")
       .populate("finalPlan.author", "name _id")
+      .populate("responsibleParty", "name _id")
       .exec((err, issue) => {
 
         if(!err) {
@@ -363,9 +364,12 @@ module.exports.issuesUpdateOne = function(req, res) {
           utils.sendJSONresponse(res, 400, err);
           return;
         }
+        
+        if(req.body.responsibleParty) {
+          issue.responsibleParty = req.body.responsibleParty._id || req.body.responsibleParty;
+        }
 
         issue.title = req.body.title;
-        issue.responsibleParty = req.body.responsibleParty._id || req.body.responsibleParty;
         issue.resolutionTimeframe = req.body.resolutionTimeframe;
         issue.submitBy = req.body.submitBy._id;
         issue.description = req.body.description;
