@@ -94,7 +94,7 @@ module.exports.confirmPassword = function(req, res) {
       if (user.validPassword(password)) {
 
         if (req.body.type === "boss") {
-          bossConfirmedPassword(req.body.recoveryid);
+          bossConfirmedPassword(res, req.body.recoveryid);
         } else {
 
           findRecoveryByUser(res, req.params.userid, function(recovery) {
@@ -229,7 +229,7 @@ function getConfidentialIssues(recoveredMember, callback) {
     });
 }
 
-function bossConfirmedPassword(recoveryid) {
+function bossConfirmedPassword(res, recoveryid) {
 
   IssRecovery.findOne({
     "_id": recoveryid
