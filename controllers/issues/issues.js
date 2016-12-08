@@ -369,16 +369,20 @@ module.exports.issuesUpdateOne = function(req, res) {
           issue.responsibleParty = req.body.responsibleParty._id || req.body.responsibleParty;
         }
 
+        if(req.body.submitBy._id) {
+          issue.submitBy = req.body.submitBy._id;
+        }
+
         issue.title = req.body.title;
         issue.resolutionTimeframe = req.body.resolutionTimeframe;
-        issue.submitBy = req.body.submitBy._id;
+
         issue.description = req.body.description;
         issue.status = req.body.status;
         issue.due = req.body.due;
 
         issue.checklists = req.body.checklists;
         issue.labels = req.body.labels;
-      
+
         issue.shelvedDate = req.body.shelvedDate;
 
         if (req.body.deletedMember) {
