@@ -364,7 +364,7 @@ module.exports.issuesUpdateOne = function(req, res) {
           utils.sendJSONresponse(res, 400, err);
           return;
         }
-        
+
         if(req.body.responsibleParty) {
           issue.responsibleParty = req.body.responsibleParty._id || req.body.responsibleParty;
         }
@@ -378,15 +378,16 @@ module.exports.issuesUpdateOne = function(req, res) {
 
         issue.checklists = req.body.checklists;
         issue.labels = req.body.labels;
-        //issue.updateInfo = req.body.updateInfo;
+      
         issue.shelvedDate = req.body.shelvedDate;
 
-        if (req.body.deletedMember !== undefined) {
+        if (req.body.deletedMember) {
           issue.idMembers.splice(issue.idMembers.map(function(d) {
             return d.name;
           }).indexOf(req.body.deletedMember), 1);
         } else {
           issue.idMembers = req.body.idMembers;
+          console.log(issue.idMembers);
         }
 
 
