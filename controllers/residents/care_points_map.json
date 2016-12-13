@@ -45,7 +45,11 @@
     "After Supper": 1
   },
   "frequencyOfBathing": {
-    "0": 0, "1": 1, "2": 2, "3": 3, "4": 4
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4
   },
   "bathingAssist": {
     "Independent": 0,
@@ -58,5 +62,450 @@
     "Dislikes": 1,
     "Refuses": 2,
     "Indifferent": 3
+  },
+  "insideApartment": {
+    "useOfAssistiveDevice": {
+      "walker": 1,
+      "cane": 1,
+      "wheelchair": 1,
+      "electric wheelchair": 1,
+      "no device": 1,
+      "other": 1
+    },
+    "apartmentMobilityDevices": {
+      "transfer pole": 1,
+      "side rails": 1,
+      "pivot transfer": 1,
+      "lift recliner chair": 1,
+      "transfer lift": 1
+    }
+  },
+  "outsideApartment": {
+    "useOfAssistiveDevice": {
+      "walker": 1,
+      "cane": 1,
+      "wheelchair": 1,
+      "electric wheelchair": 1,
+      "no device": 1,
+      "other": 1
+    }
+  },
+  "transfers": {
+    "standby": 1,
+    "independent": 1,
+    "full assist": 1,
+    "transfer pole": 1,
+    "gait belt": 1
+  },
+  "fallRisk": {
+    "true": 1,
+    "false": 1
+  },
+  "bedReposition": {
+    "true": 1,
+    "false": 1
+  },
+  "twoPersonLift": {
+    "true": 1,
+    "false": 1
+  },
+  "nap": {
+    "true": 1,
+    "false": 1
+  },
+  "assistanceToBed": {
+    "medication": 1,
+    "positioning": 1,
+    "pillows": 1,
+    "drink": 1,
+    "alcohol": 1,
+    "hot tea": 1,
+    "warm milk": 1
+  },
+  "sleepsThroughNight": {
+    "true": 1,
+    "false": 1
+  },
+  "canCallForAssistance": {
+    "true": 1,
+    "false": 1
+  },
+  "continentIndependent": {
+    "true": 1,
+    "false": 1
+  },
+  "colostomy": {
+    "true": 1,
+    "false": 1
+  },
+  "bowelContinent": {
+    "0": 1,
+    "1": 1,
+    "2": 1
+  },
+  "constipated": {
+    "0": 1,
+    "1": 1,
+    "2": 1
+  },
+  "urostomy": {
+    "true": 1,
+    "false": 1
+  },
+  "bladderContinent": {
+    "0": 1,
+    "1": 1,
+    "2": 1
+  },
+  "dribbles": {
+    "0": 1,
+    "1": 1,
+    "2": 1
+  },
+  "catheter": {
+    "true": 1,
+    "false": 1
+  },
+  "incontinentApparel": {
+    "true": 1,
+    "false": 1
+  },
+  "incontinentApparelAssist": {
+    "independent": 1,
+    "full": 1
+  },
+  "toiletTransfer": {
+    "independent": 1,
+    "standby": 1,
+    "partial assistance": 1,
+    "full assistance": 1
+  },
+  "toiletingDevice": {
+    "urinal": 1,
+    "seat riser": 1,
+    "bedside commode": 1,
+    "none": 1,
+    "bars around toilet": 1
+  },
+  "toiletingAssist": {
+    "independent": 1,
+    "reminder": 1,
+    "partial assistance": 1,
+    "full assistance": 1
+  },
+  "toiletingReminder": {
+    "true": 1,
+    "false": 1
+  },
+  "overallNutrition": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1
+  },
+  "diabetic": {
+    "true": 1,
+    "false": 1
+  },
+  "diabeticType": {
+    "diet controlled": 1,
+    "medication controlled": 1,
+    "insulin controlled": 1
+  },
+  "bloodSugarMonitoring": {
+    "true": 1,
+    "false": 1
+  },
+  "bedtimeSnack": {
+    "true": 1,
+    "false": 1
+  },
+  "adaptiveEquipment": {
+    "plate guard": 1,
+    "built up silverware": 1,
+    "special cups": 1,
+    "none": 1
+  },
+  "typeOfDiet": {
+    "BRAT": 1,
+    "gluten free": 1,
+    "full vegan": 1,
+    "partial vegan": 1,
+    "lactose free": 1,
+    "other": 1,
+    "regular": 1
+  },
+  "specialDiet": {
+    "pureed": 1,
+    "ground": 1,
+    "regular": 1,
+    "soft": 1
+  },
+  "fingerFoods": {
+    "true": 1,
+    "false": 1
+  },
+  "feedAssist": {
+    "independent": 1,
+    "reminder": 1,
+    "partial assistance": 1,
+    "full assistance": 1
+  },
+  "foodInRoom": {
+    "true": 1,
+    "false": 1
+  },
+  "drinkInRoom": {
+    "true": 1,
+    "false": 1
+  },
+  "skinCondition": {
+    "average": 1,
+    "tears easily": 1
+  },
+  "hasWound": {
+    "true": 1,
+    "false": 1
+  },
+  "skinBreakdown": {
+    "true": 1,
+    "false": 1
+  },
+  "urinaryTractInfectionRisk": {
+    "true": 1,
+    "false": 1
+  },
+  "upperRespiratoryInfectionRisk": {
+    "true": 1,
+    "false": 1
+  },
+  "methicillinResistantStaphylococcusAureusRisk": {
+    "true": 1,
+    "false": 1
+  },
+  "vancomycinResistantEnterococcusRisk": {
+    "true": 1,
+    "false": 1
+  },
+  "shinglesRisk": {
+    "true": 1,
+    "false": 1
+  },
+  "pneumoniaRisk": {
+    "true": 1,
+    "false": 1
+  },
+  "rightEar": {
+    "adequate": 1,
+    "adequate with aid": 1,
+    "poor": 1,
+    "none": 1
+  },
+  "leftEar": {
+    "adequate": 1,
+    "adequate with aid": 1,
+    "poor": 1,
+    "none": 1
+  },
+  "hearingAbility": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 1,
+    "9": 1,
+    "10": 1
+  },
+  "wearsHearingAid": {
+    "true": 1,
+    "false": 1
+  },
+  "visionDevice": {
+    "glasses": 1,
+    "contacts": 1,
+    "none": 1
+  },
+  "rightEye": {
+    "adequate": 1,
+    "adequate with aid": 1,
+    "poor": 1,
+    "none": 1
+  },
+  "leftEye": {
+    "adequate": 1,
+    "adequate with aid": 1,
+    "poor": 1,
+    "none": 1
+  },
+  "visionAbility": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 1,
+    "9": 1,
+    "10": 1
+  },
+  "visionAssist": {
+    "full": 1,
+    "independent": 1,
+    "reminder": 1,
+    "none": 1
+  },
+  "teethCare": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 1
+  },
+  "upperTeeth": {
+    "has own": 1,
+    "has dentures": 1,
+    "has partial": 1
+  },
+  "lowerTeeth": {
+    "has own": 1,
+    "has dentures": 1,
+    "has partial": 1
+  },
+  "teethCondition": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 1,
+    "9": 1,
+    "10": 1
+  },
+  "teethAssist": {
+    "full": 1,
+    "independent": 1,
+    "reminder": 1,
+    "none": 1
+  },
+  "oxygen": {
+    "true": 1,
+    "false": 1
+  },
+  "medsAtBedside": {
+    "true": 1,
+    "false": 1
+  },
+  "selfMeds": {
+    "true": 1,
+    "false": 1
+  },
+  "med": {
+    "true": 1,
+    "false": 1
+  },
+  "swallowAssist": {
+    "true": 1,
+    "false": 1
+  },
+  "chemotherapy": {
+    "true": 1,
+    "false": 1
+  },
+  "dialysis": {
+    "true": 1,
+    "false": 1
+  },
+  "marijuana": {
+    "true": 1,
+    "false": 1
+  },
+  "hairAssist": {
+    "true": 1,
+    "false": 1
+  },
+  "barber": {
+    "true": 1,
+    "false": 1
+  },
+  "shaveAssist": {
+    "independent": 1,
+    "reminder": 1,
+    "full": 1
+  },
+  "fingerNailsAssist": {
+    "independent": 1,
+    "full": 1
+  },
+  "toeNailsAssist": {
+    "independent": 1,
+    "full": 1
+  },
+  "makeupAssist": {
+    "independent": 1,
+    "partial": 1,
+    "full": 1,
+    "standby": 1
+  },
+  "jewelryAssist": {
+    "independent": 1,
+    "partial": 1,
+    "full": 1,
+    "standby": 1
+  },
+  "lotionAssist": {
+    "independent": 1,
+    "partial": 1,
+    "full": 1,
+    "reminder": 1
+  },
+  "layoutCloths": {
+    "true": 1,
+    "false": 1
+  },
+  "shoesAssist": {
+    "true": 1,
+    "false": 1
+  },
+  "bottomAssist": {
+    "true": 1,
+    "false": 1
+  },
+  "buttonAssist": {
+    "true": 1,
+    "false": 1
+  },
+  "zipperAssist": {
+    "true": 1,
+    "false": 1
+  },
+  "compressionStockingsAssist": {
+    "true": 1,
+    "false": 1
+  },
+  "brace": {
+    "true": 1,
+    "false"
+  },
+  "braceAssist": {
+    "true": 1,
+    "false": 1
+  },
+  "bedAssist": {
+    "independent": 1,
+    "full assistance": 1,
+    "partial assistance": 1,
+    "standby": 1
+  },
+  "psychosocialStatus": {
+    "alert": 1
   }
 }
