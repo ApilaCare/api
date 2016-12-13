@@ -493,7 +493,7 @@
   },
   "brace": {
     "true": 1,
-    "false"
+    "false": 1
   },
   "braceAssist": {
     "true": 1,
