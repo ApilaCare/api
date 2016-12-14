@@ -51,6 +51,9 @@ var ctrlCommunities = require('../controllers/communities/communities');
 // todos
 var ctrlToDos = require('../controllers/todos/todos');
 
+// activity
+var ctrlActivity = require('../controllers/activities/activities');
+
 // communities
 router.get('/communities/', sanitizeInput, auth, ctrlCommunities.communitiesList);
 router.get('/communites/canceled/:userid', sanitizeInput , auth, ctrlCommunities.hasCanceledCommunity);
@@ -145,6 +148,9 @@ router.get('/todos/:todoid/activecount', sanitizeInput, auth, ctrlToDos.activeTa
 router.post('/todos/:todoid', sanitizeInput, auth, ctrlToDos.addTask);
 router.put('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.updateTask);
 router.delete('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.deleteTask);
+
+// Activity
+router.post('/activity/:todoid', sanitizeInput, auth, ctrlActivity.createToDoActivity);
 
 // residents
 router.get('/residents/list/:communityid', sanitizeInput , auth, ctrlResidents.residentsList);
