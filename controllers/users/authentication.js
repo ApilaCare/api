@@ -22,8 +22,6 @@ module.exports.register = function(req, res) {
     return;
   }
 
-  console.log(req.body);
-
   //create a new user instance and set name and email
   var user = new User();
 
@@ -126,6 +124,10 @@ function saveUser(user, todoid, res) {
 
       }
     });
+  })
+  .catch((err) => {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, {'err': "failed_send"});
   });
 }
 
