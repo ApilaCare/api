@@ -10,6 +10,7 @@ var crypto = require('crypto');
 
 var fs = require('fs');
 var imageUploadService = require('../../services/imageUpload');
+const sanitize = require("sanitize-filename");
 
 
 // GET /users - Returns list of users
@@ -189,13 +190,14 @@ module.exports.uploadImage = function(req, res) {
   var stream = fs.createReadStream(file.path);
 
   var params = {
-    Key: file.originalFilename,
+    Key: sanitize(file.originalFilename),
     Body: stream
   };
 
   imageUploadService.upload(params, file.path, function() {
+
     var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
-      imageUploadService.getBucket() + "/" + escape(file.originalFilename);
+      imageUploadService.getBucket() + "/" + escape(sanitize(file.originalFilename));
 
     fs.unlinkSync(file.path);
 
