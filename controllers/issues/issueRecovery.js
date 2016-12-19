@@ -137,7 +137,7 @@ function selectRandomUser(res, boss, recoveredMember, communityid, callback) {
   Community.findOne({
       _id: communityid
     })
-    .populate("communityMembers")
+    .populate("communityMembers", "_id name email userImage")
     .exec(function(err, community) {
       if (community) {
 
@@ -201,7 +201,7 @@ function findRecoveryByUser(res, userid, callback) {
   IssRecovery.findOne({
       "chosenMember": userid
     })
-    .populate("recoveredMember")
+    .populate("recoveredMember", "_id name userImage email")
     .exec(function(err, recovery) {
       if (recovery) {
         callback(recovery);

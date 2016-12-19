@@ -44,6 +44,7 @@ module.exports.appointmentsCreate = function(req, res) {
             activitiesService.addActivity(text, req.payload._id,
                                             "appointment-create", req.body.community._id);
 
+
             utils.sendJSONresponse(res, 200, appoint);
           }
 
