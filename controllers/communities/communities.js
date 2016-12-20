@@ -129,7 +129,7 @@ module.exports.addPendingMember = function(req, res) {
             } else {
 
               let text = " wants to join " + community.name + " community";
-              activitiesService.addActivity(text, userId, "community-join", community._id);
+              activitiesService.addActivity(text, userId, "community-join", community._id, 'community');
 
               utils.sendJSONresponse(res, 200, community);
             }

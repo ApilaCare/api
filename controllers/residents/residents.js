@@ -29,7 +29,7 @@ module.exports.residentsCreate = function(req, res) {
 
       let community = req.body.community._id ? req.body.community._id : req.body.community;
 
-      activitiesService.addActivity(text, req.payload._id, "resident-create", community);
+      activitiesService.addActivity(text, req.payload._id, "resident-create", community, 'community');
 
       utils.sendJSONresponse(res, 200, resident);
     }
@@ -356,7 +356,7 @@ module.exports.residentsUpdateOne = function(req, res) {
       let community = req.body.community._id ? req.body.community._id : req.body.community;
 
       let text = ` updated resident  ${req.body.firstName} ${req.body.lastName}`;
-      activitiesService.addActivity(text, req.payload._id, "resident-update", community);
+      activitiesService.addActivity(text, req.payload._id, "resident-update", community, 'community');
 
         console.log(resident);
 

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 let ActivitySchema = new mongoose.Schema({
+  scope: {type: String, enum: ['community', 'user']},
   type: {type: String},
   createdOn: {type: Date, default: Date.now()},
   text: {type: String},

@@ -28,7 +28,7 @@ module.exports.issuesCreate = function(req, res) {
       }, function(err, populatedIssue) {
 
         activitiesService.addActivity(" created issue " + req.body.title, req.body.responsibleParty,
-                                        "issue-create", req.body.community._id);
+                                        "issue-create", req.body.community._id, 'community');
 
         utils.sendJSONresponse(res, 200, populatedIssue);
       });
@@ -416,7 +416,16 @@ module.exports.issuesUpdateOne = function(req, res) {
                {'path' : 'submitBy', select: '_id name userImage'},
                 {'path' : 'checklists.author', select: '_id name userImage'}],
             function(err, iss) {
-                    utils.sendJSONresponse(res, 200, iss);
+              if(err) {
+                utils.sendJSONresponse(res, 500, err);
+              } else {
+
+                activitiesService.addActivity(" updated issue " + req.body.title, req.body.responsibleParty,
+                                                "issue-update", issue.community, 'community');
+
+                utils.sendJSONresponse(res, 200, iss);
+              }
+
             });
           }
         });
