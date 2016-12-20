@@ -37,7 +37,8 @@ module.exports = (socketConn) => {
             _.forEach(activities, function(activity) {
               activity.scope = activity.scope || 'community';
 
-              if(activity.scope === 'community' || activity.userId._id === userid) {
+              if(activity.scope === 'community' || toString(activity.userId._id) === toString(userid)) {
+
                 usersActivities.push(activity);
               }
             });
@@ -69,15 +70,18 @@ module.exports.acceptedMember = (data) => {
 };
 
 //dynamicly adds activity to the db ands sends the new activity to everybody in that community
-module.exports.addActivity = (text, userId, type, communityId, scope) => {
+module.exports.addActivity = (text, userId, type, communityId, scope, respUser) => {
 
   console.log(`CommunityId for activity: ${communityId}`);
+
+  let responsibleUser = respUser || userId;
 
   let activity = {
     "type": type,
     "createdOn": moment().toDate(),
     "text": text,
     "userId": userId,
+    "responsibleUser": responsibleUser,
     "communityId": communityId,
     "scope": scope
   };
@@ -85,7 +89,6 @@ module.exports.addActivity = (text, userId, type, communityId, scope) => {
 
   activityCtrl.addActivity(activity, (err, populatedActivity) => {
     if(populatedActivity) {
-      console.log("Added activity!!!");
       io.sockets.to(communityId).emit("add-activity", populatedActivity);
     } else {
       console.log(err);

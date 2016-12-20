@@ -419,9 +419,13 @@ module.exports.issuesUpdateOne = function(req, res) {
               if(err) {
                 utils.sendJSONresponse(res, 500, err);
               } else {
-
-                activitiesService.addActivity(" updated issue " + req.body.title, req.body.responsibleParty,
-                                                "issue-update", issue.community, 'community');
+                if(req.body.addedMember) {
+                  activitiesService.addActivity(" added member " + req.body.addedMember.name + " to issue" + issue.title, req.body.responsibleParty,
+                                                  "issue-update", issue.community, 'user', req.body.addedMember._id);
+                } else {
+                  activitiesService.addActivity(" updated issue " + req.body.title, req.body.responsibleParty,
+                                                  "issue-update", issue.community, 'community');
+                }
 
                 utils.sendJSONresponse(res, 200, iss);
               }
