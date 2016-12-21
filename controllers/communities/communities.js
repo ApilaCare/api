@@ -413,7 +413,7 @@ module.exports.updateContactAndRoomInfo = function(req, res) {
        community.fax = req.body.fax;
        community.address = req.body.address;
 
-       community.floors = req.body.floors || 0;
+       community.numFloors = req.body.floors || 0;
        community.rooms = req.body.rooms || 0;
 
        community.save((err, com) => {
@@ -491,6 +491,30 @@ module.exports.restoreCommunity = function(req, res) {
         });
       }
     });
+};
+
+//POST
+module.exports.addFloor = async function(req, res) {
+
+  let communityid = req.params.communityid;
+
+  if (utils.checkParams(req, res, ['communityid'])) {
+    return;
+  }
+
+  try {
+    let community = await Community.findById(communityid).exec();
+
+    community.floors.push(req.body);
+
+    await community.save();
+
+    utils.sendJSONresponse(res, 200, community);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 404, err);
+  }
+
 };
 
 module.exports.doCreateCommunity = function(communityInfo, callback) {

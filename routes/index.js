@@ -61,6 +61,7 @@ router.post('/communities/new', ctrlCommunities.communitiesCreate);
 router.post('/communites/:communityid/role/:userid', sanitizeInput , auth, ctrlCommunities.addRole);
 router.post('/communites/:communityid/restore/:userid', sanitizeInput , auth, ctrlCommunities.restoreCommunity);
 router.post('/communities/:communityid/roomstyle', sanitizeInput, auth, ctrlCommunities.createRoomStyle);
+router.post('/communities/:communityid/floor', sanitizeInput, auth, ctrlCommunities.addFloor);
 router.put('/communities/accept/:communityid/', sanitizeInput , auth, ctrlCommunities.acceptMember);
 router.put('/communities/decline/:communityid/', sanitizeInput , auth, ctrlCommunities.declineMember);
 router.put('/communities/pending/:communityid/', sanitizeInput , auth, ctrlCommunities.addPendingMember);
