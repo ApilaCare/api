@@ -63,6 +63,7 @@ router.post('/communites/:communityid/restore/:userid', sanitizeInput , auth, ct
 router.post('/communities/:communityid/roomstyle', sanitizeInput, auth, ctrlCommunities.createRoomStyle);
 router.post('/communities/:communityid/floor', sanitizeInput, auth, ctrlCommunities.addFloor);
 router.put('/communities/accept/:communityid/', sanitizeInput , auth, ctrlCommunities.acceptMember);
+router.put('/communities/:communityid/floor', sanitizeInput, auth, ctrlCommunities.updateFloor);
 router.put('/communities/decline/:communityid/', sanitizeInput , auth, ctrlCommunities.declineMember);
 router.put('/communities/pending/:communityid/', sanitizeInput , auth, ctrlCommunities.addPendingMember);
 router.put('/communities/:communityid/roomstyle/:roomid', sanitizeInput, auth, ctrlCommunities.updateRoomStyle);
