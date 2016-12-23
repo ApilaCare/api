@@ -28,8 +28,8 @@ var communitySchema = new mongoose.Schema({
     numFloors: {type: Number},
     floors: [{
       floorNumber: {type: Number},
-      startRoom: {type: Number},
-      endRoom: {type: Number}
+      startRoom: {type: String},
+      endRoom: {type: String}
     }],
     rooms: {type: Number},
     roomStyle: [roomStyleSchema]

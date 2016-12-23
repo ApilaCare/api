@@ -363,7 +363,7 @@ module.exports.updateRoomStyle = function(req, res) {
 
        community.save((err, comm) => {
          if(!err) {
-           utils.sendJSONresponse(res, 200, {});
+           utils.sendJSONresponse(res, 200, comm.roomStyle);
          } else {
            utils.sendJSONresponse(res, 500, err);
          }
