@@ -412,6 +412,7 @@ module.exports.updateContactAndRoomInfo = function(req, res) {
        community.website = req.body.website;
        community.fax = req.body.fax;
        community.address = req.body.address;
+       community.town = req.body.town;
 
        community.numFloors = req.body.numFloors || 0;
        community.rooms = req.body.rooms || 0;

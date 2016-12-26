@@ -23,6 +23,7 @@ var communitySchema = new mongoose.Schema({
     website: {type: String},
     phone: {type: String},
     address: {type: String},
+    town: {type: String},
     logo: {type: String},
     fax: {type: String},
     numFloors: {type: Number},
