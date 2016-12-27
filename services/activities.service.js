@@ -3,6 +3,7 @@ const socketioJwt = require('socketio-jwt');
 const _ = require("lodash");
 
 const activityCtrl = require('../controllers/activities/activities');
+const chatCtrl = require('../controllers/chat/chat');
 
 let io = null;
 
@@ -55,6 +56,19 @@ module.exports = (socketConn) => {
       console.log(`${msg.message} has been received and send to ${msg.community}`);
 
       socket.broadcast.to(msg.community).emit("chat-newmsg", msg);
+
+      chatCtrl.saveMsg(msg);
+    });
+
+    socket.on('get-community-msgs', async (community) => {
+
+      let messages = await chatCtrl.listRecent(community);
+
+      console.log(messages);
+
+      console.log('community' + community);
+
+      io.sockets.to(community).emit("community-msgs", messages);
     });
 
   });
