@@ -22,7 +22,6 @@ module.exports = (socketConn) => {
       let community = client.community;
       let userid = client.userid;
 
-      //console.log(`User id: ${userid}  socket id ${socket.id}`);
       connectedUsers[userid] = socket.id;
 
       if(community) {
@@ -50,6 +49,12 @@ module.exports = (socketConn) => {
         });
       }
 
+    });
+
+    socket.on('chat-msg', (msg) => {
+      console.log(`${msg.message} has been received and send to ${msg.community}`);
+
+      socket.broadcast.to(msg.community).emit("chat-newmsg", msg);
     });
 
   });
