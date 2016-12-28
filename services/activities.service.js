@@ -28,32 +28,19 @@ module.exports = (socketConn) => {
       if(community) {
         socket.join(community._id);
 
-        socket.on('get-activities', (community) => {
+        socket.on('get-activities', async (community) => {
 
-          activityCtrl.recentActivities(community._id).then((activities) => {
+          let activities = await activityCtrl.recentActivities(community._id);
 
-            let usersActivities = [];
+          let usersActivities = communityActivities(activities, userid);
 
-            _.forEach(activities, function(activity) {
-              activity.scope = activity.scope || 'community';
-
-              if(activity.scope === 'community' || toString(activity.userId._id) === toString(userid)) {
-
-                usersActivities.push(activity);
-              }
-            });
-
-            io.sockets.to(community._id).emit('recent-activities', usersActivities);
-          }, err => {
-            console.log(err);
-          });
+          io.sockets.to(community._id).emit('recent-activities', usersActivities);
         });
       }
 
     });
 
     socket.on('chat-msg', (msg) => {
-      console.log(`${msg.message} has been received and send to ${msg.community}`);
 
       socket.broadcast.to(msg.community).emit("chat-newmsg", msg);
 
@@ -62,13 +49,9 @@ module.exports = (socketConn) => {
 
     socket.on('get-community-msgs', async (community) => {
 
-      let messages = await chatCtrl.listRecent(community);
+      let messages = await chatCtrl.listRecent(community, 50);
 
-      console.log(messages);
-
-      console.log('community' + community);
-
-      io.sockets.to(community).emit("community-msgs", messages);
+      socket.emit("community-msgs", messages);
     });
 
   });
@@ -89,7 +72,7 @@ module.exports.acceptedMember = (data) => {
 };
 
 //dynamicly adds activity to the db ands sends the new activity to everybody in that community
-module.exports.addActivity = (text, userId, type, communityId, scope, respUser) => {
+module.exports.addActivity = async (text, userId, type, communityId, scope, respUser) => {
 
   console.log(`CommunityId for activity: ${communityId}`);
 
@@ -105,13 +88,28 @@ module.exports.addActivity = (text, userId, type, communityId, scope, respUser) 
     "scope": scope
   };
 
+  let populatedActivity = await activityCtrl.addActivity(activity);
 
-  activityCtrl.addActivity(activity, (err, populatedActivity) => {
-    if(populatedActivity) {
-      io.sockets.to(communityId).emit("add-activity", populatedActivity);
-    } else {
-      console.log(err);
+  if(populatedActivity) {
+    io.sockets.to(communityId).emit("add-activity", populatedActivity);
+  }
+
+};
+
+
+//////////////////// HELPER FUNCTIONS /////////////////////////
+function communityActivities(activities, userid) {
+
+  let usersActivities = [];
+
+  _.forEach(activities, function(activity) {
+    activity.scope = activity.scope || 'community';
+
+    if(activity.scope === 'community' || toString(activity.userId._id) === toString(userid)) {
+
+      usersActivities.push(activity);
     }
   });
 
-};
+  return usersActivities;
+}

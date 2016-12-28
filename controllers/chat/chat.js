@@ -20,10 +20,14 @@ module.exports.saveMsg = async (msg) => {
 };
 
 
-module.exports.listRecent = async (communityid) => {
+module.exports.listRecent = async (communityid, numMsgs) => {
   try {
 
-    let msgs = await Chat.find({'community': communityid}).exec();
+    let msgs = await Chat.find({'community': communityid})
+              .populate('userSend', '_id name userImage')
+              //.sort("-timeSent")
+              .limit(numMsgs)
+              .exec();
 
     return msgs;
 

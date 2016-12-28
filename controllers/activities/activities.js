@@ -7,23 +7,35 @@ const utils = require('../../services/utils');
 let Activity = mongoose.model('Activity');
 let User = mongoose.model('User');
 
-module.exports.recentActivities = (communityId) => {
+module.exports.recentActivities = async (communityId) => {
+  try {
 
-  return Activity.find({"communityId": communityId})
-        .populate("userId", "name userImage community")
-        .sort("-createdOn")
-        .limit(10)
-        .exec();
+    return await Activity.find({"communityId": communityId})
+          .populate("userId", "name userImage community")
+          .sort("-createdOn")
+          .limit(10)
+          .exec();
+
+  } catch(err) {
+    console.log(err);
+  }
+
 };
 
-module.exports.addActivity = (data, callback) => {
-  Activity.create(data, function(err, activity) {
-    if(err) {
-      console.log(err);
-    } else {
-      activity.populate({path: "userId", select: "name userImage community"}, callback);
-    }
-  });
+module.exports.addActivity = async (data) => {
+
+  try {
+
+    let activity = new Activity(data);
+
+    let savedActivity = await activity.save();
+
+    return activity.populate({path: "userId", select: "name userImage community"});
+
+  } catch(err) {
+    console.log(err);
+  }
+
 };
 
 module.exports.createToDoActivity = (req, res) => {
