@@ -51,15 +51,23 @@ var ctrlCommunities = require('../controllers/communities/communities');
 // todos
 var ctrlToDos = require('../controllers/todos/todos');
 
+// activity
+var ctrlActivity = require('../controllers/activities/activities');
+
 // communities
 router.get('/communities/', sanitizeInput, auth, ctrlCommunities.communitiesList);
 router.get('/communites/canceled/:userid', sanitizeInput , auth, ctrlCommunities.hasCanceledCommunity);
 router.post('/communities/new', ctrlCommunities.communitiesCreate);
 router.post('/communites/:communityid/role/:userid', sanitizeInput , auth, ctrlCommunities.addRole);
 router.post('/communites/:communityid/restore/:userid', sanitizeInput , auth, ctrlCommunities.restoreCommunity);
+router.post('/communities/:communityid/roomstyle', sanitizeInput, auth, ctrlCommunities.createRoomStyle);
+router.post('/communities/:communityid/floor', sanitizeInput, auth, ctrlCommunities.addFloor);
 router.put('/communities/accept/:communityid/', sanitizeInput , auth, ctrlCommunities.acceptMember);
+router.put('/communities/:communityid/floor', sanitizeInput, auth, ctrlCommunities.updateFloor);
 router.put('/communities/decline/:communityid/', sanitizeInput , auth, ctrlCommunities.declineMember);
 router.put('/communities/pending/:communityid/', sanitizeInput , auth, ctrlCommunities.addPendingMember);
+router.put('/communities/:communityid/roomstyle/:roomid', sanitizeInput, auth, ctrlCommunities.updateRoomStyle);
+router.put('/communities/:communityid/contactinfo', sanitizeInput, auth, ctrlCommunities.updateContactAndRoomInfo);
 router.put('/communities/update/:communityid/', sanitizeInput , auth, ctrlCommunities.communitiesUpdateOne);
 router.delete('/communites/:communityid/user/:userid/', sanitizeInput , auth, ctrlCommunities.removeMember);
 router.delete('/communities/:communityid/', sanitizeInput , auth, ctrlCommunities.communitiesDeleteOne);
@@ -71,6 +79,7 @@ router.get('/issues/count/:userid/id/:communityid', sanitizeInput , auth, ctrlIs
 router.get('/issues/issuescount/:communityid', sanitizeInput , auth, ctrlIssues.issuesCount);
 router.get('/issues/due/:communityid', sanitizeInput , auth, ctrlIssues.dueIssuesList);
 router.get('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesReadOne);
+router.get('/issues/:issueid/populate', sanitizeInput, auth, ctrlIssues.issuesPopulateOne);
 router.get('/issues/:issueid/updateinfo', sanitizeInput, auth, ctrlIssues.issueUpdateInfo);
 router.post('/issues/new', sanitizeInput , auth, ctrlIssues.issuesCreate);
 router.put('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesUpdateOne);
@@ -137,9 +146,13 @@ router.post('/login', ctrlAuth.login);
 
 // todos
 router.get('/todos/:todoid', sanitizeInput, auth, ctrlToDos.listTasks);
+router.get('/todos/:todoid/activecount', sanitizeInput, auth, ctrlToDos.activeTasksCount);
 router.post('/todos/:todoid', sanitizeInput, auth, ctrlToDos.addTask);
 router.put('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.updateTask);
 router.delete('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.deleteTask);
+
+// Activity
+router.post('/activity/:todoid', sanitizeInput, auth, ctrlActivity.createToDoActivity);
 
 // residents
 router.get('/residents/list/:communityid', sanitizeInput , auth, ctrlResidents.residentsList);

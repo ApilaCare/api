@@ -8,22 +8,28 @@ var _ = require('lodash');
 var fs = require('fs');
 var imageUploadService = require('../../services/imageUpload');
 const activitiesService = require('../../services/activities.service');
+const carePoints = require('./care_points');
+const sanitize = require("sanitize-filename");
 
 
 // POST /residents/new - Creates a new resident
 module.exports.residentsCreate = function(req, res) {
 
   let residentData = req.body;
-  residentData.submitBy = req.payload.name;
+  residentData.submitBy = req.payload._id;
   residentData.community = req.body.community._id;
+  residentData.carePoints = 0; //set care point so the sort on the frontend works
 
   Resid.create(residentData, function(err, resident) {
     if (err) {
       utils.sendJSONresponse(res, 400, err);
     } else {
 
-      let text = " created resident " + req.body.firstName + " " + req.body.lastName;
-      activitiesService.addActivity(text, req.payload._id, "resident-create", req.body.community._id);
+      let text = ` created resident ${req.body.firstName}  ${req.body.lastName}`;
+
+      let community = req.body.community._id ? req.body.community._id : req.body.community;
+
+      activitiesService.addActivity(text, req.payload._id, "resident-create", community, 'community');
 
       utils.sendJSONresponse(res, 200, resident);
     }
@@ -91,14 +97,22 @@ module.exports.getAverageAge = function(req, res) {
     },
     function(err, residents) {
       if (residents) {
-        var averageAge = 0;
+        let averageAge = 0;
+        let residentCount = 0;
 
-        for (var i = 0; i < residents.length; ++i) {
-          var age = moment().diff(residents[i].birthDate, 'years');
-          averageAge += age;
+        for (let i = 0; i < residents.length; ++i) {
+          if(residents[i].birthDate) {
+            let age = moment().diff(residents[i].birthDate, 'years');
+            if(age < 0) {age = 0;}
+            averageAge += age;
+            residentCount++;
+          }
+
         }
 
-        averageAge = averageAge / residents.length;
+        if(residentCount !== 0) {
+          averageAge = averageAge / residentCount;
+        }
 
         utils.sendJSONresponse(res, 200, averageAge);
       } else {
@@ -122,14 +136,21 @@ module.exports.averageStayTime = function(req, res) {
     },
     function(err, residents) {
       if (residents) {
-        var averageStay = 0;
+        let averageStay = 0;
+        let residentCount = 0;
 
-        for (var i = 0; i < residents.length; ++i) {
-          var stay = moment().diff(residents[i].admissionDate, "days");
-          averageStay += stay;
+        for (let i = 0; i < residents.length; ++i) {
+          if(residents[i].admissionDate) {
+            let stay = moment().diff(residents[i].admissionDate, "days");
+            if(stay < 0) {stay = 0;}
+            averageStay += stay;
+            residentCount++;
+          }
         }
 
-        averageStay = averageStay / residents.length;
+        if(residentCount !== 0) {
+          averageStay = averageStay / residentCount;
+        }
 
         utils.sendJSONresponse(res, 200, averageStay);
       } else {
@@ -256,6 +277,7 @@ module.exports.updateListItem = function(req, res) {
           "updateDate" : new Date(),
           "updateBy" : req.body.updateBy
         });
+        console.log(`UPDATE BY ${req.body.updateBy}`);
 
         resident.save(function(err, r) {
           if(err) {
@@ -317,6 +339,10 @@ module.exports.residentsUpdateOne = function(req, res) {
   req.body.foodLikes = req.body.newfoodLikes;
   req.body.foodDislikes = req.body.newfoodDislikes;
 
+  req.body.carePoints = carePoints.calculateCarePoints(req.body);
+
+  console.log(`${req.body.timeOfBathing}  | ${req.body.typeOfBathing}  | ${req.body.frequencyOfBathing}`);
+
   Resid.findOneAndUpdate({
     _id: req.params.residentid
   }, req.body)
@@ -327,8 +353,12 @@ module.exports.residentsUpdateOne = function(req, res) {
       utils.sendJSONresponse(res, 404, err);
     } else {
 
-      let text = " updated resident " + req.body.firstName + " " + req.body.lastName;
-      activitiesService.addActivity(text, req.payload._id, "resident-update", req.body.community._id);
+      let community = req.body.community._id ? req.body.community._id : req.body.community;
+
+      let text = ` updated resident  ${req.body.firstName} ${req.body.lastName}`;
+      activitiesService.addActivity(text, req.payload._id, "resident-update", community, 'community');
+
+        console.log(resident);
 
       utils.sendJSONresponse(res, 200, resident);
     }
@@ -350,13 +380,13 @@ module.exports.uploadOutsideAgencyAssesment = function(req, res) {
   var stream = fs.createReadStream(file.path);
 
   var params = {
-    Key: file.originalFilename,
+    Key: sanitize(file.originalFilename),
     Body: stream
   };
 
   imageUploadService.upload(params, file.path, function() {
-    var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
-      imageUploadService.getBucket() + "/" + escape(file.originalFilename);
+    let fullUrl = `https://${imageUploadService.getRegion()}.amazonaws.com/
+      ${imageUploadService.getBucket()}/${escape(sanitize(file.originalFilename))}`;
 
     fs.unlinkSync(file.path);
 

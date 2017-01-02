@@ -7,22 +7,44 @@ var utils = require('../../services/utils');
 var async = require('async');
 
 const activitiesService = require('../../services/activities.service');
+const GooglePlaces = require('node-googleplaces');
 
-// POST /communities/new - Creates an empty community
-module.exports.communitiesCreate = function(req, res) {
+const places = new GooglePlaces(process.env.GOOGLE_PLACE_API);
 
-  Community.create({
-    name: req.body.name,
-    communityMembers: req.body.communityMembers,
-    pendingMembers: req.body.pendingMembers
-
-  }, function(err, community) {
+function createCommunity(req, res) {
+  Community.create(req.body, function(err, community) {
     if (err) {
       utils.sendJSONresponse(res, 400, err);
     } else {
       addUserToCommunity(req, res, community);
     }
   });
+}
+
+// POST /communities/new - Creates an empty community
+module.exports.communitiesCreate = function(req, res) {
+
+  searchPlace(req.body.name)
+  .then(placeDetail)
+  .then((details) => {
+
+    if(details) {
+      let deets = getDetails(details);
+
+      req.body.phone = deets.phone;
+      req.body.website = deets.website;
+      req.body.fax = deets.fax;
+      req.body.address = deets.address;
+    }
+
+    createCommunity(req, res);
+  }) //if things go wrong you gonna catch dem hands
+  .catch((demHands) => {
+    console.log(demHands);
+
+    createCommunity(req, res);
+  });
+
 };
 
 // POST - /communites/:communityid/role/:userid - Switches or adds a user role
@@ -107,7 +129,7 @@ module.exports.addPendingMember = function(req, res) {
             } else {
 
               let text = " wants to join " + community.name + " community";
-              activitiesService.addActivity(text, userId, "community-join", community._id);
+              activitiesService.addActivity(text, userId, "community-join", community._id, 'community');
 
               utils.sendJSONresponse(res, 200, community);
             }
@@ -179,6 +201,8 @@ module.exports.acceptMember = function(req, res) {
           if (err) {
             utils.sendJSONresponse(res, 404, err);
           } else {
+            activitiesService.acceptedMember({id: req.body.member, communityName: community.name});
+
             utils.sendJSONresponse(res, 200, community);
           }
         });
@@ -319,6 +343,96 @@ module.exports.hasCanceledCommunity = function(req, res) {
     });
 };
 
+
+module.exports.updateRoomStyle = function(req, res) {
+  Community.findOne({"_id": req.params.communityid})
+   .exec((err, community) => {
+     if(!err) {
+
+       let roomStyleId = community.roomStyle.id(req.params.roomid);
+
+       let index = community.roomStyle.indexOf(roomStyleId);
+       let roomStyle = req.body;
+
+       if(index !== -1) {
+         community.roomStyle.set(index, roomStyle);
+       } else {
+         utils.sendJSONresponse(res, 500, {message: "Room not found"});
+         return;
+       }
+
+       community.save((err, comm) => {
+         if(!err) {
+           utils.sendJSONresponse(res, 200, comm.roomStyle);
+         } else {
+           utils.sendJSONresponse(res, 500, err);
+         }
+       });
+
+     } else {
+       utils.sendJSONresponse(res, 500, err);
+     }
+   });
+};
+
+//POST
+module.exports.createRoomStyle = function(req, res) {
+  Community.findOne({"_id": req.params.communityid})
+   .exec((err, community) => {
+     if(!err) {
+
+       let newRoomStyle = req.body;
+
+       community.roomStyle.push(newRoomStyle);
+
+       community.save((err, comm) => {
+         if(!err) {
+           utils.sendJSONresponse(res, 200, comm.roomStyle[comm.roomStyle.length - 1]);
+         } else {
+           utils.sendJSONresponse(res, 500, err);
+         }
+       });
+
+     } else {
+       utils.sendJSONresponse(res, 500, err);
+     }
+   });
+};
+
+//PUT /communities/:communityid/contactinfo - Updates community Info of a community
+module.exports.updateContactAndRoomInfo = function(req, res) {
+
+  Community.findById(req.params.communityid)
+   .exec((err, community) => {
+
+     if(err) {
+       utils.sendJSONresponse(res, 500, err);
+     } else {
+       community.phone = req.body.phone;
+       community.website = req.body.website;
+       community.fax = req.body.fax;
+       community.address = req.body.address;
+       community.town = req.body.town;
+
+       community.numFloors = req.body.numFloors || 0;
+       community.rooms = req.body.rooms || 0;
+
+       community.floors = req.body.floors;
+
+       community.save((err, com) => {
+         if(err) {
+           console.log(err);
+           utils.sendJSONresponse(res, 500, err);
+         } else {
+           utils.sendJSONresponse(res, 200, com);
+         }
+       });
+     }
+
+  });
+
+};
+
 module.exports.communitiesDeleteOne = function(req, res) {
   var communityid = req.params.communityid;
   if (communityid) {
@@ -382,6 +496,56 @@ module.exports.restoreCommunity = function(req, res) {
       }
     });
 };
+
+//POST
+module.exports.addFloor = async function(req, res) {
+
+  let communityid = req.params.communityid;
+
+  if (utils.checkParams(req, res, ['communityid'])) {
+    return;
+  }
+
+  try {
+    let community = await Community.findById(communityid).exec();
+
+    community.floors.push(req.body);
+
+    await community.save();
+
+    utils.sendJSONresponse(res, 200, community);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 404, err);
+  }
+
+};
+
+//PUT /communities/:communityid/floor - Updating floor info
+module.exports.updateFloor  = async (req, res) => {
+  let communityid = req.params.communityid;
+
+  if (utils.checkParams(req, res, ['communityid'])) {
+    return;
+  }
+
+  try {
+    let community = await Community.findById(communityid).exec();
+
+    console.log(req.body);
+
+    community.floors = req.body;
+
+    await community.save();
+
+    utils.sendJSONresponse(res, 200, community.floors);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 404, err);
+  }
+
+}
+
 
 module.exports.doCreateCommunity = function(communityInfo, callback) {
 
@@ -506,4 +670,39 @@ function removeCommunityFromUser(res, userid, callback) {
         });
       }
     });
+}
+
+
+//Given a name try to find it from google place api and return place id
+function searchPlace(name) {
+ return places.textSearch({query: name}).then((data) => {
+     if(data.body.results[0]){
+       return data.body.results[0].place_id;
+     } else {
+       return null;
+     }
+  });
+}
+
+// Get google place details from a provided api
+function placeDetail(id) {
+  if(!id) {
+    return null;
+  }
+
+  return places.details({placeid: id}).then((details) => {
+    return details.body;
+  });
+}
+
+// Extracts the details from google place details object
+function getDetails(data) {
+  let details = data.result || {};
+
+  return {
+    phone: details.formatted_phone_number,
+    website: details.website,
+    fax: details.international_phone_number,
+    address: details.formatted_address
+  };
 }

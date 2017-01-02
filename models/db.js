@@ -56,6 +56,7 @@ require('./issues');
 require('./appointments');
 require('./users');
 require('./residents');
+require('./chat');
 require('./community');
 require('./todo');
 require('./activities');

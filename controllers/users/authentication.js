@@ -125,6 +125,10 @@ function saveUser(user, todoid, res) {
 
       }
     });
+  })
+  .catch((err) => {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, {'err': "failed_send"});
   });
 }
 

@@ -20,7 +20,7 @@ module.exports.appointmentsCreate = function(req, res) {
     minutes: req.body.minutes,
     timezone: req.body.timezone,
     isAm: req.body.isAm,
-    submitBy: req.payload.name,
+    submitBy: req.payload._id,
     transportation: req.body.transportation,
     community: req.body.community._id
   }, function(err, appointment) {
@@ -36,10 +36,14 @@ module.exports.appointmentsCreate = function(req, res) {
             utils.sendJSONresponse(res, 500, err);
           } else {
 
+            let location = appoint.locationName.name || appoint.locationName;
+
             let text = " created " + appoint.residentGoing.firstName + " " + appoint.residentGoing.lastName +
-                                 " to " + appoint.locationName;
+                                 " to " + location;
+
             activitiesService.addActivity(text, req.payload._id,
                                             "appointment-create", req.body.community._id);
+
 
             utils.sendJSONresponse(res, 200, appoint);
           }
@@ -47,7 +51,6 @@ module.exports.appointmentsCreate = function(req, res) {
 
         });
 
-      //getFullAppointment(req, res, appointment._id);
     }
   });
 };
@@ -61,7 +64,9 @@ module.exports.appointmentsList = function(req, res) {
 
   Appoint.find({
     "community": req.params.communityid
-  }).populate("residentGoing").exec(function(err, appointments) {
+  }).populate("residentGoing")
+    .populate("appointmentComment.author", "name _id")
+    .exec(function(err, appointments) {
     if (err) {
       utils.sendJSONresponse(res, 404, {
         'message': 'Error while listing appointements'
@@ -188,31 +193,4 @@ module.exports.appointmentsDeleteOne = function(req, res) {
       "message": "No appointmentid"
     });
   }
-};
-
-//HELPER FUNCTIONS
-
-//get's appointment and resident info populated
-var getFullAppointment = function(req, res, appointId) {
-  Appoint
-    .findById(appointId)
-    .populate("residentGoing")
-    .exec(function(err, appointment) {
-      if (!appointment) {
-
-        utils.sendJSONresponse(res, 404, {"error_list" : true});
-        return;
-      } else if (err) {
-        console.log(err);
-        utils.sendJSONresponse(res, 404, {"error_list" : true});
-        return;
-      }
-
-      let text = " created " + appointment.residentGoing.firstName + " " + appointment.residentGoing.lastName +
-                           " to " + appointment.locationName;
-      activitiesService.addActivity(text, req.payload._id,
-                                      "appointment-create", req.body.community._id);
-
-      utils.sendJSONresponse(res, 200, appointment);
-    });
 };

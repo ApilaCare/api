@@ -1,15 +1,15 @@
 var mongoose = require('mongoose');
 
 var residentContactSchema = new mongoose.Schema({
-    firstName: {type: String},
+    firstName: {type: String, required: true},
     lastName: {type: String},
     primaryPhoneNumber: {type: String},
     secondaryPhoneNumber: {type: String},
     email: {type: String},
-    physicalAddress: {type: String},
+    physicalAddress: {type: mongoose.Schema.Types.Mixed},
     primaryContact: {type: Boolean, default: false},
     trustedPerson: {type: Boolean, default: false},
-    relation: {type: String},
+    relation: {type: String, required: true},
     medicalPowerOfAttorney: {type: Boolean, default: false},
     financialPowerOfAttorney: {type: Boolean, default: false},
     conservator: {type: Boolean, default: false},
@@ -37,17 +37,17 @@ var residentSchema = new mongoose.Schema({
     aliasName: {type: String},
     middleName: {type: String},
     lastName: {type: String, required: true},
-    room: {type: Number},
-    birthDate: {type: Date, required: true},
+    room: {type: String},
+    birthDate: {type: Date},
     admissionDate: {type: Date},
-    sex: {type: String, required: true}, // male, female, other
+    sex: {type: String}, // male, female, other
       maidenName: {type: String}, // if female | open field
     maritalStatus: {type: String}, // single, divorced, widowed, married, single never married
     veteran: {type: Boolean, default: false},
     socialSecurityNumber: {type: Number},
 
     // location
-    buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out
+    buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out, out of building
       movedOutDescribe: {type: String}, // conditional if moved out selected | open field
       movedOutTo: {type: String}, // conditional if moved out is selected | Nursing Home, Home, Another AL
     movedFrom: {
@@ -80,7 +80,7 @@ var residentSchema = new mongoose.Schema({
     assessmentIntervalFile: [String],
     updateInfo: [updateInfoSchema],
     submitDate: {type: Date, default: Date.now},
-    submitBy: {type: String, required: true},
+    submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     community: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Community'

@@ -6,7 +6,9 @@ var TaskService = require('./task_update');
 
 var _ = require('lodash');
 var moment = require('moment');
-const cons = require('../../services/constants');
+
+const occurrence = require('../../services/constants').occurrence;
+const taskState = require('../../services/constants').taskState;
 const activitiesService = require('../../services/activities.service');
 
 // creates an empty todo object called when a user is registered
@@ -97,7 +99,8 @@ module.exports.addTask = function(req, res) {
       if(err) {
         utils.sendJSONresponse(res, 500, err);
       } else {
-        activitiesService.addActivity(" created a task " + newTask.text, userId, "task-create", req.body.communityId);
+        activitiesService.addActivity(" created a task " + newTask.text, 
+                          userId, "task-create", req.body.communityId, "user");
 
         utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
       }
@@ -127,7 +130,7 @@ module.exports.updateTask = function(req, res) {
 
       if(index !== -1) {
 
-        if(task.state === "complete") {
+        if(task.state === taskState.COMPLETE) {
 
           task.cycleDate = currentTime.toDate();
 
@@ -142,19 +145,19 @@ module.exports.updateTask = function(req, res) {
         // if we switched occurrence, reset other active set fields
         if(todo.tasks[index].occurrence !== task.occurrence) {
           switch(task.occurrence) {
-            case cons.occurrence.HOURLY:
+            case occurrence.HOURLY:
               setToDefault(task, ["daily", "weekly", "monthly"]);
             break;
 
-            case cons.occurrence.DAILY:
+            case occurrence.DAILY:
               setToDefault(task, ["hourly", "weekly", "monthly"]);
             break;
 
-            case cons.occurrence.WEEKLY:
+            case occurrence.WEEKLY:
               setToDefault(task, ["daily", "hourly", "monthly"]);
             break;
 
-            case cons.occurrence.MONTHLY:
+            case occurrence.MONTHLY:
               setToDefault(task, ["daily", "weekly", "hourly"]);
             break;
           }
@@ -219,6 +222,35 @@ module.exports.deleteTask = function(req, res) {
 };
 
 
+//TODO: count using mongo functions
+// GET /todos/:todoid/activecount - Gets the number of active tasks
+module.exports.activeTasksCount = (req, res) => {
+
+  let todoid = req.params.todoid;
+
+  let tasks = ToDo.find({'_id': todoid})
+                  .exec();
+
+  tasks.then((todo) => {
+
+    if(!todo[0]) {
+      utils.sendJSONresponse(res, 200, 0);
+    }
+
+     let tasks = _.filter(todo[0].tasks, function(d) {
+      if(d.state === "current"){
+        return true;
+      }
+    });
+
+    utils.sendJSONresponse(res, 200, tasks.length);
+  }, (err) => {
+    console.log(err);
+  });
+
+};
+
+
 //////////////////////////// HELPER FUNCTION /////////////////////////////////
 
 function isOverdue(task, currTime) {
@@ -228,25 +260,25 @@ function isOverdue(task, currTime) {
 
   switch(task.occurrence) {
 
-    case cons.occurrence.HOURLY:
+    case occurrence.HOURLY:
       if(currTime.minutes() >= 30 && !currTime.isSame(createdOn, "hour")) {
         overdue = true;
       }
     break;
 
-    case cons.occurrence.DAILY:
+    case occurrence.DAILY:
       if(currTime.hour() >= 12 && !currTime.isSame(createdOn, "day")) {
         overdue = true;
       }
     break;
 
-    case cons.occurrence.WEEKLY:
+    case occurrence.WEEKLY:
       if(currTime.day() > 2 && !currTime.isSame(createdOn, "week")) {
         overdue = true;
       }
     break;
 
-    case cons.occurrence.MONTHLY:
+    case occurrence.MONTHLY:
       if((currTime.date() > (currTime.date() / 2)) && !currTime.isSame(createdOn, "month")) {
         overdue = true;
       }

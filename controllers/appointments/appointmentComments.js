@@ -14,7 +14,7 @@ module.exports.appointmentCommentsCreate = function(req, res) {
           if (err) {
             utils.sendJSONresponse(res, 400, err);
           } else {
-            doAddComment(req, res, appointment, req.payload.name);
+            doAddComment(req, res, appointment, req.payload._id);
           }
         }
       );
@@ -30,6 +30,7 @@ var doAddComment = function(req, res, appointment, author) {
   if (!appointment) {
     utils.sendJSONresponse(res, 404, "appointmentid not found");
   } else {
+
     appointment.appointmentComment.push({
       author: author,
       commentText: req.body.commentText

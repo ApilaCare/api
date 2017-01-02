@@ -19,15 +19,16 @@ module.exports.issuesCreate = function(req, res) {
   }, function(err, issue) {
     if (err) {
       console.log(err);
-      utils.sendJSONresponseresponse(res, 400, err);
+      utils.sendJSONresponse(res, 400, err);
     } else {
 
       User.populate(issue, {
-        path: 'responsibleParty submitBy'
+        path: 'responsibleParty submitBy',
+        select: '_id name userImage'
       }, function(err, populatedIssue) {
 
         activitiesService.addActivity(" created issue " + req.body.title, req.body.responsibleParty,
-                                        "issue-create", req.body.community._id);
+                                        "issue-create", req.body.community._id, 'community');
 
         utils.sendJSONresponse(res, 200, populatedIssue);
       });
@@ -210,19 +211,27 @@ module.exports.issuesList = function(req, res) {
       //Populate user model so we have responsibleParty name and not just the _id
       User.populate(issues, [{
         path: '_id',
-        model: 'User'
+        model: 'User',
+        select: '_id name userImage'
       },{
         path: 'updateInfo.updateBy',
-        model: 'User'
+        model: 'User',
+        select: '_id name userImage'
       },{
         path: 'submitBy',
-        model: 'User'
+        model: 'User',
+        select: '_id name userImage'
+      },{
+        path: 'responsibleParty',
+        model: 'User',
+        select: '_id name userImage'
       }], function(err) {
         if (err) {
           utils.sendJSONresponse(res, 404, {
             'message': err
           });
         } else {
+          console.log(issues);
           utils.sendJSONresponse(res, 200, issues);
         }
 
@@ -243,6 +252,7 @@ module.exports.issuesListByStatus = function(req, res) {
 
   Iss.find({status: status, community: communityid})
       .populate("submitBy", "name _id")
+      .populate("responsibleParty", "name _id")
       .exec(function(err, issues) {
     if (err) {
       utils.sendJSONresponse(res, 404, {
@@ -278,6 +288,26 @@ module.exports.dueIssuesList = function(req, res) {
         });
       }
     });
+};
+
+module.exports.issuesPopulateOne = (req, res) => {
+
+  Iss.findById(req.params.issueid)
+      .populate("checklists.author", "name _id")
+      .populate("finalPlan.author", "name _id")
+      .populate("responsibleParty", "name _id")
+      .exec((err, issue) => {
+
+        if(!err) {
+          console.log(issue);
+
+          utils.sendJSONresponse(res, 200, issue);
+        } else {
+          utils.sendJSONresponse(res, 404, err);
+        }
+
+      });
+
 };
 
 // GET /issues/:issueid - Reads issue info by id
@@ -340,20 +370,27 @@ module.exports.issuesUpdateOne = function(req, res) {
           return;
         }
 
+        if(req.body.responsibleParty) {
+          issue.responsibleParty = req.body.responsibleParty._id || req.body.responsibleParty;
+        }
+
+        if(req.body.submitBy._id) {
+          issue.submitBy = req.body.submitBy._id;
+        }
+
         issue.title = req.body.title;
-        issue.responsibleParty = req.body.responsibleParty;
         issue.resolutionTimeframe = req.body.resolutionTimeframe;
-        issue.submitBy = req.body.submitBy;
+
         issue.description = req.body.description;
         issue.status = req.body.status;
         issue.due = req.body.due;
 
         issue.checklists = req.body.checklists;
         issue.labels = req.body.labels;
-        //issue.updateInfo = req.body.updateInfo;
+
         issue.shelvedDate = req.body.shelvedDate;
 
-        if (req.body.deletedMember !== undefined) {
+        if (req.body.deletedMember) {
           issue.idMembers.splice(issue.idMembers.map(function(d) {
             return d.name;
           }).indexOf(req.body.deletedMember), 1);
@@ -374,8 +411,25 @@ module.exports.issuesUpdateOne = function(req, res) {
             console.log(err);
             utils.sendJSONresponse(res, 404, err);
           } else {
-            Iss.populate(issue.updateField, [{'path' : 'updateBy'}, {'path' : 'submitBy'}], function(err, iss) {
-                    utils.sendJSONresponse(res, 200, iss);
+            Iss.populate(issue.updateField,
+              [{'path' : 'updateBy', select: '_id name userImage'},
+               {'path' : 'submitBy', select: '_id name userImage'},
+                {'path' : 'checklists.author', select: '_id name userImage'}],
+            function(err, iss) {
+              if(err) {
+                utils.sendJSONresponse(res, 500, err);
+              } else {
+                if(req.body.addedMember) {
+                  activitiesService.addActivity(" added member " + req.body.addedMember.name + " to issue" + issue.title, req.body.responsibleParty,
+                                                  "issue-update", issue.community, 'user', req.body.addedMember._id);
+                } else {
+                  activitiesService.addActivity(" updated issue " + req.body.title, req.body.responsibleParty,
+                                                  "issue-update", issue.community, 'community');
+                }
+
+                utils.sendJSONresponse(res, 200, iss);
+              }
+
             });
           }
         });

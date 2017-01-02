@@ -6,6 +6,7 @@ var User = mongoose.model('User');
 
 var fs = require('fs');
 var imageUploadService = require('../../services/imageUpload');
+const sanitize = require("sanitize-filename");
 
 // POST /issues/:issueid/attachments/new - Create a new attachement
 module.exports.issueAttachmentsCreate = function(req, res) {
@@ -81,13 +82,13 @@ var doAddAttachment = function(req, res, issue) {
   var stream = fs.createReadStream(file.path);
 
   var params = {
-    Key: file.originalFilename,
+    Key: sanitize(file.originalFilename),
     Body: stream
   };
 
   imageUploadService.upload(params, file.path, function() {
     var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
-               imageUploadService.getBucket() + "/" + escape(file.originalFilename);
+               imageUploadService.getBucket() + "/" + escape(sanitize(file.originalFilename));
 
     issue.attachments.push({
       uploader: req.payload._id,

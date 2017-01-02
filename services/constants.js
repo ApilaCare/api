@@ -1,7 +1,13 @@
 module.exports.MONTHLY_CHARGE = 20000; //IMPORTANT the charge value is in cents
 module.exports.STANDARD_PLAN_ID = "9n89gbusdfds";
 
-module.exports.APILA_EMAIL = "supprot@apila.com";
+module.exports.APILA_EMAIL = "support@apila.care";
+
+const taskState = {
+  "CURRENT" : "current",
+  "COMPLETE" : "complete",
+  "INACTIVE" : "inactive"
+};
 
 const day = {
   "MONDAY" : 1,
@@ -23,3 +29,4 @@ const occurrence = {
 
 module.exports.day = day;
 module.exports.occurrence = occurrence;
+module.exports.taskState = taskState;

@@ -3,7 +3,8 @@ const moment = require('moment');
 require('moment-range');
 
 const fs = require('fs');
-const cons = require('../../services/constants');
+const occurrence = require('../../services/constants').occurrence;
+const taskState = require('../../services/constants').taskState;
 
 var currentTime = moment();
 
@@ -47,7 +48,7 @@ function updateTask(task, currTime) {
   switch(task.occurrence) {
 
     // Every Hour
-    case cons.occurrence.HOURLY:
+    case occurrence.HOURLY:
 
         checkIfCompleted(task, currTime, cycleDate, "hours");
 
@@ -61,7 +62,7 @@ function updateTask(task, currTime) {
 
       break;
 
-    case cons.occurrence.DAILY:
+    case occurrence.DAILY:
 
         checkIfCompleted(task, currTime, cycleDate, "days");
 
@@ -73,7 +74,7 @@ function updateTask(task, currTime) {
 
       break;
 
-    case cons.occurrence.WEEKLY:
+    case occurrence.WEEKLY:
 
         checkIfCompleted(task, currTime, cycleDate, "weeks");
 
@@ -85,7 +86,7 @@ function updateTask(task, currTime) {
 
       break;
 
-    case cons.occurrence.MONTHLY:
+    case occurrence.MONTHLY:
 
         checkIfCompleted(task, currTime, cycleDate, "months");
 
@@ -108,14 +109,14 @@ function checkIfCompleted(task, currTime, cycleDate, cycle) {
   let currTimeCycle = isInActiveCycle(task, currTime);
   let sinceLastUpdate = moment.range(cycleDate, currentTime);
 
-  if(!currTime.isSame(cycleDate, cycleWithoutS) && task.state !== "complete" && currTimeCycle(cycle)) {
+  if(!currTime.isSame(cycleDate, cycleWithoutS) && task.state !== taskState.COMPLETE && currTimeCycle(cycle)) {
 
     sinceLastUpdate.by(cycle, (currCycle) => {
 
       let inCycle = isInActiveCycle(task, currCycle);
       if(inCycle(cycle)) {
 
-        if(task.occurrence !== cons.occurrence.HOURLY) {
+        if(task.occurrence !== occurrence.HOURLY) {
           if(!isInNotCompleted(task, currTime) && !currTime.isSame(currCycle, cycleWithoutS)) {
             task.notCompleted.push({updatedOn: currCycle.toDate()});
           }
@@ -171,17 +172,17 @@ function isInActiveCycle(task, currTime) {
 
 function toggleTask(task, taskNotActive) {
   if(taskNotActive === true) {
-    task.state = "inactive";
+    task.state = taskState.INACTIVE;
   } else {
-    if(task.state !== 'complete') {
-      task.state = 'current';
+    if(task.state !== taskState.COMPLETE) {
+      task.state = taskState.CURRENT;
     }
   }
 }
 
 
 function resetTaskCycle(task) {
-  task.state = "current";
+  task.state = taskState.CURRENT;
   task.cycleDate = new Date();
 }
 

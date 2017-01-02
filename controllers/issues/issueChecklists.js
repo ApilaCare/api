@@ -102,17 +102,29 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
             });
           } else {
 
-            var updateInfo = formatUpdateInfo(req, issue);
-            issue.updateInfo.push(updateInfo);
+            let checklist = issue.checklists.id(req.params.checklistid);
 
-            issue.checklists.id(req.params.checklistid).remove();
-            issue.save(function(err) {
-              if (err) {
-                utils.sendJSONresponse(res, 404, err);
-              } else {
-                utils.sendJSONresponse(res, 204, null);
-              }
-            });
+            if(checklist) {
+              
+              var updateInfo = formatUpdateInfo(req, issue);
+              issue.updateInfo.push(updateInfo);
+
+              checklist.remove();
+
+              issue.save(function(err) {
+                if (err) {
+                  console.log(err);
+                  utils.sendJSONresponse(res, 404, err);
+                } else {
+                  utils.sendJSONresponse(res, 204, null);
+                }
+              });
+
+            } else {
+              utils.sendJSONresponse(res, 404, {message: "Checklist not found"});
+            }
+
+
           }
         } else {
           utils.sendJSONresponse(res, 404, {
@@ -168,7 +180,7 @@ function issueHasError(res, err, issue) {
 function formatUpdateInfo(req, issue) {
   var updateInfo = {};
 
-  updateInfo.updateBy = req.payload.name;
+  updateInfo.updateBy = req.payload._id;
   updateInfo.updateDate = new Date();
   updateInfo.updateField = [];
   updateInfo.updateField.push({

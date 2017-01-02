@@ -94,7 +94,7 @@ module.exports.confirmPassword = function(req, res) {
       if (user.validPassword(password)) {
 
         if (req.body.type === "boss") {
-          bossConfirmedPassword(req.body.recoveryid);
+          bossConfirmedPassword(res, req.body.recoveryid);
         } else {
 
           findRecoveryByUser(res, req.params.userid, function(recovery) {
@@ -137,7 +137,7 @@ function selectRandomUser(res, boss, recoveredMember, communityid, callback) {
   Community.findOne({
       _id: communityid
     })
-    .populate("communityMembers")
+    .populate("communityMembers", "_id name email userImage")
     .exec(function(err, community) {
       if (community) {
 
@@ -201,7 +201,7 @@ function findRecoveryByUser(res, userid, callback) {
   IssRecovery.findOne({
       "chosenMember": userid
     })
-    .populate("recoveredMember")
+    .populate("recoveredMember", "_id name userImage email")
     .exec(function(err, recovery) {
       if (recovery) {
         callback(recovery);
@@ -229,7 +229,7 @@ function getConfidentialIssues(recoveredMember, callback) {
     });
 }
 
-function bossConfirmedPassword(recoveryid) {
+function bossConfirmedPassword(res, recoveryid) {
 
   IssRecovery.findOne({
     "_id": recoveryid
