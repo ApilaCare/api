@@ -6,6 +6,8 @@ var utils = require('../../services/utils');
 
 const activitiesService = require('../../services/activities.service');
 
+const sizeof = require('object-sizeof');
+
 // POST /api/appointments/new - Creates a new appointment
 module.exports.appointmentsCreate = function(req, res) {
 
