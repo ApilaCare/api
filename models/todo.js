@@ -1,5 +1,9 @@
 var mongoose = require('mongoose');
 
+var counterSchema = new mongoose.Schema({
+  updatedOn: {type: Date, default: Date.now}
+});
+
 var todoItemSchema = new mongoose.Schema({
 
   text: {type: String, required: true},
@@ -24,10 +28,6 @@ var todoItemSchema = new mongoose.Schema({
   completed: [counterSchema], // completed before certain amount of time
   overDue: [counterSchema], // not completed
   notCompleted: [counterSchema],
-});
-
-var counterSchema = new mongoose.Schema({
-  updatedOn: {type: Date, default: Date.now}
 });
 
 var todoSchema = new mongoose.Schema({

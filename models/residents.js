@@ -29,6 +29,11 @@ var updateInfoSchema = new mongoose.Schema({
   updateField: [mongoose.Schema.Types.Mixed]
 });
 
+var vitalsInfoSchema = new mongoose.Schema({
+    data: {type: Number, required: true},
+    date: {type: Date, 'default': Date.now},
+});
+
 var residentSchema = new mongoose.Schema({
 
     // administrative information ----------------------------------------------------------
@@ -384,11 +389,6 @@ var residentSchema = new mongoose.Schema({
       internationalNormalizedRatio: [vitalsInfoSchema], // if yes | array of values
 });
 
-
-var vitalsInfoSchema = new mongoose.Schema({
-    data: {type: Number, required: true},
-    date: {type: Date, 'default': Date.now},
-});
 
 mongoose.model('Resident', residentSchema);
 mongoose.model('Contact', residentContactSchema);
