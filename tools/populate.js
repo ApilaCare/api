@@ -1,4 +1,6 @@
 require('../models/db');
+
+const moment = require('moment');
 const faker = require('faker');
 
 const mongoose = require('mongoose');
@@ -9,7 +11,7 @@ const userId = "58528db24502e67a14da3721";
 const community = "5858fb85edf1df6c6bb30ad6";
 const residentId = "5857ed74539ca36e2671ca51";
 
-const NUM_APPOINTMENTS = 20;
+const NUM_APPOINTMENTS = 300;
 const NUM_RESIDENTS = 500;
 
 function createResidents() {
@@ -68,13 +70,14 @@ function createAppointments() {
       locationName: faker.address.streetAddress(),
       locationDoctor: faker.name.firstName() + " " + faker.name.lastName(),
       residentGoing: residentId,
-      appointmentDate: faker.date.between('2017-05-01', '2017-05-30'),
+      appointmentDate: faker.date.between('2017-04-01', '2017-04-30'),
       hours: faker.random.number(12),
       minutes: faker.random.number(60),
       isAm: Math.random() >= 0.5,
       submitBy: userId,
       transportation: faker.lorem.sentence(),
-      community: community
+      community: community,
+      currMonth: moment('2017-04-01').format("YYYY M")
     });
 
   }

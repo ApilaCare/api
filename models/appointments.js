@@ -18,6 +18,7 @@ var appointmentSchema = new mongoose.Schema({
     isAm: {type: Boolean},
     transportation: {type: String, default: 'We are Transporting'},
     cancel: {type: Boolean, default: false},
+    currMonth: {type: String},
     appointmentComment: [appointmentCommentSchema],
     submitDate: {type: Date, default: Date.now, required: true},
     submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},

@@ -4,6 +4,8 @@ var User = mongoose.model('User');
 
 var utils = require('../../services/utils');
 
+const moment = require('moment');
+
 const activitiesService = require('../../services/activities.service');
 
 // POST /api/appointments/new - Creates a new appointment
@@ -22,6 +24,7 @@ module.exports.appointmentsCreate = function(req, res) {
     isAm: req.body.isAm,
     submitBy: req.payload._id,
     transportation: req.body.transportation,
+    currMonth: moment().format("YYYY M"),
     community: req.body.community._id
   }, function(err, appointment) {
     if (err) {
@@ -55,30 +58,24 @@ module.exports.appointmentsCreate = function(req, res) {
   });
 };
 
-// GET /appointments/:communityid - list all appointments populated with resident info
+// GET /appointments/:communityid/month/:month - list all appointments populated with resident info
 module.exports.appointmentsList = function(req, res) {
 
   if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
 
-  //
-  // let {start, end} = getMonthDateRange(2017, 1);
-  //
-  // console.log(start.toDate());
-  // console.log(end.toDate());
+  let month = req.params.month;
 
-  Appoint.find({community: req.params.communityid})
+  Appoint.find({community: req.params.communityid, currMonth: month})
     .populate("residentGoing", "_id firstName aliasName middleName lastName")
     .populate("appointmentComment.author", "name _id")
-  //  .select("_id reason locationName locationDoctor residentGoing")
     .exec(function(err, appointments) {
     if (err) {
       utils.sendJSONresponse(res, 404, {
         'message': 'Error while listing appointements'
       });
     } else {
-      //console.log(appointments);
 
       utils.sendJSONresponse(res, 200, appointments);
     }
@@ -86,23 +83,6 @@ module.exports.appointmentsList = function(req, res) {
   });
 };
 
-function getMonthDateRange(year, month) {
-    var moment = require('moment');
-
-    // month in moment is 0 based, so 9 is actually october, subtract 1 to compensate
-    // array is 'year', 'month', 'day', etc
-    var startDate = moment([year, month]).add(-1,"month");
-
-    // Clone the value before .endOf()
-    var endDate = moment(startDate).endOf('month');
-
-    // just for demonstration:
-    console.log(startDate.toDate());
-    console.log(endDate.toDate());
-
-    // make sure to call toDate() for plain JavaScript date type
-    return { start: startDate, end: endDate };
-}
 
 // GET /appointments/today/:communityid - Number of appointments for today
 module.exports.appointmentsToday = function(req, res) {

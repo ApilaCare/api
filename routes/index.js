@@ -110,7 +110,7 @@ router.post('/issues/recovery/:communityid', sanitizeInput , auth, ctrlIssueReco
 router.post('/issues/recovery/verify/:userid', sanitizeInput , auth, ctrlIssueRecovery.confirmPassword);
 
 // appointments
-router.get('/appointments/:communityid', sanitizeInput , auth, ctrlAppointments.appointmentsList);
+router.get('/appointments/:communityid/month/:month', sanitizeInput , auth, ctrlAppointments.appointmentsList);
 router.get('/appointments/today/:communityid', sanitizeInput , auth,  ctrlAppointments.appointmentsToday);
 router.post('/appointments/new', sanitizeInput , auth, ctrlAppointments.appointmentsCreate);
 router.put('/appointments/update/:appointmentid', sanitizeInput , auth, ctrlAppointments.appointmentsUpdateOne);
