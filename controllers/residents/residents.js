@@ -45,10 +45,8 @@ module.exports.residentsList = function(req, res) {
     return;
   }
 
-  Resid.find({
-      'community': community
-    })
-    .populate('updateInfo.updateBy', 'email name userImage')
+  Resid.find({'community': community})
+    .select('_id firstName lastName aliasName carePoints')
     .exec(function(err, residents) {
       if (err) {
         utils.sendJSONresponse(res, 404, {
@@ -195,6 +193,7 @@ module.exports.residentById = function(req, res) {
 
   Resid
     .findById(req.params.residentid)
+    .populate('updateInfo.updateBy', 'email name userImage')
     .exec(
       function(err, resident) {
         if (resident) {

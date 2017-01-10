@@ -6,8 +6,6 @@ var utils = require('../../services/utils');
 
 const activitiesService = require('../../services/activities.service');
 
-const sizeof = require('object-sizeof');
-
 // POST /api/appointments/new - Creates a new appointment
 module.exports.appointmentsCreate = function(req, res) {
 
@@ -64,7 +62,7 @@ module.exports.appointmentsList = function(req, res) {
     return;
   }
 
-  // 
+  //
   // let {start, end} = getMonthDateRange(2017, 1);
   //
   // console.log(start.toDate());
