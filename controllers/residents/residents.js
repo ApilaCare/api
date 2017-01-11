@@ -60,26 +60,26 @@ module.exports.residentsList = function(req, res) {
     });
 };
 
+
 // GET /residents/count/:communityid - Number of residents in building
-module.exports.residentsCount = function(req, res) {
+module.exports.residentsCount = async (req, res) => {
 
   if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
 
-  Resid.find({
-      'community': req.params.communityid,
-      'buildingStatus': 'In Building'
-    },
-    function(err, c) {
-      if (err) {
-        utils.sendJSONresponse(res, 404, {
-          'message': 'Error counting residents'
-        });
-      } else {
-        utils.sendJSONresponse(res, 200, c.length);
-      }
-    });
+  try {
+
+    let searchQuery = {community: req.params.communityid, buildingStatus: 'In Building'};
+
+    let numResidents = await Resid.find(searchQuery).count().exec();
+
+    utils.sendJSONresponse(res, 200, numResidents);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+
 };
 
 // GET /residents/average_age/:communityid - Get's average agre of residents in the building
@@ -185,25 +185,22 @@ module.exports.getLocations = function(req, res) {
 };
 
 // GET /residents/:residentid - Get resident info by id
-module.exports.residentById = function(req, res) {
+module.exports.residentById = async (req, res) => {
 
   if (utils.checkParams(req, res, ['residentid'])) {
     return;
   }
 
-  Resid
-    .findById(req.params.residentid)
-    .populate('updateInfo.updateBy', 'email name userImage')
-    .exec(
-      function(err, resident) {
-        if (resident) {
-          utils.sendJSONresponse(res, 200, resident);
-        } else {
-          utils.sendJSONresponse(res, 404, {
-            'message': 'resident not found'
-          });
-        }
-      });
+  try {
+    let resident  = await Resid
+                          .findById(req.params.residentid)
+                          .populate('updateInfo.updateBy', 'email name userImage')
+                          .exec();
+
+    utils.sendJSONresponse(res, 200, resident);
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
 };
 
 //POST /residents/:residentid/contact - Adds a new contact to the list
@@ -318,15 +315,15 @@ module.exports.residentsUpdateOne = function(req, res) {
     utils.sendJSONresponse(res, 404, err);
   }
 
-  addToArray(req.body.respiration, req.body.newrespiration, "Vitals");
-  addToArray(req.body.vitalsPain, req.body.newvitalsPain, "Vitals");
-  addToArray(req.body.pulse, req.body.newpulse, "Vitals");
-  addToArray(req.body.oxygenSaturation, req.body.newoxygenSaturation, "Vitals");
-  addToArray(req.body.bloodPressureDiastolic, req.body.newbloodPressureDiastolic, "Vitals");
-  addToArray(req.body.bloodPressureSystolic, req.body.newbloodPressureSystolic, "Vitals");
-  addToArray(req.body.temperature, req.body.newtemperature, "Vitals");
-  addToArray(req.body.internationalNormalizedRatio, req.body.newinternationalNormalizedRatio, "Vitals");
-  addToArray(req.body.weight, req.body.newweight, "Vitals");
+  addToArray(req.body.respiration, req.body.newrespiration);
+  addToArray(req.body.vitalsPain, req.body.newvitalsPain);
+  addToArray(req.body.pulse, req.body.newpulse);
+  addToArray(req.body.oxygenSaturation, req.body.newoxygenSaturation);
+  addToArray(req.body.bloodPressureDiastolic, req.body.newbloodPressureDiastolic);
+  addToArray(req.body.bloodPressureSystolic, req.body.newbloodPressureSystolic);
+  addToArray(req.body.temperature, req.body.newtemperature);
+  addToArray(req.body.internationalNormalizedRatio, req.body.newinternationalNormalizedRatio);
+  addToArray(req.body.weight, req.body.newweight);
 
   req.body.foodAllergies = req.body.newfoodAllergies;
   req.body.medicationAllergies = req.body.newmedicationAllergies;
@@ -356,8 +353,6 @@ module.exports.residentsUpdateOne = function(req, res) {
 
       let text = ` updated resident  ${req.body.firstName} ${req.body.lastName}`;
       activitiesService.addActivity(text, req.payload._id, "resident-update", community, 'community');
-
-        console.log(resident);
 
       utils.sendJSONresponse(res, 200, resident);
     }
@@ -441,38 +436,21 @@ module.exports.residentsDeleteOne = function(req, res) {
 
 // HELPER FUNCTIONS
 
-//To check if the fields is a number
-function isNumber(obj) {
-  return !isNaN(parseFloat(obj));
-}
-
 //when pushing to array make sure we aren't adding invalid data
-function addToArray(arr, value, type) {
+function addToArray(arr, value) {
 
-  if (value != undefined) {
-
-    if (type === "Vitals") {
-      value = value.data;
-    }
-
-    if (value != "") {
-      if (type === "Vitals") {
-        var info = {};
-        info.data = value;
-        info.date = new Date();
-        arr.push(info);
-      } else {
-        arr.push(value);
-      }
-
-    }
+  if (value && value.data) {
+    arr.push({
+      data: value.data,
+      date: new Date()
+    });
   }
 
 }
 
 
 function setCommunicatedWithField(req) {
-  var communicatedWith = [];
+  let communicatedWith = [];
 
   if(req.body.communicatedWithResident === true) {
     communicatedWith.push("resident");

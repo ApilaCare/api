@@ -129,7 +129,7 @@ module.exports.issueUpdateInfo = function(req, res) {
 };
 
 // GET /issues/issuescount/:communityid - Number of open isues for a community
-module.exports.issuesCount = function(req, res) {
+module.exports.issuesCount = async (req, res) => {
 
   var communityid = req.params.communityid;
 
@@ -137,19 +137,17 @@ module.exports.issuesCount = function(req, res) {
     return;
   }
 
-  Iss.find({
-    status: "Open",
-    community: communityid
-  }, function(err, issues) {
-    if (err) {
-      utils.sendJSONresponse(res, 404, {
-        'message': err
-      });
-    } else {
-      utils.sendJSONresponse(res, 200, issues.length);
-    }
+  try {
 
-  });
+    let searchQuery = { status: "Open", community: communityid };
+
+    let issueCount = await Iss.find(searchQuery).count().exec();
+
+    utils.sendJSONresponse(res, 200, issueCount);
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+
 };
 
 // GET /issues/list/:status/id/:communityid - Gets a list of issues grouped by responsibleParty
