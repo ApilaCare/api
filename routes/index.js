@@ -156,6 +156,7 @@ router.post('/activity/:todoid', sanitizeInput, auth, ctrlActivity.createToDoAct
 
 // residents
 router.get('/residents/list/:communityid', sanitizeInput , auth, ctrlResidents.residentsList);
+router.get('/residents/full-list/:communityid', sanitizeInput, auth, ctrlResidents.residentsFullList);
 router.get('/residents/:residentid', sanitizeInput , auth, ctrlResidents.residentById);
 router.get('/residents/count/:communityid', sanitizeInput , auth, ctrlResidents.residentsCount);
 router.get('/residents/:communityid/locations', sanitizeInput , auth, ctrlResidents.getLocations);
