@@ -290,7 +290,7 @@ module.exports.updateListItem = function(req, res) {
           "updateDate" : new Date(),
           "updateBy" : req.body.updateBy
         });
-        console.log(`UPDATE BY ${req.body.updateBy}`);
+
 
         resident.save(function(err, r) {
           if(err) {
@@ -353,8 +353,6 @@ module.exports.residentsUpdateOne = function(req, res) {
   req.body.foodDislikes = req.body.newfoodDislikes;
 
   req.body.carePoints = carePoints.calculateCarePoints(req.body);
-
-  console.log(`${req.body.timeOfBathing}  | ${req.body.typeOfBathing}  | ${req.body.frequencyOfBathing}`);
 
   Resid.findOneAndUpdate({
     _id: req.params.residentid
