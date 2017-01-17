@@ -343,7 +343,7 @@ module.exports.hasCanceledCommunity = function(req, res) {
     });
 };
 
-
+//PUT /communities/:communityid/roomstyle/:roomid
 module.exports.updateRoomStyle = function(req, res) {
   Community.findOne({"_id": req.params.communityid})
    .exec((err, community) => {
@@ -375,7 +375,29 @@ module.exports.updateRoomStyle = function(req, res) {
    });
 };
 
-//POST
+//DELETE /communities/:communityid/roomstyle/:roomid
+module.exports.deleteRoomStyle = async (req, res) => {
+
+  if (utils.checkParams(req, res, ['roomid', 'communityid'])) {
+    return;
+  }
+
+  try {
+
+    let community = await Community.findById(req.params.communityid).exec();
+
+    community.roomStyle.pull(req.params.roomid);
+
+    await community.save();
+
+    utils.sendJSONresponse(res, 200, req.params.roomid);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+};
+
+//POST /communities/:communityid/roomstyle
 module.exports.createRoomStyle = function(req, res) {
   Community.findOne({"_id": req.params.communityid})
    .exec((err, community) => {

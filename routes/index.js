@@ -56,10 +56,10 @@ var ctrlActivity = require('../controllers/activities/activities');
 
 // communities
 router.get('/communities/', sanitizeInput, auth, ctrlCommunities.communitiesList);
-router.get('/communites/canceled/:userid', sanitizeInput , auth, ctrlCommunities.hasCanceledCommunity);
+router.get('/communities/canceled/:userid', sanitizeInput , auth, ctrlCommunities.hasCanceledCommunity);
 router.post('/communities/new', ctrlCommunities.communitiesCreate);
-router.post('/communites/:communityid/role/:userid', sanitizeInput , auth, ctrlCommunities.addRole);
-router.post('/communites/:communityid/restore/:userid', sanitizeInput , auth, ctrlCommunities.restoreCommunity);
+router.post('/communities/:communityid/role/:userid', sanitizeInput , auth, ctrlCommunities.addRole);
+router.post('/communities/:communityid/restore/:userid', sanitizeInput , auth, ctrlCommunities.restoreCommunity);
 router.post('/communities/:communityid/roomstyle', sanitizeInput, auth, ctrlCommunities.createRoomStyle);
 router.post('/communities/:communityid/floor', sanitizeInput, auth, ctrlCommunities.addFloor);
 router.put('/communities/accept/:communityid/', sanitizeInput , auth, ctrlCommunities.acceptMember);
@@ -69,7 +69,8 @@ router.put('/communities/pending/:communityid/', sanitizeInput , auth, ctrlCommu
 router.put('/communities/:communityid/roomstyle/:roomid', sanitizeInput, auth, ctrlCommunities.updateRoomStyle);
 router.put('/communities/:communityid/contactinfo', sanitizeInput, auth, ctrlCommunities.updateContactAndRoomInfo);
 router.put('/communities/update/:communityid/', sanitizeInput , auth, ctrlCommunities.communitiesUpdateOne);
-router.delete('/communites/:communityid/user/:userid/', sanitizeInput , auth, ctrlCommunities.removeMember);
+router.delete('/communities/:communityid/roomstyle/:roomid', sanitizeInput, auth, ctrlCommunities.deleteRoomStyle);
+router.delete('/communities/:communityid/user/:userid/', sanitizeInput , auth, ctrlCommunities.removeMember);
 router.delete('/communities/:communityid/', sanitizeInput , auth, ctrlCommunities.communitiesDeleteOne);
 
 // issues
