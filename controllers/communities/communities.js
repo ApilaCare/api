@@ -544,12 +544,13 @@ module.exports.addFloor = async function(req, res) {
 };
 
 //PUT /communities/:communityid/floor - Updating floor info
-module.exports.updateFloor  = async (req, res) => {
+module.exports.updateFloor = async (req, res) => {
   let communityid = req.params.communityid;
 
   if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
+
 
   try {
     let community = await Community.findById(communityid).exec();
