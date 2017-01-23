@@ -36,7 +36,7 @@ module.exports.residentsCreate = function(req, res) {
   });
 };
 
-// GET /residents/list/:communityid - Full detailed List all residents of a community
+// GET /residents/list/:communityid - List all residents of a community
 module.exports.residentsList = async (req, res) => {
 
   var community = req.params.communityid;
@@ -49,7 +49,8 @@ module.exports.residentsList = async (req, res) => {
 
     let fields = '_id firstName lastName aliasName carePoints';
 
-    let residents = await Resid.find({'community': community}).select(fields).exec();
+    let residents = await Resid.find({'community': community})
+                          .select(fields).sort({'carePoints': -1}).exec();
 
     utils.sendJSONresponse(res, 200, residents);
   } catch(err) {
@@ -58,7 +59,7 @@ module.exports.residentsList = async (req, res) => {
 
 };
 
-// GET /residents/full-list/:communityid - List all residents of a community
+// GET /residents/full-list/:communityid - Full detailed List all residents of a community
 module.exports.residentsFullList = async (req, res) => {
 
   var community = req.params.communityid;
