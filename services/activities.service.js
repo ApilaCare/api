@@ -23,16 +23,16 @@ module.exports = (socketConn) => {
       let community = client.community;
       let userid = client.userid;
 
-      connectedUsers[userid] = socket.id;
+      connectedUsers[userid] = socket;
 
       if(community) {
         socket.join(community._id);
 
-        socket.on('get-activities', async (community) => {
+        socket.on('get-activities', async (community, currUserid) => {
 
           let activities = await activityCtrl.recentActivities(community._id);
 
-          let usersActivities = communityActivities(activities, userid);
+          let usersActivities = communityActivities(activities, currUserid);
 
           io.sockets.to(community._id).emit('recent-activities', usersActivities);
         });
@@ -74,8 +74,6 @@ module.exports.acceptedMember = (data) => {
 //dynamicly adds activity to the db ands sends the new activity to everybody in that community
 module.exports.addActivity = async (text, userId, type, communityId, scope, respUser) => {
 
-  console.log(`CommunityId for activity: ${communityId}`);
-
   let responsibleUser = respUser || userId;
 
   let activity = {
@@ -90,8 +88,18 @@ module.exports.addActivity = async (text, userId, type, communityId, scope, resp
 
   let populatedActivity = await activityCtrl.addActivity(activity);
 
+
   if(populatedActivity) {
-    io.sockets.to(communityId).emit("add-activity", populatedActivity);
+
+    // if the activity is specific for a user
+    if(activity.scope === "user") {
+      if(connectedUsers[userId]) {
+        connectedUsers[userId].emit("add-activity", populatedActivity);
+      }
+    } else {
+      io.sockets.to(communityId).emit("add-activity", populatedActivity);
+    }
+
   }
 
 };
@@ -105,7 +113,8 @@ function communityActivities(activities, userid) {
   _.forEach(activities, function(activity) {
     activity.scope = activity.scope || 'community';
 
-    if(activity.scope === 'community' || toString(activity.userId._id) === toString(userid)) {
+    // add if commuity wide our it's for the user that requested activities
+    if(activity.scope === 'community' || activity.userId._id.toString() === userid.toString()) {
 
       usersActivities.push(activity);
     }
