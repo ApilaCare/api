@@ -12,7 +12,7 @@ const crypto = require('crypto');
 const cons = require('../../services/constants');
 
 // POST /register - User registration
-module.exports.register = function(req, res) {
+module.exports.register = async (req, res) => {
 
   // respond with an error status if not al required fields are found
   if (!req.body.name || !req.body.email || !req.body.password) {
@@ -32,15 +32,13 @@ module.exports.register = function(req, res) {
   user.setPassword(req.body.password);
 
   // create a new empty to do on register
-  todoCtrl.createEmptyToDo(function(todoid) {
-    if(todoid) {
-      //Save User
-      user.todoid = todoid;
-      saveUser(user, todoid, res);
-    } else {
-      utils.sendJSONresponse(res, 500, {"message" : "Error while saving todo"});
-    }
-  });
+  let todoid = await todoCtrl.createEmptyToDo();
+
+  if(todoid) {
+    user.todoid = todoid;
+    saveUser(user, todoid, res);
+  }
+
 
 };
 
@@ -79,56 +77,45 @@ module.exports.login = function(req, res) {
   })(req, res);
 };
 
-function saveUser(user, todoid, res) {
+async function saveUser(user, todoid, res) {
 
-  var tokenVerify = generateToken(user.email);
+  let tokenVerify = generateToken(user.email);
 
-  emailService.sendVerificationEmail(cons.APILA_EMAIL, user.email, tokenVerify)
-  .then(() => {
+  try {
+
     user.verifyToken = tokenVerify;
-  })
-  .then(() => {
 
-    user.save(function(err, u) {
-      var token;
-      if (err) {
-        utils.sendJSONresponse(res, 404, err);
-        return;
-      } else {
-        // generate a JWT using schema method and send it to browser
-        token = user.generateJwt();
+    let savedUser = await user.save();
 
-        var data = {
-          "creator": u._id,
-          "name": "Test"
-        };
+    await emailService.sendVerificationEmail(cons.APILA_EMAIL, user.email, tokenVerify);
 
+    let data = {
+      "creator": savedUser._id,
+      "name": "Test"
+    };
 
-          // create the user a new test community
-          communityCtrl.doCreateCommunity(data, function(status, community) {
-            if (status) {
-              utils.sendJSONresponse(res, 200, {
-                'token': token,
-                'community': community,
-                'id': user._id,
-                'todoid' : todoid
-              });
-              return;
-            } else {
-              utils.sendJSONresponse(res, 404, {
-                message: "Error while creating test community"
-              });
-              return;
-            }
+    // create the user a new test community
+    let community = await communityCtrl.doCreateCommunity(data, user);
+
+    let token = user.generateJwt(community._id);
+
+    if(community) {
+      utils.sendJSONresponse(res, 200, {
+            'token': token,
+            'community': community,
+            'id': user._id,
+            'todoid' : todoid
           });
+    } else {
+      utils.sendJSONresponse(res, 404, {message: "Error while creating test community"});
+    }
 
-      }
-    });
-  })
-  .catch((err) => {
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 404, err);
     console.log(err);
-    utils.sendJSONresponse(res, 500, {'err': "failed_send"});
-  });
+  }
+
 }
 
 function generateToken(email) {

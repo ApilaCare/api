@@ -570,45 +570,35 @@ module.exports.updateFloor = async (req, res) => {
 }
 
 
-module.exports.doCreateCommunity = function(communityInfo, callback) {
+module.exports.doCreateCommunity = async (communityInfo, user) => {
 
-  var members = [];
-  members.push(communityInfo.creator);
+  try {
 
-  Community.create({
-    name: communityInfo.name,
-    communityMembers: members,
-    pendingMembers: [],
-    creator: communityInfo.creator,
-    boss: communityInfo.creator,
-    testCommunity: true
+    let members = [];
+    members.push(communityInfo.creator);
 
-  }, function(err, community) {
+    let community = new Community({
+      name: communityInfo.name,
+      communityMembers: members,
+      pendingMembers: [],
+      creator: communityInfo.creator,
+      boss: communityInfo.creator,
+      testCommunity: true
+    });
 
-    if (err) {
-      console.log(err);
-      callback(false);
-    } else {
+    let savedCommunity = await community.save();
 
-      User.findById(communityInfo.creator)
-        .exec(function(err, user) {
-          if (user) {
-            user.community = community._id;
+    user.community = savedCommunity._id;
 
-            user.save(function(err) {
-              if (err) {
-                callback(false);
-              } else {
-                callback(true, community);
-              }
-            });
-          } else {
-            callback(false);
-          }
-        });
+    await user.save();
 
-    }
-  });
+    return savedCommunity;
+
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
+
 };
 
 //PRIVATE FUNCTIONS

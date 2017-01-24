@@ -12,20 +12,25 @@ const taskState = require('../../services/constants').taskState;
 const activitiesService = require('../../services/activities.service');
 
 // creates an empty todo object called when a user is registered
-module.exports.createEmptyToDo = function(callback) {
+module.exports.createEmptyToDo = async () => {
 
-  ToDo.create({
-    tasks: [],
-    completed: [],
-    overDue: [],
-    notCompleted: []
-  }, function(err, todo) {
-    if (err) {
-      callback(false);
-    } else {
-      callback(todo._id);
-    }
-  });
+
+  try {
+    let task = new ToDo({
+      tasks: [],
+      completed: [],
+      overDue: [],
+      notCompleted: []
+    });
+
+    let savedTask = await task.save();
+
+    return savedTask.id;
+
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
 
 };
 
@@ -99,7 +104,7 @@ module.exports.addTask = function(req, res) {
       if(err) {
         utils.sendJSONresponse(res, 500, err);
       } else {
-        activitiesService.addActivity(" created a task " + newTask.text, 
+        activitiesService.addActivity(" created a task " + newTask.text,
                           userId, "task-create", req.body.communityId, "user");
 
         utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
