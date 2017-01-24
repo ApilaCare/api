@@ -409,30 +409,24 @@ module.exports.issuesUpdateOne = function(req, res) {
             console.log(err);
             utils.sendJSONresponse(res, 404, err);
           } else {
-            Iss.populate(issue.updateField,
-              [{'path' : 'updateBy', select: '_id name userImage'},
-               {'path' : 'submitBy', select: '_id name userImage'},
-                {'path' : 'checklists.author', select: '_id name userImage'}],
-            function(err, iss) {
-              if(err) {
-                utils.sendJSONresponse(res, 500, err);
-              } else {
-                if(req.body.addedMember) {
-                  activitiesService.addActivity(" added member " + req.body.addedMember.name + " to issue" + issue.title, req.body.responsibleParty,
-                                                  "issue-update", issue.community, 'user', req.body.addedMember._id);
-                } else {
-                  activitiesService.addActivity(" updated issue " + req.body.title, req.body.responsibleParty,
-                                                  "issue-update", issue.community, 'community');
-                }
 
-                utils.sendJSONresponse(res, 200, iss);
+              if(req.body.addedMember) {
+                activitiesService.addActivity(" added member " + req.body.addedMember.name + " to issue" + issue.title, req.body.responsibleParty,
+                                                "issue-update", issue.community, 'user', req.body.addedMember._id);
+              } else if(req.body.oldResponsibleParty) {
+                activitiesService.addActivity(" changed responsible party in issue " + issue.title, req.body.responsibleParty,
+                                                "issue-update", issue.community, 'user');
+              } else {
+                activitiesService.addActivity(" updated issue " + req.body.title, req.body.responsibleParty,
+                                                "issue-update", issue.community, 'community');
               }
 
-            });
+              utils.sendJSONresponse(res, 200, issue);
           }
+
+
         });
-      }
-    );
+      });
 };
 
 // DELETE /issues/:issueid - Delte an issue by id
