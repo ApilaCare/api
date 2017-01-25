@@ -37,6 +37,8 @@ module.exports.register = async (req, res) => {
   if(todoid) {
     user.todoid = todoid;
     saveUser(user, todoid, res);
+  } else {
+    utils.sendJSONresponse(res, 404, {message: "Error while creating todo"});
   }
 
 
