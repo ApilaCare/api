@@ -62,11 +62,9 @@ module.exports = (socketConn) => {
 module.exports.acceptedMember = (data) => {
   let userId = data.id;
 
-  let socketId = connectedUsers[userId];
-
-  if(socketId) {
+  if(connectedUsers[userId]) {
     console.log("accepted member being send ");
-    io.sockets.socket(socketId).emit('member-accepted', data);
+    connectedUsers[userId].emit('member-accepted', data);
   }
 
 };
