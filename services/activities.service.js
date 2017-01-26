@@ -85,7 +85,7 @@ module.exports.addActivity = async (text, userId, type, communityId, scope, resp
   };
 
   let populatedActivity = await activityCtrl.addActivity(activity);
-
+  
 
   if(populatedActivity) {
 

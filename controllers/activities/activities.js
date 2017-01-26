@@ -25,12 +25,11 @@ module.exports.recentActivities = async (communityId) => {
 module.exports.addActivity = async (data) => {
 
   try {
-
     let activity = new Activity(data);
 
     let savedActivity = await activity.save();
 
-    return activity.populate({path: "userId", select: "name userImage community"});
+    return savedActivity.populate({path: "userId", select: "name userImage community"}).execPopulate();
 
   } catch(err) {
     console.log(err);
