@@ -411,13 +411,14 @@ module.exports.issuesUpdateOne = function(req, res) {
           } else {
 
               if(req.body.addedMember) {
-                activitiesService.addActivity(" added member " + req.body.addedMember.name + " to issue" + issue.title, req.body.responsibleParty,
+                console.log("added a member");
+                activitiesService.addActivity(" added member " + req.body.addedMember.name + " to issue " + issue.title, req.payload._id,
                                                 "issue-update", issue.community, 'user', req.body.addedMember._id);
               } else if(req.body.oldResponsibleParty) {
-                activitiesService.addActivity(" changed responsible party in issue " + issue.title, req.body.responsibleParty,
+                activitiesService.addActivity(" changed responsible party in issue " + issue.title, req.payload._id,
                                                 "issue-update", issue.community, 'user');
               } else {
-                activitiesService.addActivity(" updated issue " + req.body.title, req.body.responsibleParty,
+                activitiesService.addActivity(" updated issue " + req.body.title, req.payload._id,
                                                 "issue-update", issue.community, 'community');
               }
 

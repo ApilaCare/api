@@ -13,7 +13,7 @@ module.exports.recentActivities = async (communityId) => {
     return await Activity.find({"communityId": communityId})
           .populate("userId", "name userImage community")
           .sort("-createdOn")
-          .limit(10)
+          .limit(20)
           .exec();
 
   } catch(err) {
