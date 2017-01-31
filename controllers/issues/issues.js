@@ -347,11 +347,12 @@ module.exports.issuesUpdateOne = function(req, res) {
     return;
   }
 
-  var updateInfo = {
-    "updateBy": req.body.modifiedBy,
-    "updateDate": req.body.modifiedDate,
-    "updateField": req.body.updateField
-  };
+
+  // var updateInfo = {
+  //   "updateBy": req.body.modifiedBy,
+  //   "updateDate": req.body.modifiedDate,
+  //   "updateField": req.body.updateField
+  // };
 
   Iss
     .findById(req.params.issueid)
@@ -396,13 +397,12 @@ module.exports.issuesUpdateOne = function(req, res) {
           issue.idMembers = req.body.idMembers;
         }
 
-
-        if (updateInfo.updateField !== undefined) {
-          if (updateInfo.updateField.length > 0) {
-            issue.updateInfo.push(updateInfo);
-          }
-
-        }
+        // if (updateInfo.updateField !== undefined) {
+        //   if (updateInfo.updateField.length > 0) {
+        //     issue.updateInfo.push(updateInfo);
+        //   }
+        //
+        // }
 
         issue.save(function(err, issue) {
           if (err) {
@@ -428,6 +428,28 @@ module.exports.issuesUpdateOne = function(req, res) {
 
         });
       });
+};
+
+//PUT /issues/:issueid/updateinfo - Adding a new update info entry
+module.exports.addUpdateInfo = async (req, res) => {
+
+  try {
+
+    if(!req.body) {
+      throw "UpdateInfo is empty";
+    }
+
+    let issue = await Iss.findById(req.params.issueid).exec();
+
+    issue.updateInfo.push(req.body);
+
+    let savedIssue = await issue.save();
+
+    utils.sendJSONresponse(res, 200, req.body);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
 };
 
 // DELETE /issues/:issueid - Delte an issue by id
