@@ -51,9 +51,6 @@ module.exports.issueAttachmentsDeleteOne = function(req, res) {
 
             var attch = issue.attachments.id(req.params.attachmentid);
 
-            var updateInfo = formatUpdateIssue(req, attch);
-            issue.updateInfo.push(updateInfo);
-
             issue.attachments.id(req.params.attachmentid).remove();
 
             issue.save(function(err) {
@@ -98,8 +95,6 @@ var doAddAttachment = function(req, res, issue) {
       type: file.type,
     });
 
-    issue.updateInfo.push(req.body.updateInfo);
-
     fs.unlinkSync(file.path);
 
     issue.save(function(err, issue) {
@@ -114,20 +109,6 @@ var doAddAttachment = function(req, res, issue) {
   });
 
 };
-
-function formatUpdateIssue(req, attch) {
-
-  var updateInfo = {};
-
-  updateInfo.updateBy = req.payload.name;
-  updateInfo.updateDate = new Date();
-  updateInfo.updateField = [];
-  updateInfo.updateField.push({
-    "field": "attachments",
-    "new": "",
-    "old": attch.name
-  });
-}
 
 function issueHasError(res, err, issue) {
 

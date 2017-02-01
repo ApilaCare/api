@@ -349,12 +349,6 @@ module.exports.issuesUpdateOne = function(req, res) {
   }
 
 
-  // var updateInfo = {
-  //   "updateBy": req.body.modifiedBy,
-  //   "updateDate": req.body.modifiedDate,
-  //   "updateField": req.body.updateField
-  // };
-
   Iss
     .findById(req.params.issueid)
     .exec(
@@ -397,13 +391,6 @@ module.exports.issuesUpdateOne = function(req, res) {
         } else {
           issue.idMembers = req.body.idMembers;
         }
-
-        // if (updateInfo.updateField !== undefined) {
-        //   if (updateInfo.updateField.length > 0) {
-        //     issue.updateInfo.push(updateInfo);
-        //   }
-        //
-        // }
 
         issue.save(function(err, issue) {
           if (err) {

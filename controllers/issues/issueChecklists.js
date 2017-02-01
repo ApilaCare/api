@@ -54,11 +54,6 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
             thisChecklist.checkItems = req.body.checkItems;
             thisChecklist.checkItemsChecked = req.body.checkItemsChecked;
 
-
-            if (req.body.updateInfo) {
-              issue.updateInfo.push(req.body.updateInfo);
-            }
-
             // other update items
             issue.save(function(err, issue) {
               if (err) {
@@ -105,9 +100,6 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
             let checklist = issue.checklists.id(req.params.checklistid);
 
             if(checklist) {
-
-              var updateInfo = formatUpdateInfo(req, issue);
-              issue.updateInfo.push(updateInfo);
 
               checklist.remove();
 
@@ -173,19 +165,4 @@ function issueHasError(res, err, issue) {
   }
 
   return false;
-}
-
-function formatUpdateInfo(req, issue) {
-  var updateInfo = {};
-
-  updateInfo.updateBy = req.payload._id;
-  updateInfo.updateDate = new Date();
-  updateInfo.updateField = [];
-  updateInfo.updateField.push({
-    "field": "checkitem",
-    "new": "",
-    "old": issue.checklists.id(req.params.checklistid).checklistName
-  });
-
-  return updateInfo;
 }
