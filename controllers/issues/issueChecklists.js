@@ -105,7 +105,7 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
             let checklist = issue.checklists.id(req.params.checklistid);
 
             if(checklist) {
-              
+
               var updateInfo = formatUpdateInfo(req, issue);
               issue.updateInfo.push(updateInfo);
 
@@ -147,8 +147,6 @@ var doAddChecklist = function(req, res, issue) {
       checklistName: req.body.checklistName,
       // needs the checkItems as the mixed mongoose schema
     });
-
-    issue.updateInfo.push(req.body.updateInfo);
 
     issue.save(function(err, issue) {
       var thisChecklist;

@@ -294,6 +294,7 @@ module.exports.issuesPopulateOne = (req, res) => {
       .populate("checklists.author", "name _id")
       .populate("finalPlan.author", "name _id")
       .populate("responsibleParty", "name _id")
+      .populate("submitBy", "name _id")
       .exec((err, issue) => {
 
         if(!err) {
