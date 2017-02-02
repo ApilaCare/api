@@ -102,9 +102,6 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
                 } else {
                     var label = issue.labels.id(req.params.labelid);
 
-                    var updateInfo = formatUpdateInfo(req, label);
-                    issue.updateInfo.push(updateInfo);
-
                     issue.labels.id(req.params.labelid).remove();
 
                     issue.save(function(err) {
@@ -125,24 +122,6 @@ module.exports.issueLabelsDeleteOne = function(req, res) {
       );
 };
 
-//////////////////////////// HELPER FUNCTIONS /////////////////////////////
-
-function formatUpdateInfo(req, label) {
-  var updateInfo = {};
-
-  updateInfo.updateBy = req.payload._id;
-  updateInfo.updateDate = new Date();
-  updateInfo.updateField = [];
-  updateInfo.updateField.push({
-    "field": "labels",
-    "new": "",
-    "old": label.name
-  });
-
-  return updateInfo;
-
-}
-
 var doAddLabel = function(req, res, issue) {
 
     if (!issue) {
@@ -152,8 +131,6 @@ var doAddLabel = function(req, res, issue) {
             name: req.body.name,
             color: req.body.color
         });
-
-        issue.updateInfo.push(req.body.updateInfo);
 
         issue.save(function(err, issue) {
             var thisLabel;

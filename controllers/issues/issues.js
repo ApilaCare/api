@@ -348,7 +348,6 @@ module.exports.issuesUpdateOne = function(req, res) {
     return;
   }
 
-
   Iss
     .findById(req.params.issueid)
     .exec(
@@ -368,7 +367,7 @@ module.exports.issuesUpdateOne = function(req, res) {
           issue.responsibleParty = req.body.responsibleParty._id || req.body.responsibleParty;
         }
 
-        if(req.body.submitBy._id) {
+        if(req.body.submitBy && req.body.submitBy._id) {
           issue.submitBy = req.body.submitBy._id;
         }
 
@@ -466,6 +465,37 @@ module.exports.issuesDeleteOne = function(req, res) {
       "message": "No issueid"
     });
   }
+};
+
+//PUT /issues/:issueid/plan/:planid
+module.exports.updateFinalPlan = async (req, res) => {
+
+  let planId = req.params.planid;
+
+  if (utils.checkParams(req, res, ['issueid', 'planid'])) {
+    return;
+  }
+
+  try {
+    let issue = await Iss.findById(req.params.issueid).exec();
+
+    let index = issue.finalPlan.indexOf(issue.finalPlan.id(planId));
+    let plan = req.body;
+
+    if(index === -1) {
+      throw "No final Plan found";
+    }
+
+    issue.finalPlan.set(index, plan);
+
+    const savedIssue = await issue.save();
+
+    utils.sendJSONresponse(res, 200, savedIssue);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+
 };
 
 //////////////////////// HELPER FUNCTIONS ////////////////////////////
