@@ -212,25 +212,16 @@ module.exports.issuesList = function(req, res) {
         model: 'User',
         select: '_id name userImage'
       },{
-        path: 'updateInfo.updateBy',
+        path: 'issues.responsibleParty',
         model: 'User',
         select: '_id name userImage'
-      },{
-        path: 'submitBy',
-        model: 'User',
-        select: '_id name userImage'
-      },{
-        path: 'responsibleParty',
-        model: 'User',
-        select: '_id name userImage'
-      }], function(err) {
+      }], function(err, populated) {
         if (err) {
           utils.sendJSONresponse(res, 404, {
             'message': err
           });
         } else {
-          console.log(issues);
-          utils.sendJSONresponse(res, 200, issues);
+          utils.sendJSONresponse(res, 200, populated);
         }
 
       });
