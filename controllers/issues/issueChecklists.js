@@ -53,6 +53,7 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
             thisChecklist.author = req.body.author;
             thisChecklist.checkItems = req.body.checkItems;
             thisChecklist.checkItemsChecked = req.body.checkItemsChecked;
+            thisChecklist.checklistName = req.body.checklistName;
 
             // other update items
             issue.save(function(err, issue) {
