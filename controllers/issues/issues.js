@@ -283,8 +283,8 @@ module.exports.issuesPopulateOne = (req, res) => {
 
   Iss.findById(req.params.issueid)
       .populate("checklists.author", "name _id")
-      .populate("finalPlan.author", "name _id")
-      .populate("responsibleParty", "name _id")
+      .populate("finalPlan.author", "name _id userImage")
+      .populate("responsibleParty", "name _id userImage")
       .populate("submitBy", "name _id")
       .exec((err, issue) => {
 
