@@ -1,6 +1,11 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var chatSchema = new mongoose.Schema({
+const issueLabelsSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    color: {type: String, required: true},
+});
+
+const chatSchema = new mongoose.Schema({
   message: {type: String, required: true},
   userSend: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   userReceived: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
@@ -8,7 +13,7 @@ var chatSchema = new mongoose.Schema({
   timeSent: {type: Date, default: Date.now()}
 });
 
-var roomStyleSchema = new mongoose.Schema({
+const roomStyleSchema = new mongoose.Schema({
     name: {type: String, required: true},
     area: {type: Number},
     areaUnit: {type: Boolean, default: true}, // if true: feet^2 | if false: meter^2
@@ -18,7 +23,7 @@ var roomStyleSchema = new mongoose.Schema({
     submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
 });
 
-var communitySchema = new mongoose.Schema({
+const communitySchema = new mongoose.Schema({
     name: {type: String, required: true},
     communityMembers: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     pendingMembers: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
@@ -35,6 +40,7 @@ var communitySchema = new mongoose.Schema({
     logo: {type: String},
     fax: {type: String},
     numFloors: {type: Number},
+    labels: [issueLabelsSchema],
     floors: [{
       floorNumber: {type: Number},
       startRoom: {type: String},

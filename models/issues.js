@@ -27,6 +27,8 @@ var issueLabelsSchema = new mongoose.Schema({
     color: {type: String, required: true},
 });
 
+mongoose.model('Labels', issueLabelsSchema);
+
 var issueMembersSchema = new mongoose.Schema({
   name: {type: String, required: true}
 });
@@ -87,4 +89,5 @@ var issueSchema = new mongoose.Schema({
 });
 
 mongoose.model('Issue', issueSchema);
+
 mongoose.model('MemberRecover', memberRecoverSchema);

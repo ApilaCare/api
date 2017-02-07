@@ -100,7 +100,8 @@ router.put('/issues/:issueid/checklists/:checklistid', sanitizeInput , auth, ctr
 router.delete('/issues/:issueid/checklists/:checklistid', sanitizeInput , auth, ctrlIssueChecklists.issueChecklistsDeleteOne);
 
 // issue labels
-router.post('/issues/:issueid/labels/new', sanitizeInput , auth, ctrlIssueLabels.issueLabelsCreate);
+router.post('/issues/labels/:communityid', sanitizeInput, auth, ctrlIssueLabels.createLabel);
+router.post('/issues/:issueid/labels/:labelid', sanitizeInput , auth, ctrlIssueLabels.addLabelToCard);
 router.put('/issues/:issueid/labels/:labelid', sanitizeInput , auth, ctrlIssueLabels.issueLabelsUpdateOne);
 router.delete('/issues/:issueid/labels/:labelid', sanitizeInput , auth, ctrlIssueLabels.issueLabelsDeleteOne);
 

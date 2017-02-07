@@ -5,6 +5,8 @@ var utils = require('../../services/utils');
 const activitiesService = require('../../services/activities.service');
 const ToDo = mongoose.model('ToDo');
 
+const Labels = mongoose.model('Labels');
+
 // POST /issues/new - Creates a new issue
 module.exports.issuesCreate = function(req, res) {
 
@@ -286,12 +288,17 @@ module.exports.issuesPopulateOne = (req, res) => {
       .populate("finalPlan.author", "name _id userImage")
       .populate("responsibleParty", "name _id userImage")
       .populate("submitBy", "name _id")
+    //  .populate("labels", "color name")
       .exec((err, issue) => {
 
         if(!err) {
-          console.log(issue);
 
-          utils.sendJSONresponse(res, 200, issue);
+          Labels.populate(issue, {path: "labels", model:"Labels"}, function(err, d) {
+            console.log(d);
+            utils.sendJSONresponse(res, 200, issue);
+          });
+
+
         } else {
           utils.sendJSONresponse(res, 404, err);
         }
