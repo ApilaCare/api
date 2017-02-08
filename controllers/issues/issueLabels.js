@@ -5,6 +5,8 @@ const Iss = mongoose.model('Issue');
 const User = mongoose.model('User');
 const Community = mongoose.model('Community');
 
+const _ = require('lodash');
+
 // POST /issues/label/:communityid - Creates a new label for that community
 module.exports.createLabel = async (req, res) => {
   try {
@@ -43,8 +45,6 @@ module.exports.addLabelToCard = async (req, res) => {
 
     let issue = await Iss.findById(req.params.issueid).exec();
 
-    console.log(req.body);
-
     issue.labels.push({
       name: req.body.name,
       color: req.body.color
@@ -60,55 +60,54 @@ module.exports.addLabelToCard = async (req, res) => {
 
 };
 
-// PUT /issues/:issueid/labels/:labelid - Updates the label
-module.exports.issueLabelsUpdateOne = function(req, res) {
+// DELETE /issues/:issueid/labels/:labelname - Removes a label from card
+module.exports.removeLabelFromCard = async (req, res) => {
 
-    if(utils.checkParams(req, res, ['issueid', 'labelid'])) {
-      return;
+  try {
+
+    const labelname = req.params.labelname;
+
+    let issue = await Iss.findById(req.params.issueid).exec();
+
+
+    const index = _.findIndex(issue.labels, {name: labelname});
+
+    if(index === -1) {
+      throw 'Label not found';
     }
 
-    Iss
-        .findById(req.params.issueid)
-        .select('labels')
-        .exec(
-            function(err, issue) {
-                var thisLabel;
+    issue.labels.splice(index, 1);
 
-                if (!issue) {
-                    utils.sendJSONresponse(res, 404, {
-                        "message": "issueid not found"
-                    });
-                    return;
-                } else if (err) {
-                    utils.sendJSONresponse(res, 400, err);
-                    return;
-                }
-                if (issue.labels && issue.labels.length > 0) {
-                    thisLabel = issue.labels.id(req.params.labelid);
-                    if (!thisLabel) {
-                        utils.sendJSONresponse(res, 404, {
-                            "message": "labelid not found"
-                        });
-                    } else {
+    await issue.save();
 
-                        thisLabel.name = req.body.name;
-                        thisLabel.color = req.body.color;
-                        issue.save(function(err, issue) {
-                            if (err) {
-                                console.log(err);
-                                utils.sendJSONresponse(res, 404, err);
-                            } else {
-                                utils.sendJSONresponse(res, 200, thisLabel);
-                            }
-                        });
-                    }
-                } else {
-                    utils.sendJSONresponse(res, 404, {
-                        "message": "No label to update"
-                    });
-                }
-            }
-        );
+    utils.sendJSONresponse(res, 200, {});
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 400, err);
+  }
+
+};
+
+// PUT /issues/:issueid/labels/:labelname - Updates the label
+module.exports.updateLabel = async (req, res) => {
+
+    Iss.update({
+      labels: labelname
+    }, {
+      $pullAll: {name: [labelname]}
+    }, {multi: true}, function(err, kk) {
+      if(err) {
+        utils.sendJSONresponse(res, 400, err);
+      }
+
+      console.log(kk);
+
+      utils.sendJSONresponse(res, 200, {});
+    })
+
+
+
+
 };
 
 // DELETE /issues/:issueid/labels/:labelid - Removes a label by id
