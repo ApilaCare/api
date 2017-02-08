@@ -88,97 +88,87 @@ module.exports.removeLabelFromCard = async (req, res) => {
 
 };
 
-// PUT /issues/:issueid/labels/:labelname - Updates the label
+// PUT /issues/:communityid/labels/:labelname - Updates the label
 module.exports.updateLabel = async (req, res) => {
 
-    Iss.update({
-      labels: labelname
-    }, {
-      $pullAll: {name: [labelname]}
-    }, {multi: true}, function(err, kk) {
-      if(err) {
-        utils.sendJSONresponse(res, 400, err);
-      }
+  try {
 
-      console.log(kk);
+    //update in community
+    let community = await Community.findById(req.params.communityid).exec();
+    community.labels = updateLabel(community.labels, req.body, req.params.labelname);
+    await community.save();
 
-      utils.sendJSONresponse(res, 200, {});
-    })
+    let issues = await Iss.find({'labels.name' : req.params.labelname}).exec();
+
+    let cnt = 0;
+
+    // update in all the issues
+    issues.forEach((issue) => {
+
+      issue.labels = updateLabel(issue.labels, req.body, req.params.labelname);
+
+      issue.save((err) => {
+        cnt++;
+        if(cnt === issues.length) {
+          utils.sendJSONresponse(res, 200, {});
+        }
+      });
 
 
+    });
 
 
-};
-
-// DELETE /issues/:issueid/labels/:labelid - Removes a label by id
-module.exports.issueLabelsDeleteOne = function(req, res) {
-
-  if(utils.checkParams(req, res, ['issueid', 'labelid'])) {
-    return;
+  } catch(err) {
+    utils.sendJSONresponse(res, 400, err);
   }
 
-  Iss
-    .findById(req.params.issueid)
-    .select('labels updateInfo')
-    .exec(
-        function(err, issue) {
-            if (!issue) {
-                utils.sendJSONresponse(res, 404, {
-                    "message": "issueid not found"
-                });
-                return;
-            } else if (err) {
-                utils.sendJSONresponse(res, 400, err);
-                return;
-            }
-            if (issue.labels && issue.labels.length > 0) {
-                if (!issue.labels.id(req.params.labelid)) {
+};
 
-                    utils.sendJSONresponse(res, 404, {
-                        "message": "labelid not found"
-                    });
-                } else {
-                    var label = issue.labels.id(req.params.labelid);
+// DELETE /issues/:communityid/labels/:labelname - Removes a label by id
+module.exports.deleteLabel = async (req, res) => {
 
-                    issue.labels.id(req.params.labelid).remove();
+  try {
 
-                    issue.save(function(err) {
-                        if (err) {
-                           console.log(err);
-                            utils.sendJSONresponse(res, 404, err);
-                        } else {
-                            utils.sendJSONresponse(res, 204, {});
-                        }
-                    });
-                }
-            } else {
-                utils.sendJSONresponse(res, 404, {
-                    "message": "No label to delete"
-                });
-            }
+    //update in community
+    let community = await Community.findById(req.params.communityid).exec();
+
+    const index = _.findIndex(community.labels, {name: req.params.labelname});
+    community.labels.splice(index, 1);
+
+    await community.save();
+
+    let issues = await Iss.find({'labels.name' : req.params.labelname}).exec();
+
+    let cnt = 0;
+
+
+    issues.forEach((issue) => {
+
+      const index = _.findIndex(issue.labels, {name: req.params.labelname});
+
+      issue.labels.splice(index, 1);
+
+      issue.save((err) => {
+        cnt++;
+        if(cnt === issues.length) {
+          utils.sendJSONresponse(res, 200, {});
         }
-      );
+      });
+
+
+    });
+
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 400, err);
+  }
 };
 
-var doAddLabel = function(req, res, issue) {
+function updateLabel(labels, data, labelname) {
+  const index = _.findIndex(labels, {name: labelname});
 
-    if (!issue) {
-        utils.sendJSONresponse(res, 404, "issueid not found");
-    } else {
-        issue.labels.push({
-            name: req.body.name,
-            color: req.body.color
-        });
+  labels[index].name = data.newName;
+  labels[index].color = data.color;
 
-        issue.save(function(err, issue) {
-            var thisLabel;
-            if (err) {
-                utils.sendJSONresponse(res, 400, err);
-                console.log(err);
-            } else {
-                thisLabel = issue.labels[issue.labels.length - 1];
-                utils.sendJSONresponse(res, 201, thisLabel);
-            }
-        });
-    }
-};
+  return labels;
+}

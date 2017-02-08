@@ -102,9 +102,9 @@ router.delete('/issues/:issueid/checklists/:checklistid', sanitizeInput , auth, 
 // issue labels
 router.post('/issues/labels/:communityid', sanitizeInput, auth, ctrlIssueLabels.createLabel);
 router.post('/issues/:issueid/labels/:labelid', sanitizeInput , auth, ctrlIssueLabels.addLabelToCard);
-router.put('/issues/:issueid/labels/:labelname', sanitizeInput , auth, ctrlIssueLabels.updateLabel);
+router.put('/issues/:communityid/labels/:labelname', sanitizeInput , auth, ctrlIssueLabels.updateLabel);
 router.delete('/issues/:issueid/labels/:labelname', sanitizeInput , auth, ctrlIssueLabels.removeLabelFromCard);
-//router.delete('/issues/:issueid/labels/:labelid', sanitizeInput , auth, ctrlIssueLabels.issueLabelsDeleteOne);
+router.delete('/community/:communityid/labels/:labelname', sanitizeInput , auth, ctrlIssueLabels.deleteLabel);
 
 // issue attachments
 router.post('/issues/:issueid/attachments/new', sanitizeInput , auth, multipartyMiddleware, ctrlIssueAttachments.issueAttachmentsCreate);
