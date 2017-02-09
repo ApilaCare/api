@@ -60,34 +60,6 @@ module.exports.addLabelToCard = async (req, res) => {
 
 };
 
-// DELETE /issues/:issueid/labels/:labelname - Removes a label from card
-module.exports.removeLabelFromCard = async (req, res) => {
-
-  try {
-
-    const labelname = req.params.labelname;
-
-    let issue = await Iss.findById(req.params.issueid).exec();
-
-
-    const index = _.findIndex(issue.labels, {name: labelname});
-
-    if(index === -1) {
-      throw 'Label not found';
-    }
-
-    issue.labels.splice(index, 1);
-
-    await issue.save();
-
-    utils.sendJSONresponse(res, 200, {});
-
-  } catch(err) {
-    utils.sendJSONresponse(res, 400, err);
-  }
-
-};
-
 // PUT /issues/:communityid/labels/:labelname - Updates the label
 module.exports.updateLabel = async (req, res) => {
 
@@ -117,6 +89,33 @@ module.exports.updateLabel = async (req, res) => {
 
     });
 
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 400, err);
+  }
+
+};
+
+// DELETE /issues/:issueid/labels/:labelname - Removes a label from card
+module.exports.removeLabelFromCard = async (req, res) => {
+
+  try {
+
+    const labelname = req.params.labelname;
+
+    let issue = await Iss.findById(req.params.issueid).exec();
+
+    const index = _.findIndex(issue.labels, {name: labelname});
+
+    if(index === -1) {
+      throw 'Label not found';
+    }
+
+    issue.labels.splice(index, 1);
+
+    await issue.save();
+
+    utils.sendJSONresponse(res, 200, {});
 
   } catch(err) {
     utils.sendJSONresponse(res, 400, err);
@@ -167,8 +166,10 @@ module.exports.deleteLabel = async (req, res) => {
 function updateLabel(labels, data, labelname) {
   const index = _.findIndex(labels, {name: labelname});
 
-  labels[index].name = data.newName;
-  labels[index].color = data.color;
+  if(index !== -1) {
+    labels[index].name = data.newName;
+    labels[index].color = data.color;
+  }
 
   return labels;
 }

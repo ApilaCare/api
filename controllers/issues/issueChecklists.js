@@ -30,6 +30,8 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
     return;
   }
 
+  console.log("In Update checklist");
+
   Iss
     .findById(req.params.issueid)
     .exec(
@@ -49,6 +51,8 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
               "message": "checklistid not found"
             });
           } else {
+
+            console.log(thisChecklist);
 
             thisChecklist.author = req.body.author;
             thisChecklist.checkItems = req.body.checkItems;
