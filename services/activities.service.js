@@ -63,7 +63,6 @@ module.exports.acceptedMember = (data) => {
   let userId = data.id;
 
   if(connectedUsers[userId]) {
-    console.log("accepted member being send ");
     connectedUsers[userId].emit('member-accepted', data);
   }
 
@@ -85,7 +84,7 @@ module.exports.addActivity = async (text, userId, type, communityId, scope, resp
   };
 
   let populatedActivity = await activityCtrl.addActivity(activity);
-  
+
 
   if(populatedActivity) {
 
