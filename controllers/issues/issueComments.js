@@ -35,6 +35,8 @@ module.exports.issueCommentsUpdate = function(req, res) {
 
   let commentId = req.body._id;
 
+  console.log("IN COMMENTS UPDATE " +  commentId);
+
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
   }
@@ -44,6 +46,8 @@ module.exports.issueCommentsUpdate = function(req, res) {
   issue.then((issue) => {
 
     let index = issue.comments.indexOf(issue.comments.id(commentId));
+
+    console.log(index);
     let comment = req.body;
 
     if(index !== -1) {

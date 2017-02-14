@@ -491,6 +491,7 @@ module.exports.updateFinalPlan = async (req, res) => {
     utils.sendJSONresponse(res, 200, savedIssue);
 
   } catch(err) {
+    console.log(err);
     utils.sendJSONresponse(res, 500, err);
   }
 
@@ -522,7 +523,7 @@ function finalPlan(req, res, taskid) {
              utils.sendJSONresponse(res, 404,
                {'message' : 'Unable to save issue while adding final plan'});
            } else {
-             utils.sendJSONresponse(res, 200, finalPlan);
+             utils.sendJSONresponse(res, 200, issue.finalPlan.pop());
            }
          });
        }
