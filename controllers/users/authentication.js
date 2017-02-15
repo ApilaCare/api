@@ -1,11 +1,12 @@
-var passport = require('passport');
-var mongoose = require('mongoose');
-var User = mongoose.model('User');
+const passport = require('passport');
+const mongoose = require('mongoose');
+const User = mongoose.model('User');
 
-var communityCtrl = require('../communities/communities');
-var todoCtrl = require('../todos/todos');
-var utils = require('../../services/utils');
-var emailService = require('../../services/email');
+const communityCtrl = require('../communities/communities');
+const todoCtrl = require('../todos/todos');
+const utils = require('../../services/utils');
+const emailService = require('../../services/email');
+const logs = require('../communities/logs');
 
 const crypto = require('crypto');
 
@@ -66,8 +67,14 @@ module.exports.login = function(req, res) {
       utils.sendJSONresponse(res, 404, err);
       return;
     }
+
     // if Passport returned a user instance, generate and send a JWT (json web token)
     if (user) {
+
+      const usersIpAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+      logs.addLogEntry(user.community, user._id, usersIpAddress);
+
       token = user.generateJwt();
 
       utils.sendJSONresponse(res, 200, {

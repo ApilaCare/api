@@ -23,6 +23,12 @@ const roomStyleSchema = new mongoose.Schema({
     submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
 });
 
+const logsSchema = new mongoose.Schema({
+  ipAddress: {type: String},
+  loggedOn: {type: Date, "default": Date.now},
+  user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+});
+
 const communitySchema = new mongoose.Schema({
     name: {type: String, required: true},
     communityMembers: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
@@ -48,7 +54,8 @@ const communitySchema = new mongoose.Schema({
     }],
     rooms: {type: Number},
     roomStyle: [roomStyleSchema],
-    communityChat: [chatSchema]
+    communityChat: [chatSchema],
+    logs: [logsSchema]
 });
 
 mongoose.model('Community', communitySchema);
