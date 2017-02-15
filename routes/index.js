@@ -54,6 +54,9 @@ var ctrlToDos = require('../controllers/todos/todos');
 // activity
 var ctrlActivity = require('../controllers/activities/activities');
 
+// logs
+const ctrlLogs = require('../controllers/communities/logs');
+
 // communities
 router.get('/communities/', sanitizeInput, auth, ctrlCommunities.communitiesList);
 router.get('/communities/canceled/:userid', sanitizeInput , auth, ctrlCommunities.hasCanceledCommunity);
@@ -158,6 +161,9 @@ router.delete('/todos/:todoid/task/:taskid', sanitizeInput, auth, ctrlToDos.dele
 
 // Activity
 router.post('/activity/:todoid', sanitizeInput, auth, ctrlActivity.createToDoActivity);
+
+// logs
+router.get('/logs/:communityid', sanitizeInput, auth, ctrlLogs.listLogs);
 
 // residents
 router.get('/residents/list/:communityid', sanitizeInput , auth, ctrlResidents.residentsList);
