@@ -60,12 +60,15 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
             thisChecklist.checklistName = req.body.checklistName;
 
             // other update items
-            issue.save(function(err, issue) {
+            issue.save(function(err, savedIssue) {
               if (err) {
                 console.log(err);
                 utils.sendJSONresponse(res, 404, err);
               } else {
-                utils.sendJSONresponse(res, 200, thisChecklist);
+
+                const savedChecklist = savedIssue.checklists;
+
+                utils.sendJSONresponse(res, 200, savedChecklist);
               }
             });
           }
