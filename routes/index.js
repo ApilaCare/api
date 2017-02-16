@@ -164,6 +164,7 @@ router.post('/activity/:todoid', sanitizeInput, auth, ctrlActivity.createToDoAct
 
 // logs
 router.get('/logs/:communityid', sanitizeInput, auth, ctrlLogs.listLogs);
+router.get('/user_logs/:communityid/user/:userid', sanitizeInput, auth, ctrlLogs.listUserLogs);
 
 // residents
 router.get('/residents/list/:communityid', sanitizeInput , auth, ctrlResidents.residentsList);
