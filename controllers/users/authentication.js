@@ -15,8 +15,6 @@ const cons = require('../../services/constants');
 // POST /register - User registration
 module.exports.register = async (req, res) => {
 
-  console.log("Register");
-
   // respond with an error status if not al required fields are found
   if (!req.body.name || !req.body.email || !req.body.password) {
     utils.sendJSONresponse(res, 400, {

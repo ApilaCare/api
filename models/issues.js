@@ -55,7 +55,8 @@ var memberRecoverSchema =  new mongoose.Schema({
 var updateInfoSchema = new mongoose.Schema({
   updateBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   updateDate: {type: Date, default: Date.now},
-  updateField: [mongoose.Schema.Types.Mixed]
+  updateField: [mongoose.Schema.Types.Mixed],
+  ipAddress: {type: String}
 });
 
 var issueSchema = new mongoose.Schema({

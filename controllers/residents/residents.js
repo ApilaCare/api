@@ -241,7 +241,8 @@ module.exports.addContact = function(req, res) {
         "updateField": [{
           "field" : "create-contact",
           "new" : req.body.firstName + " " + req.body.lastName,
-          "old" : ""
+          "old" : "",
+          "ipAddress" : req.headers['x-forwarded-for'] || req.connection.remoteAddress
         }],
         "updateDate" : new Date(),
         "updateBy" : req.body.submitBy
@@ -286,7 +287,8 @@ module.exports.updateListItem = function(req, res) {
           "updateField": [{
             "field" : req.body.type,
             "new" : newValue,
-            "old" : oldValue
+            "old" : oldValue,
+            "ipAddress" : req.headers['x-forwarded-for'] || req.connection.remoteAddress
           }],
           "updateDate" : new Date(),
           "updateBy" : req.body.updateBy
@@ -319,8 +321,11 @@ module.exports.residentsUpdateOne = function(req, res) {
     "updateBy": req.body.modifiedBy,
     "updateDate": req.body.modifiedDate,
     "updateField": req.body.updateField,
-    "communicatedWith": communicatedWith
+    "communicatedWith": communicatedWith,
+    "ipAddress" : req.headers['x-forwarded-for'] || req.connection.remoteAddress
   };
+
+  console.log(req.body.updateField);
 
   if(req.body.updateField) {
     req.body.updateInfo.push(updateInfo);

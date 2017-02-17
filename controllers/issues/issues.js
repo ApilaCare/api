@@ -426,6 +426,8 @@ module.exports.addUpdateInfo = async (req, res) => {
 
     let issue = await Iss.findById(req.params.issueid).exec();
 
+    req.body.ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
     issue.updateInfo.push(req.body);
 
     let savedIssue = await issue.save();
