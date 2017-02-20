@@ -142,11 +142,7 @@ var doAddChecklist = function(req, res, issue) {
   if (!issue) {
     utils.sendJSONresponse(res, 404, "issueid not found");
   } else {
-    issue.checklists.push({
-      author: req.payload._id,
-      checklistName: req.body.checklistName,
-      // needs the checkItems as the mixed mongoose schema
-    });
+    issue.checklists.push(req.body);
 
     issue.save(function(err, issue) {
       var thisChecklist;
