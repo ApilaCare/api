@@ -25,8 +25,24 @@ module.exports.issueAttachmentsCreate = function(req, res) {
 
 };
 
+// PUT /issues/:issueid/attachments/restore - Restores an attachment for an issue
+module.exports.restoreAttachment = async (req, res) => {
+  try {
 
-// DELETE /issues/:issueid/attachments/:attachmentid - Delte and attachment by issueid
+    const issue = await Iss.findById(req.params.issueid).exec();
+
+    issue.attachments.push(req.body);
+
+    await issue.save();
+
+    utils.sendJSONresponse(res, 200, req.body);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 400, err);
+  }
+};
+
+// DELETE /issues/:issueid/attachments/:attachmentid - Delete and attachment by issueid
 module.exports.issueAttachmentsDeleteOne = function(req, res) {
 
   if (utils.checkParams(req, res, ['issueid', 'attachmentid'])) {

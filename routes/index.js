@@ -111,6 +111,7 @@ router.delete('/community/:communityid/labels/:labelname', sanitizeInput , auth,
 
 // issue attachments
 router.post('/issues/:issueid/attachments/new', sanitizeInput , auth, multipartyMiddleware, ctrlIssueAttachments.issueAttachmentsCreate);
+router.put('/issues/:issueid/attachments/restore', sanitizeInput , auth, ctrlIssueAttachments.restoreAttachment);
 router.delete('/issues/:issueid/attachments/:attachmentid', sanitizeInput , auth, ctrlIssueAttachments.issueAttachmentsDeleteOne);
 
 // issues recovery
