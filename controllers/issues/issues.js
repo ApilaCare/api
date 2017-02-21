@@ -50,7 +50,7 @@ module.exports.addFinalPlan = function(req, res) {
     return;
   }
 
-  if(!req.body.checklist) {
+  if(req.body.checklist) {
 
     let todo = ToDo.findById(todoId).exec();
 
