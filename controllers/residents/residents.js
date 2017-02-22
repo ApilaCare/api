@@ -47,7 +47,7 @@ module.exports.residentsList = async (req, res) => {
 
   try {
 
-    let fields = '_id firstName lastName aliasName carePoints';
+    let fields = '_id firstName lastName aliasName carePoints birthDate';
 
     let residents = await Resid.find({'community': community})
                           .select(fields).sort({'carePoints': -1}).exec();

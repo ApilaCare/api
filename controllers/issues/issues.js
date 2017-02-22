@@ -256,29 +256,28 @@ module.exports.issuesListByStatus = function(req, res) {
 };
 
 // GET /issues/due/:communityid - List of issues that are due in a community
-module.exports.dueIssuesList = function(req, res) {
+module.exports.dueIssuesList = async (req, res) => {
 
-  var communityid = req.params.communityid;
+  const communityid = req.params.communityid;
 
   if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
 
-  Iss.find({
-      "due": {
-        $exists: true
-      },
-      community: communityid
-    },
-    function(err, issues) {
-      if (issues) {
-        utils.sendJSONresponse(res, 200, issues);
-      } else {
-        utils.sendJSONresponse(res, 404, {
-          "message": "Issues with due date not found"
-        });
-      }
-    });
+  try {
+
+    const issues = await Iss.find({
+        "due": {
+          $exists: true
+        },
+        community: communityid
+      }).select("title due _id").exec();
+
+    utils.sendJSONresponse(res, 200, issues);
+  } catch(err) {
+    utils.sendJSONresponse(res, 400, err);
+  }
+  
 };
 
 module.exports.issuesPopulateOne = (req, res) => {
