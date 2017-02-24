@@ -11,6 +11,9 @@ const GooglePlaces = require('node-googleplaces');
 
 const places = new GooglePlaces(process.env.GOOGLE_PLACE_API);
 
+const populate = require('./populate_community');
+
+
 function createCommunity(req, res) {
   Community.create(req.body, function(err, community) {
     if (err) {
@@ -591,6 +594,8 @@ module.exports.doCreateCommunity = async (communityInfo, user) => {
     user.community = savedCommunity._id;
 
     await user.save();
+
+    await populate.populateTestCommunity(community, user);
 
     return savedCommunity;
 
