@@ -4,6 +4,7 @@ const Resid = mongoose.model('Resident');
 const Appoint = mongoose.model('Appointment');
 const Iss = mongoose.model('Issue');
 const moment = require('moment');
+const ToDo = mongoose.model('ToDo');
 
 
 module.exports.populateTestCommunity = async (community, user) => {
@@ -63,6 +64,27 @@ module.exports.populateTestCommunity = async (community, user) => {
   });
 
   await issue.save();
+
+  console.log(user);
+
+  let todo = await ToDo.findById(user.todoid).exec();
+
+  //Adding a new task to todo
+  let dayTask = {
+    "text" : faker.lorem.sentence(),
+    "occurrence" : 1,
+    "state" : "current",
+    "activeDays" : Array(5).fill(true),
+    "activeWeeks": Array(5).fill(false),
+    "activeMonths": Array(12).fill(false),
+    "hourStart": 0,
+    "hourEnd": 23,
+    "cycleDate" : new Date()
+  };
+
+  todo.tasks.push(dayTask);
+
+  await todo.save();
 
 }
 
