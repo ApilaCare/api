@@ -7,6 +7,7 @@ const ToDo = mongoose.model('ToDo');
 
 const Labels = mongoose.model('Labels');
 
+
 // POST /issues/new - Creates a new issue
 module.exports.issuesCreate = function(req, res) {
 
@@ -277,7 +278,7 @@ module.exports.dueIssuesList = async (req, res) => {
   } catch(err) {
     utils.sendJSONresponse(res, 400, err);
   }
-  
+
 };
 
 module.exports.issuesPopulateOne = (req, res) => {
@@ -361,7 +362,15 @@ module.exports.issuesUpdateOne = function(req, res) {
         }
 
         if(req.body.responsibleParty) {
-          issue.responsibleParty = req.body.responsibleParty._id || req.body.responsibleParty;
+          let newResponsibleUser = req.body.responsibleParty._id || req.body.responsibleParty;
+
+          //user getting switched
+          if(newResponsibleUser !== issue.responsibleParty) {
+            activitiesService.updateIssueCount(newResponsibleUser, 'increment');
+            activitiesService.updateIssueCount(issue.responsibleParty, 'decrement');
+          }
+
+          issue.responsibleParty = newResponsibleUser;
         }
 
         if(req.body.submitBy && req.body.submitBy._id) {
@@ -372,7 +381,19 @@ module.exports.issuesUpdateOne = function(req, res) {
         issue.resolutionTimeframe = req.body.resolutionTimeframe;
 
         issue.description = req.body.description;
+
+        //if status changed
+        if(issue.status !== req.body.status) {
+          if(req.body.status === 'Open') {
+            activitiesService.updateIssueCount(req.payload._id, 'increment');
+          } else {
+            activitiesService.updateIssueCount(req.payload._id, 'decrement');
+          }
+
+        }
+
         issue.status = req.body.status;
+
         issue.due = req.body.due;
 
         issue.checklists = req.body.checklists;

@@ -23,6 +23,8 @@ module.exports = (socketConn) => {
       let community = client.community;
       let userid = client.userid;
 
+      console.log("Adding user: " + userid);
+
       connectedUsers[userid] = socket;
 
       if(community) {
@@ -64,6 +66,18 @@ module.exports.acceptedMember = (data) => {
 
   if(connectedUsers[userId]) {
     connectedUsers[userId].emit('member-accepted', data);
+  }
+
+};
+
+//sends an update for community count
+module.exports.updateIssueCount = (userId, type) => {
+  let connectedUser = connectedUsers[userId];
+
+  console.log(userId);
+
+  if(connectedUser) {
+    connectedUser.emit('issue-count-update', type);
   }
 
 };
