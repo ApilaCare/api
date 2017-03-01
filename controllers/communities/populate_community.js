@@ -21,11 +21,11 @@ module.exports.populateTestCommunity = async (community, user) => {
     admissionDate: faker.date.past(faker.random.number({min: 1, max: 20})),
     sex: (Math.random() >= 0.5) ? "male" : "female", // male, female, other
     veteran: Math.random() >= 0.5,
-    administrativeNotes: faker.lorem.sentence(),
-    religion: faker.lorem.paragraph(),
-    education: faker.lorem.paragraph(),
-    occupation: faker.lorem.paragraph(),
-    contribution: faker.lorem.paragraph(),
+    administrativeNotes: "Here we can add administrative notes",
+    religion: "Christian",
+    education: "High school education",
+    occupation: "Accountant",
+    contribution: "Very helpfull person",
     buildingStatus: "In Building",
     supportGroup: Math.random() >= 0.5,
     extensionCord: Math.random() >= 0.5,
@@ -37,19 +37,21 @@ module.exports.populateTestCommunity = async (community, user) => {
 
   await resident.save();
 
+  const month = moment().format('M');
+
   const appoint = new Appoint({
-    reason: faker.lorem.sentence(),
+    reason: "Pain in the arm",
     locationName: faker.address.streetAddress(),
     locationDoctor: faker.name.firstName() + " " + faker.name.lastName(),
     residentGoing: resident._id,
-    appointmentDate: faker.date.between('2017-02-01', '2017-02-28'),
+    appointmentDate: faker.date.between(`2017-0${month}-01`, `2017-0${month}-28`),
     hours: faker.random.number(12),
     minutes: faker.random.number(60),
     isAm: Math.random() >= 0.5,
     submitBy: user._id,
-    transportation: faker.lorem.sentence(),
+    transportation: "We provide transportation",
     community: community._id,
-    currMonth: moment('2017-02-01').format("YYYY M")
+    currMonth: moment(`2017-0${month}-01`).format("YYYY M")
   });
 
   await appoint.save();
@@ -58,20 +60,18 @@ module.exports.populateTestCommunity = async (community, user) => {
     title: "Having an Issue",
     responsibleParty: user._id,
     resolutionTimeframe: 'Week',
-    description: faker.lorem.sentence(),
+    description: "Description of our issue",
     submitBy: user._id,
     community: community._id
   });
 
   await issue.save();
 
-  console.log(user);
-
   let todo = await ToDo.findById(user.todoid).exec();
 
   //Adding a new task to todo
   let dayTask = {
-    "text" : faker.lorem.sentence(),
+    "text" : "A Daily task",
     "occurrence" : 1,
     "state" : "current",
     "activeDays" : Array(5).fill(true),
