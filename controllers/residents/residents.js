@@ -69,7 +69,7 @@ module.exports.residentsFullList = async (req, res) => {
   }
 
   try {
-    let residents = await Resid.find({'community': community}).exec();
+    let residents = await Resid.find({'community': community}).populate("submitBy", "_id name").exec();
 
     utils.sendJSONresponse(res, 200, residents);
   } catch(err) {
@@ -213,10 +213,12 @@ module.exports.residentById = async (req, res) => {
     let resident  = await Resid
                           .findById(req.params.residentid)
                           .populate('updateInfo.updateBy', 'email name userImage')
+                          .populate('submitBy', 'name _id')
                           .exec();
 
     utils.sendJSONresponse(res, 200, resident);
   } catch(err) {
+    console.log(err);
     utils.sendJSONresponse(res, 500, err);
   }
 };

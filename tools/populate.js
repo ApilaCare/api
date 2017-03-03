@@ -7,12 +7,12 @@ const mongoose = require('mongoose');
 const Appoint = mongoose.model('Appointment');
 const Resid = mongoose.model('Resident');
 
-const userId = "58528db24502e67a14da3721";
-const community = "5858fb85edf1df6c6bb30ad6";
+const userId = "58b40605e254ca288fcad8f5";
+const community = "58b54e33cb93860a87df099d";
 const residentId = "5857ed74539ca36e2671ca51";
 
 const NUM_APPOINTMENTS = 300;
-const NUM_RESIDENTS = 500;
+const NUM_RESIDENTS = 300;
 
 function createResidents() {
 
