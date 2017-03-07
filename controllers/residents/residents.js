@@ -429,31 +429,22 @@ module.exports.uploadOutsideAgencyAssesment = function(req, res) {
 };
 
 // DELETE /api/residents/:residentid - delete a resident by id
-module.exports.residentsDeleteOne = function(req, res) {
-  var residentid = req.params.residentid;
+module.exports.residentsDeleteOne = async (req, res) => {
+  const residentid = req.params.residentid;
 
   if (utils.checkParams(req, res, ['residentid'])) {
     return;
   }
 
-  if (residentid) {
-    Resid
-      .findByIdAndRemove(residentid)
-      .exec(
-        function(err, resident) {
-          if (err) {
-            console.log(err);
-            utils.sendJSONresponse(res, 404, err);
-            return;
-          }
-          utils.sendJSONresponse(res, 204, null);
-        }
-      );
-  } else {
-    utils.sendJSONresponse(res, 404, {
-      "message": "No residentid"
-    });
+  try {
+    const deletedResident = Resid.findByIdAndRemove(residentid).exec();
+
+    utils.sendJSONresponse(res, 204, null);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 404, err);
   }
+
 };
 
 
