@@ -327,6 +327,8 @@ module.exports.residentsUpdateOne = function(req, res) {
     "ipAddress" : req.headers['x-forwarded-for'] || req.connection.remoteAddress
   };
 
+  console.log(req.body.insideApartment);
+
   console.log(req.body.updateField);
 
   if(req.body.updateField) {
@@ -334,7 +336,6 @@ module.exports.residentsUpdateOne = function(req, res) {
   }
 
   var isValidData = true;
-
 
   if (isValidData === false) {
     utils.sendJSONresponse(res, 404, err);

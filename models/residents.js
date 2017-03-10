@@ -134,6 +134,11 @@ var residentSchema = new mongoose.Schema({
           assitanceWithDevice: {type: String}, // if walker, cane, wheelchair, electric wheelchair, other
         specialAmbulationNeeds: {type: String},
 
+        transferPole : {type: Boolean},
+        liftReclinerChair : {type: Boolean},
+        transferLift : {type: Boolean},
+        sideRails : {type: Boolean},
+
         // devices
         apartmentMobilityDevices: [String], // check all that apply:
                                             //  [transfer pole, side rails, pivot transfer, lift recliner chair, transfer lift]
