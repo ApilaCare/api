@@ -435,6 +435,21 @@ module.exports.issuesUpdateOne = function(req, res) {
       });
 };
 
+//PUT /issues/:issueid/confidential 
+module.exports.updateConfidential = async (req, res) => {
+  try {
+
+    const issue = await Iss.update(
+        {_id: req.params.issueid}, 
+        {$set: { confidential: req.body.confidential}}).exec();
+
+    utils.sendJSONresponse(res, 200, {});
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 404, err);
+  }
+};
+
 //PUT /issues/:issueid/updateinfo - Adding a new update info entry
 module.exports.addUpdateInfo = async (req, res) => {
 

@@ -90,6 +90,7 @@ router.put('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesUpdateOne)
 router.put('/issues/:issueid/updateinfo', sanitizeInput, auth, ctrlIssues.addUpdateInfo);
 router.put('/issues/:issueid/finalplan', sanitizeInput, auth, ctrlIssues.addFinalPlan);
 router.put('/issues/:issueid/plan/:planid', sanitizeInput, auth, ctrlIssues.updateFinalPlan);
+router.put('/issues/:issueid/confidential', sanitizeInput, auth, ctrlIssues.updateConfidential);
 router.delete('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesDeleteOne);
 
 // issue comments
