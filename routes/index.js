@@ -8,6 +8,12 @@ require('../controllers/issues/schedule');
 var multiparty = require('connect-multiparty');
 var multipartyMiddleware = multiparty({uploadDir: "./"});
 
+const authorization = require('../services/authorization');
+
+const onlyBoss = authorization({ boss: true });
+
+const sameCommunity = authorization({ community: true });
+
 var auth = jwt({
     // set secret using same environment variable as before
     secret: process.env.JWT_SECRET,
@@ -169,18 +175,18 @@ router.get('/logs/:communityid', sanitizeInput, auth, ctrlLogs.listLogs);
 router.get('/user_logs/:communityid/user/:userid', sanitizeInput, auth, ctrlLogs.listUserLogs);
 
 // residents
-router.get('/residents/list/:communityid', sanitizeInput , auth, ctrlResidents.residentsList);
-router.get('/residents/full-list/:communityid', sanitizeInput, auth, ctrlResidents.residentsFullList);
-router.get('/residents/:residentid', sanitizeInput , auth, ctrlResidents.residentById);
+router.get('/residents/list/:communityid', sanitizeInput , auth, sameCommunity, ctrlResidents.residentsList);
+router.get('/residents/full-list/:communityid', sanitizeInput, auth, sameCommunity, ctrlResidents.residentsFullList);
+router.get('/residents/:residentid', sanitizeInput , auth, sameCommunity, ctrlResidents.residentById);
 router.get('/residents/count/:communityid', sanitizeInput , auth, ctrlResidents.residentsCount);
-router.get('/residents/:communityid/locations', sanitizeInput , auth, ctrlResidents.getLocations);
-router.get('/residents/average_age/:communityid', sanitizeInput , auth, ctrlResidents.getAverageAge);
-router.get('/residents/average_stay/:communityid', sanitizeInput , auth, ctrlResidents.averageStayTime);
-router.post('/residents/new', sanitizeInput , auth, ctrlResidents.residentsCreate);
-router.post('/residents/:residentid/contact', sanitizeInput, auth, ctrlResidents.addContact);
-router.post('/residents/:residentid/upload', sanitizeInput, auth, multipartyMiddleware, ctrlResidents.uploadOutsideAgencyAssesment);
-router.put('/residents/update/:residentid', sanitizeInput , auth, ctrlResidents.residentsUpdateOne);
-router.put('/residents/:residentid/listitem', sanitizeInput , auth, ctrlResidents.updateListItem);
-router.delete('/residents/:residentid', sanitizeInput , auth, ctrlResidents.residentsDeleteOne);
+router.get('/residents/:communityid/locations', sanitizeInput , auth, sameCommunity, ctrlResidents.getLocations);
+router.get('/residents/average_age/:communityid', sanitizeInput , auth, sameCommunity, ctrlResidents.getAverageAge);
+router.get('/residents/average_stay/:communityid', sanitizeInput , auth, sameCommunity, ctrlResidents.averageStayTime);
+router.post('/residents/new', sanitizeInput , auth, sameCommunity, ctrlResidents.residentsCreate);
+router.post('/residents/:residentid/contact', sanitizeInput, auth, sameCommunity, ctrlResidents.addContact);
+router.post('/residents/:residentid/upload', sanitizeInput, auth, sameCommunity, multipartyMiddleware, ctrlResidents.uploadOutsideAgencyAssesment);
+router.put('/residents/update/:residentid', sanitizeInput , auth, sameCommunity, ctrlResidents.residentsUpdateOne);
+router.put('/residents/:residentid/listitem', sanitizeInput , auth, sameCommunity, ctrlResidents.updateListItem);
+router.delete('/residents/:residentid', sanitizeInput , auth, onlyBoss, ctrlResidents.residentsDeleteOne);
 
 module.exports = router;
