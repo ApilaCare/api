@@ -12,7 +12,7 @@ module.exports = (options) => {
             if(options.community) {
                 const usersCommunity = userInfo.community;
 
-                const requestedCommunity = req.params.communityid || req.params.communityId;
+                const requestedCommunity = req.params.communityid || req.params.community;
 
                 //no community id was found
                 if(!requestedCommunity) {

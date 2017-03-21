@@ -6,7 +6,7 @@ var utils = require('../../services/utils');
 
 var async = require('async');
 
-const activitiesService = require('../../services/activities.service');
+const activitiesService = require('../../services/activities');
 const GooglePlaces = require('node-googleplaces');
 
 const places = new GooglePlaces(process.env.GOOGLE_PLACE_API);
@@ -57,19 +57,32 @@ module.exports.addRole = function(req, res) {
     return;
   }
 
+
   Community.findOne({
     _id: req.params.communityid
   }, function(err, communites) {
     if (communites) {
 
+      const isBoss = String(communites.boss) === String(req.payload._id);
+      const isCreator = String(communites.creator) === String(req.payload._id);
+
       if (req.body.type === "boss") {
-        communites.boss = req.params.userid;
-        communites.minions.pull(req.params.userid);
-        communites.directors.pull(req.params.userid);
+
+        if(isBoss || isCreator) {
+          communites.boss = req.params.userid;
+          communites.minions.pull(req.params.userid);
+          communites.directors.pull(req.params.userid);
+        }
+
       } else if (req.body.type === "directors") {
-        communites.directors.push(req.params.userid);
-        communites.minions.pull(req.params.userid);
+
+        if(isBoss) {
+          communites.directors.push(req.params.userid);
+          communites.minions.pull(req.params.userid);
+        }
+        
       } else if (req.body.type === "minions") {
+
         communites.minions.push(req.params.userid);
         communites.directors.pull(req.params.userid);
       }

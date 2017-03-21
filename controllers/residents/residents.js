@@ -7,7 +7,7 @@ var moment = require('moment');
 var _ = require('lodash');
 var fs = require('fs');
 var imageUploadService = require('../../services/imageUpload');
-const activitiesService = require('../../services/activities.service');
+const activitiesService = require('../../services/activities');
 const carePoints = require('./care_points');
 const sanitize = require("sanitize-filename");
 

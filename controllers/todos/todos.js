@@ -9,7 +9,7 @@ var moment = require('moment');
 
 const occurrence = require('../../services/constants').occurrence;
 const taskState = require('../../services/constants').taskState;
-const activitiesService = require('../../services/activities.service');
+const activitiesService = require('../../services/activities');
 
 // creates an empty todo object called when a user is registered
 module.exports.createEmptyToDo = async () => {

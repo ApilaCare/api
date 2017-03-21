@@ -6,7 +6,7 @@ var utils = require('../../services/utils');
 
 const moment = require('moment');
 
-const activitiesService = require('../../services/activities.service');
+const activitiesService = require('../../services/activities');
 
 // POST /api/appointments/new - Creates a new appointment
 module.exports.appointmentsCreate = function(req, res) {
