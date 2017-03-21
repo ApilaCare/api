@@ -12,6 +12,8 @@ const authorization = require('../services/authorization');
 
 const onlyBoss = authorization({ boss: true });
 
+const onlyDirector = authorization({ director: true });
+
 const sameCommunity = authorization({ community: true });
 
 var auth = jwt({
@@ -178,7 +180,7 @@ router.get('/user_logs/:communityid/user/:userid', sanitizeInput, auth, ctrlLogs
 router.get('/residents/list/:communityid', sanitizeInput , auth, sameCommunity, ctrlResidents.residentsList);
 router.get('/residents/full-list/:communityid', sanitizeInput, auth, sameCommunity, ctrlResidents.residentsFullList);
 router.get('/residents/:residentid', sanitizeInput , auth, sameCommunity, ctrlResidents.residentById);
-router.get('/residents/count/:communityid', sanitizeInput , auth, ctrlResidents.residentsCount);
+router.get('/residents/count/:communityid', sanitizeInput , auth, sameCommunity, ctrlResidents.residentsCount);
 router.get('/residents/:communityid/locations', sanitizeInput , auth, sameCommunity, ctrlResidents.getLocations);
 router.get('/residents/average_age/:communityid', sanitizeInput , auth, sameCommunity, ctrlResidents.getAverageAge);
 router.get('/residents/average_stay/:communityid', sanitizeInput , auth, sameCommunity, ctrlResidents.averageStayTime);

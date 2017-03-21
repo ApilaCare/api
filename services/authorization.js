@@ -31,10 +31,17 @@ module.exports = (options) => {
 
                 const userIsBoss = await isBoss(userInfo.community, userInfo._id);
 
-                console.log(userIsBoss);
-
                 if(!userIsBoss) {
                     utils.sendJSONresponse(res, 404, {err: "User is not a boss"});
+                    return;
+                }
+            }
+
+            if(options.director) {
+                const userIsDirector = await isDirector(userInfo.community, userInfo._id);
+
+                if(!userIsDirector) {
+                    utils.sendJSONresponse(res, 404, {err: "User is not a director"});
                     return;
                 }
             }
@@ -55,5 +62,17 @@ async function isBoss(communityid, boss) {
     } else {
         return false;
     }
+
+}
+
+async function isDirector(communityid, director) {
+
+    const community = await Community.findById(communityid);
+
+    if(community.directors.indexOf(director) !== -1) {
+        return true;
+    }
+
+    return false;
 
 }
