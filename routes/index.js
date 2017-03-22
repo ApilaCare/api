@@ -80,6 +80,7 @@ router.put('/communities/pending/:communityid/', sanitizeInput , auth, sameCommu
 router.put('/communities/:communityid/roomstyle/:roomid', sanitizeInput, auth, sameCommunity, ctrlCommunities.updateRoomStyle);
 router.put('/communities/:communityid/contactinfo', sanitizeInput, auth, sameCommunity, ctrlCommunities.updateContactAndRoomInfo);
 router.put('/communities/update/:communityid/', sanitizeInput , auth, sameCommunity, ctrlCommunities.communitiesUpdateOne);
+router.put('/communities/:communityid/units', sanitizeInput , auth, sameCommunity, ctrlCommunities.updateUnits);
 router.delete('/communities/:communityid/roomstyle/:roomid', sanitizeInput, auth, sameCommunity, ctrlCommunities.deleteRoomStyle);
 router.delete('/communities/:communityid/user/:userid/', sanitizeInput , auth, sameCommunity, ctrlCommunities.removeMember);
 router.delete('/communities/:communityid/', sanitizeInput , auth, sameCommunity, ctrlCommunities.communitiesDeleteOne);

@@ -391,6 +391,31 @@ module.exports.updateRoomStyle = function(req, res) {
    });
 };
 
+//PUT /communities/:communityid/units - Updates the unit selection for a community
+module.exports.updateUnits = async (req, res) => {
+
+  if (utils.checkParams(req, res, ['communityid'])) {
+    return;
+  }
+
+  try {
+
+    const community = await Community.findById(req.params.communityid).exec();
+
+    community.areaUnit = req.body.areaUnit;
+    community.tempUnit = req.body.tempUnit;
+    community.weightUnit = req.body.weightUnit;
+
+    await community.save();
+
+    utils.sendJSONresponse(res, 200, {});
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
 //DELETE /communities/:communityid/roomstyle/:roomid
 module.exports.deleteRoomStyle = async (req, res) => {
 

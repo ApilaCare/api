@@ -45,6 +45,11 @@ const communitySchema = new mongoose.Schema({
     town: {type: String},
     logo: {type: String},
     fax: {type: String},
+
+    areaUnit: {type: String},
+    tempUnit: {type: String},
+    weightUnit: {type: String},
+
     numFloors: {type: Number},
     labels: [issueLabelsSchema],
     floors: [{
