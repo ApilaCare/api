@@ -69,7 +69,8 @@ module.exports.residentsFullList = async (req, res) => {
   }
 
   try {
-    let residents = await Resid.find({'community': community}).populate("submitBy", "_id name").exec();
+    let residents = await Resid.find({'community': community})
+                    .populate("submitBy", "_id name").sort({'carePoints': -1}).exec();
 
     utils.sendJSONresponse(res, 200, residents);
   } catch(err) {
