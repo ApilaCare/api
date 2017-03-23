@@ -157,6 +157,7 @@ module.exports.addPendingMember = function(req, res) {
 
 };
 
+//PUT /communities/decline/:communityid/ - decline a member for the community
 module.exports.declineMember = function(req, res) {
 
   if (utils.checkParams(req, res, ['communityid'])) {
@@ -185,7 +186,7 @@ module.exports.declineMember = function(req, res) {
 
 };
 
-//  PUT /communities/accept/:communityid/ - Accept a pending member to a community
+// PUT /communities/accept/:communityid/ - Accept a pending member to a community
 module.exports.acceptMember = function(req, res) {
 
   if (utils.checkParams(req, res, ['communityid'])) {
@@ -229,6 +230,7 @@ module.exports.acceptMember = function(req, res) {
 
 };
 
+//PUT /communities/update/:communityid/ - Update general community info
 module.exports.communitiesUpdateOne = function(req, res) {
 
   if (utils.checkParams(req, res, ['communityid'])) {
@@ -269,34 +271,8 @@ module.exports.communitiesUpdateOne = function(req, res) {
     );
 };
 
-module.exports.communitiesReadOne = function(req, res) {
 
-  if (req.params && req.params.communityid) {
-    Community
-      .findById(req.params.communityid)
-      .exec(function(err, community) {
-        if (!community) {
-          utils.sendJSONresponse(res, 404, {
-            "message": "communityid not found (from controller)"
-          });
-          return;
-        } else if (err) {
-          console.log(err);
-          utils.sendJSONresponse(res, 404, err);
-          return;
-        }
-
-        utils.sendJSONresponse(res, 200, community);
-      });
-  } else {
-    console.log('No communityid specified');
-    utils.sendJSONresponse(res, 404, {
-      "message": "No communityid in request"
-    });
-  }
-};
-
-
+//DELETE /communities/:communityid/user/:userid/ - removes a member for a community
 module.exports.removeMember = function(req, res) {
 
   if (utils.checkParams(req, res, ['userid', 'communityid'])) {
@@ -307,11 +283,10 @@ module.exports.removeMember = function(req, res) {
     "_id": req.params.communityid
   }, function(err, community) {
     if (community) {
+
       community.communityMembers.pull(req.params.userid);
       community.directors.pull(req.params.userid);
       community.minions.pull(req.params.userid);
-
-      //community.creator = req.params.userid;
 
       removeCommunityFromUser(res, req.params.userid, function() {
         community.save(function(err) {
@@ -402,7 +377,6 @@ module.exports.updateUnits = async (req, res) => {
 
     const community = await Community.findById(req.params.communityid).exec();
 
-    community.areaUnit = req.body.areaUnit;
     community.tempUnit = req.body.tempUnit;
     community.weightUnit = req.body.weightUnit;
 

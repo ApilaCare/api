@@ -16,16 +16,15 @@ const chatSchema = new mongoose.Schema({
 const roomStyleSchema = new mongoose.Schema({
     name: {type: String, required: true},
     area: {type: Number},
-    areaUnit: {type: Boolean, default: true}, // if true: feet^2 | if false: meter^2
     rooms: [String],
 
-    submitOn: {type: Date, "default": Date.now},
+    submitOn: {type: Date, default: Date.now},
     submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
 });
 
 const logsSchema = new mongoose.Schema({
   ipAddress: {type: String},
-  loggedOn: {type: Date, "default": Date.now},
+  loggedOn: {type: Date, default: Date.now},
   user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
 });
 
@@ -46,9 +45,9 @@ const communitySchema = new mongoose.Schema({
     logo: {type: String},
     fax: {type: String},
 
-    areaUnit: {type: String},
-    tempUnit: {type: String},
-    weightUnit: {type: String},
+    areaUnit: {type: String, default: 'Meters'},
+    tempUnit: {type: String, default: 'Celsius'},
+    weightUnit: {type: String, default: 'Kilograms'},
 
     numFloors: {type: Number},
     labels: [issueLabelsSchema],
