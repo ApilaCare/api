@@ -75,8 +75,8 @@ router.post('/communities/:communityid/roomstyle', sanitizeInput, auth, sameComm
 router.post('/communities/:communityid/floor', sanitizeInput, auth, sameCommunity, ctrlCommunities.addFloor);
 router.put('/communities/accept/:communityid/', sanitizeInput , auth, sameCommunity, ctrlCommunities.acceptMember);
 router.put('/communities/:communityid/floor', sanitizeInput, auth, sameCommunity, ctrlCommunities.updateFloor);
-router.put('/communities/decline/:communityid/', sanitizeInput , auth, sameCommunity, ctrlCommunities.declineMember);
-router.put('/communities/pending/:communityid/', sanitizeInput , auth, sameCommunity, ctrlCommunities.addPendingMember);
+router.put('/communities/decline/:communityid/', sanitizeInput , auth, ctrlCommunities.declineMember);
+router.put('/communities/pending/:communityid/', sanitizeInput , auth, ctrlCommunities.addPendingMember);
 router.put('/communities/:communityid/roomstyle/:roomid', sanitizeInput, auth, sameCommunity, ctrlCommunities.updateRoomStyle);
 router.put('/communities/:communityid/contactinfo', sanitizeInput, auth, sameCommunity, ctrlCommunities.updateContactAndRoomInfo);
 router.put('/communities/update/:communityid/', sanitizeInput , auth, sameCommunity, ctrlCommunities.communitiesUpdateOne);
