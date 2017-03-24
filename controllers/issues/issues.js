@@ -245,6 +245,7 @@ module.exports.issuesListByStatus = function(req, res) {
   Iss.find({status: status, community: communityid})
       .populate("submitBy", "name _id")
       .populate("responsibleParty", "name _id")
+      //.select("_id title description resolutionTimeframe submitBy responsibleParty updateInfo attachments")
       .exec(function(err, issues) {
     if (err) {
       utils.sendJSONresponse(res, 404, {
