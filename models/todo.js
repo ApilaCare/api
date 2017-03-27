@@ -1,10 +1,10 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var counterSchema = new mongoose.Schema({
+const counterSchema = new mongoose.Schema({
   updatedOn: {type: Date, default: Date.now}
 });
 
-var todoItemSchema = new mongoose.Schema({
+const todoItemSchema = new mongoose.Schema({
 
   text: {type: String, required: true},
   cycleDate : {type: Date, default: Date.now},
@@ -21,6 +21,12 @@ var todoItemSchema = new mongoose.Schema({
   hourStart: {type: Number, default: 0},
   hourEnd: {type: Number, default: 23},
 
+  //availability interval
+  startTime: {type: Number},
+  endTime: {type: Number},
+  selectDay: {type: String},
+  daysInMonth: {type: Number},
+
   // automatic
   completeOn: {type: Date},
   createdOn: {type: Date, default: Date.now},
@@ -29,7 +35,7 @@ var todoItemSchema = new mongoose.Schema({
   notCompleted: [counterSchema],
 });
 
-var todoSchema = new mongoose.Schema({
+const todoSchema = new mongoose.Schema({
 
   tasks: [todoItemSchema]
 
