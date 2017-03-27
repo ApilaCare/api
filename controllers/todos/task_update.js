@@ -6,14 +6,14 @@ const fs = require('fs');
 const occurrence = require('../../services/constants').occurrence;
 const taskState = require('../../services/constants').taskState;
 
-var currentTime = moment();
+let currentTime = moment();
 
 module.exports.updateTasks = function(todo, callback) {
 
   loadMockTime((currTime) => {
     if(currTime) {
 
-      var tasks = todo.tasks;
+      let tasks = todo.tasks;
 
       _.forEach(tasks, function(task) {
         updateTask(task, currTime);
@@ -40,8 +40,6 @@ function updateTask(task, currTime) {
   var currDay = currTime.isoWeekday();
   var currWeek = weekOfMonth(currTime);
   var currMonth = currentTime.month();
-
-  var unchangedTask = JSON.parse(JSON.stringify(task));
 
   let inCycle = isInActiveCycle(task, currTime);
 

@@ -9,7 +9,7 @@ var todoItemSchema = new mongoose.Schema({
   text: {type: String, required: true},
   cycleDate : {type: Date, default: Date.now},
   occurrence: {type: Number, required: true},
-  state: {type: String, required: true}, //it can be: complete | overdue | current | inactive
+  state: {type: String, required: true}, //it can be: complete | current | inactive
   issueName: {type: String},
 
   activeDays: [{type: Boolean}], //if user selected specific days
@@ -26,7 +26,6 @@ var todoItemSchema = new mongoose.Schema({
   createdOn: {type: Date, default: Date.now},
 
   completed: [counterSchema], // completed before certain amount of time
-  overDue: [counterSchema], // not completed
   notCompleted: [counterSchema],
 });
 
@@ -41,7 +40,6 @@ var todoSchema = new mongoose.Schema({
 //
 //    item                            becomes "not completed";
 //    posted         becomes          item posted
-//    to do          "overdue"        to do again
 //      |---------------|---------------|
 //     |---------time interval---------|
 

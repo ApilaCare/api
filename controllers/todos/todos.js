@@ -19,7 +19,6 @@ module.exports.createEmptyToDo = async () => {
     let task = new ToDo({
       tasks: [],
       completed: [],
-      overDue: [],
       notCompleted: []
     });
 
@@ -49,7 +48,7 @@ module.exports.listTasks = function(req, res) {
       utils.sendJSONresponse(res, 500, err);
     } else {
 
-      //before listing tasks check if any tasks are overdue/completed
+      //before listing tasks check if any tasks are completed
       TaskService.updateTasks(todo, function(status, err) {
         if(status){
           utils.sendJSONresponse(res, 200, todo.tasks);
@@ -139,11 +138,7 @@ module.exports.updateTask = function(req, res) {
 
           task.cycleDate = currentTime.toDate();
 
-          if(!isOverdue(task, currentTime)) {
-            task.completed.push({updatedOn: currentTime.toDate()});
-          } else {
-            task.overDue.push({updatedOn: currentTime.toDate()});
-          }
+          task.completed.push({updatedOn: currentTime.toDate()});
 
         }
 
@@ -257,45 +252,6 @@ module.exports.activeTasksCount = (req, res) => {
 
 
 //////////////////////////// HELPER FUNCTION /////////////////////////////////
-
-function isOverdue(task, currTime) {
-  let overdue = false;
-
-  let createdOn = moment(task.createdOn);
-
-  switch(task.occurrence) {
-
-    case occurrence.HOURLY:
-      if(currTime.minutes() >= 30 && !currTime.isSame(createdOn, "hour")) {
-        overdue = true;
-      }
-    break;
-
-    case occurrence.DAILY:
-      if(currTime.hour() >= 12 && !currTime.isSame(createdOn, "day")) {
-        overdue = true;
-      }
-    break;
-
-    case occurrence.WEEKLY:
-      if(currTime.day() > 2 && !currTime.isSame(createdOn, "week")) {
-        overdue = true;
-      }
-    break;
-
-    case occurrence.MONTHLY:
-      if((currTime.date() > (currTime.date() / 2)) && !currTime.isSame(createdOn, "month")) {
-        overdue = true;
-      }
-    break;
-
-    default:
-      overdue = false;
-  }
-
-  return overdue;
-
-}
 
 function setToDefault(task, activeCycles) {
   _.forEach(activeCycles, function(cycle) {
