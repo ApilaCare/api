@@ -71,17 +71,23 @@ module.exports.addTask = function(req, res) {
   }
 
   let newTask = {
-    "text" : req.body.text,
-    "occurrence" : req.body.occurrence,
-    "state" : "current",
-    "activeDays" : req.body.activeDays,
-    "activeWeeks": req.body.activeWeeks,
-    "activeMonths": req.body.activeMonths,
-    "hourStart": req.body.hourStart,
-    "hourEnd": req.body.hourEnd,
-    "everyWeek": req.body.everyWeek,
-    "everyMonth": req.body.everyMonth,
-    "cycleDate" : new Date()
+    text: req.body.text,
+    occurrence: req.body.occurrence,
+    state: "current",
+    activeDays: req.body.activeDays,
+    activeWeeks: req.body.activeWeeks,
+    activeMonths: req.body.activeMonths,
+    hourStart: req.body.hourStart,
+    hourEnd: req.body.hourEnd,
+    everyWeek: req.body.everyWeek,
+    everyMonth: req.body.everyMonth,
+    cycleDate : new Date(),
+    selectedWeekDay: req.body.selectedWeekDay,
+    selectDay: req.body.selectDay,
+    startTime: req.body.startTime,
+    endTime: req.body.endTime,
+    weekStartTime: req.body.weekStartTime,
+    weekEndTime: req.body.weekEndTime
   };
 
   let userId = req.payload._id;

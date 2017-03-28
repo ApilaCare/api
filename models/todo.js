@@ -22,10 +22,13 @@ const todoItemSchema = new mongoose.Schema({
   hourEnd: {type: Number, default: 23},
 
   //availability interval
-  startTime: {type: Number},
-  endTime: {type: Number},
+  startTime: {type: String},
+  endTime: {type: String},
+  weekStartTime: {type: String},
+  weekEndTime: {type: String},
   selectDay: {type: String},
   daysInMonth: {type: Number},
+  selectedWeekDay: {type: Number},
 
   // automatic
   completeOn: {type: Date},
