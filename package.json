@@ -32,6 +32,8 @@
     "dotenv": "^2.0.0",
     "express": "~4.13.1",
     "express-jwt": "^3.3.0",
+    "faker": "^3.1.0",
+    "fs-readfile-promise": "^3.0.0",
     "helmet": "^3.1.0",
     "jsonwebtoken": "^5.7.0",
     "lodash": "^4.13.1",
@@ -53,8 +55,7 @@
     "socket.io": "^1.5.1",
     "socketio-jwt": "^4.5.0",
     "stripe": "^4.9.0",
-    "uglify-js": "~2.4.15",
-    "faker": "^3.1.0"
+    "uglify-js": "~2.4.15"
   },
   "devDependencies": {
     "chai": "^3.5.0",

@@ -3,32 +3,30 @@ const moment = require('moment');
 require('moment-range');
 
 const fs = require('fs');
+const readFile = require('fs-readfile-promise');
 const occurrence = require('../../services/constants').occurrence;
 const taskState = require('../../services/constants').taskState;
 
 let currentTime = moment();
 
-module.exports.updateTasks = function(todo, callback) {
+module.exports.updateTasks = async (todo) => {
 
-  loadMockTime((currTime) => {
-    if(currTime) {
+  let currTime = await loadMockTime();
+  currentTime = currTime; //do we need to do this?
 
-      let tasks = todo.tasks;
+  if(currTime) {
 
-      _.forEach(tasks, function(task) {
-        updateTask(task, currTime);
-      });
+    let tasks = todo.tasks;
 
-      todo.tasks = tasks;
+    _.forEach(tasks, function(task) {
+      updateTask(task, currTime);
+    });
 
-      todo.save((err) => {
-        if(err) {
-          callback(false, err);
-        } else {
-          callback(true, err);
-        }});
-    }
-  });
+    todo.tasks = tasks;
+
+    return todo.save();
+  }
+
 
 };
 
@@ -157,17 +155,28 @@ function isInActiveCycle(task, currTime) {
   return function(cycle) {
 
     const dayAvailability = hourAvailability(task, currTime, task.startTime, task.endTime);
+    const weekAvailability = hourAvailability(task, currTime, task.weekStartTime, task.weekEndTime);
 
-    console.log(dayAvailability);
+    let weekDaySelected = true;
+
+    if(task.selectDay && (currTime.format("dddd") !== task.selectDay)) {
+      weekDaySelected = false;
+    }
+
+    let daysInMonthSelected = true;
+
+    if(task.daysInMonth && (currTime.date() !== task.daysInMonth)) {
+      daysInMonthSelected = false;
+    }
 
     if(cycle === "hours") {
       return (currHour >= task.hourStart && currHour <= task.hourEnd);
     } else if(cycle === "days") {
       return task.activeDays[currDay - 1] && dayAvailability;
     } else if(cycle === "weeks") {
-      return task.activeWeeks[currWeek - 1];
+      return task.activeWeeks[currWeek - 1] && weekAvailability && weekDaySelected;
     } else if(cycle === "months") {
-      return task.activeMonths[currMonth];
+      return task.activeMonths[currMonth] && daysInMonthSelected;
     }
   };
 
@@ -180,8 +189,6 @@ function hourAvailability(task, currTime, startTime, endTime) {
     const startHours = parseInt(moment(startTime).format('Hmm'));
     const endHours = parseInt(moment(endTime).format('Hmm'));
     const currHours = parseInt(moment(currTime).format('Hmm'));
-
-    console.log(startHours, currHours, endHours);
 
     if(currHours <= startHours || currHours >= endHours) {
       return false;
@@ -207,14 +214,21 @@ function resetTaskCycle(task) {
   task.cycleDate = new Date();
 }
 
-function loadMockTime(callback) {
+async function loadMockTime() {
   if(process.env.BACK_TO_FUTURE) {
-    fs.readFile("./tools/date.txt", 'UTF8', (err, data) => {
-      currentTime = moment(parseInt(data));
-      callback(currentTime);
-    });
+
+    try {
+      const mockupTime = await readFile("./tools/date.txt", 'UTF8');
+
+      return moment(parseInt(mockupTime));
+
+    } catch (err) {
+      console.log(err);
+      return moment();
+    }
+
   } else {
-    callback(moment());
+    return moment();
   }
 
 }

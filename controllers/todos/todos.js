@@ -34,30 +34,27 @@ module.exports.createEmptyToDo = async () => {
 };
 
 //GET /todos/:todoid - List all the tasks from the todo
-module.exports.listTasks = function(req, res) {
+module.exports.listTasks = async (req, res) => {
 
-  var todoId = req.params.todoid;
+  const todoId = req.params.todoid;
 
   if (utils.checkParams(req, res, ['todoid'])) {
     return;
   }
 
-  ToDo.findById(todoId)
-  .exec(function(err, todo) {
-    if(err) {
-      utils.sendJSONresponse(res, 500, err);
-    } else {
+  try {
 
-      //before listing tasks check if any tasks are completed
-      TaskService.updateTasks(todo, function(status, err) {
-        if(status){
-          utils.sendJSONresponse(res, 200, todo.tasks);
-        } else {
-            utils.sendJSONresponse(res, 500, err);
-        }
-      });
-    }
-  });
+    const todo = await ToDo.findById(todoId).exec();
+
+    //before listing tasks check if any tasks are completed
+    await TaskService.updateTasks(todo);
+  
+    utils.sendJSONresponse(res, 200, todo.tasks);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 
