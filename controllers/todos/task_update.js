@@ -34,12 +34,12 @@ module.exports.updateTasks = function(todo, callback) {
 
 function updateTask(task, currTime) {
 
-  var cycleDate = moment(task.cycleDate);
+  let cycleDate = moment(task.cycleDate);
 
-  var currHour = currTime.hour();
-  var currDay = currTime.isoWeekday();
-  var currWeek = weekOfMonth(currTime);
-  var currMonth = currentTime.month();
+  let currHour = currTime.hour();
+  let currDay = currTime.isoWeekday();
+  let currWeek = weekOfMonth(currTime);
+  let currMonth = currentTime.month();
 
   let inCycle = isInActiveCycle(task, currTime);
 
@@ -154,11 +154,16 @@ function isInActiveCycle(task, currTime) {
   let currWeek = weekOfMonth(currTime);
   let currMonth = currentTime.month();
 
-  return function(cycle){
+  return function(cycle) {
+
+    const dayAvailability = hourAvailability(task, currTime, task.startTime, task.endTime);
+
+    console.log(dayAvailability);
+
     if(cycle === "hours") {
       return (currHour >= task.hourStart && currHour <= task.hourEnd);
     } else if(cycle === "days") {
-      return task.activeDays[currDay - 1];
+      return task.activeDays[currDay - 1] && dayAvailability;
     } else if(cycle === "weeks") {
       return task.activeWeeks[currWeek - 1];
     } else if(cycle === "months") {
@@ -166,6 +171,24 @@ function isInActiveCycle(task, currTime) {
     }
   };
 
+}
+
+//check interval availability for an hourly range
+function hourAvailability(task, currTime, startTime, endTime) {
+  if(startTime && endTime) {
+    
+    const startHours = parseInt(moment(startTime).format('Hmm'));
+    const endHours = parseInt(moment(endTime).format('Hmm'));
+    const currHours = parseInt(moment(currTime).format('Hmm'));
+
+    console.log(startHours, currHours, endHours);
+
+    if(currHours <= startHours || currHours >= endHours) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function toggleTask(task, taskNotActive) {

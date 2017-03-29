@@ -83,6 +83,7 @@ module.exports.addTask = function(req, res) {
     everyMonth: req.body.everyMonth,
     cycleDate : new Date(),
     selectedWeekDay: req.body.selectedWeekDay,
+    daysInMonth: req.body.daysInMonth,
     selectDay: req.body.selectDay,
     startTime: req.body.startTime,
     endTime: req.body.endTime,
