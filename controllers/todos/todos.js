@@ -118,73 +118,47 @@ module.exports.addTask = function(req, res) {
 };
 
 //PUT /todos/:todoid/task/:taskid - Update a specific task
-module.exports.updateTask = function(req, res) {
+module.exports.updateTask = async (req, res) => {
 
-  var todoId = req.params.todoid;
-  var taskId = req.params.taskid;
+  const todoId = req.params.todoid;
+  const taskId = req.params.taskid;
 
   if (utils.checkParams(req, res, ['todoid', 'taskid'])) {
     return;
   }
-  TaskService.loadMockTime(function(currentTime) {
-  ToDo.findById(todoId)
-  .exec(function(err, todo) {
-    if(err) {
-      utils.sendJSONresponse(res, 500, err);
-    } else {
 
-      let index = todo.tasks.indexOf(todo.tasks.id(taskId));
-      let task = req.body;
+  try {
 
-      if(index !== -1) {
+    const currentTime = await TaskService.loadMockTime();
 
-        if(task.state === taskState.COMPLETE) {
+    const todo = await ToDo.findById(todoId).exec();
 
-          task.cycleDate = currentTime.toDate();
+    const index = todo.tasks.indexOf(todo.tasks.id(taskId));
+    const task = req.body;
 
-          task.completed.push({updatedOn: currentTime.toDate()});
-
-        }
-
-        // if we switched occurrence, reset other active set fields
-        if(todo.tasks[index].occurrence !== task.occurrence) {
-          switch(task.occurrence) {
-            case occurrence.HOURLY:
-              setToDefault(task, ["daily", "weekly", "monthly"]);
-            break;
-
-            case occurrence.DAILY:
-              setToDefault(task, ["hourly", "weekly", "monthly"]);
-            break;
-
-            case occurrence.WEEKLY:
-              setToDefault(task, ["daily", "hourly", "monthly"]);
-            break;
-
-            case occurrence.MONTHLY:
-              setToDefault(task, ["daily", "weekly", "hourly"]);
-            break;
-          }
-
-        }
-
-        todo.tasks.set(index, task);
-
-      } else {
-        utils.sendJSONresponse(res, 500, {'message' : "Task with such an id not found"});
-        return;
-      }
-
-      todo.save(function(err, savedToDo) {
-        if(err) {
-          utils.sendJSONresponse(res, 500, err);
-        } else {
-          utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
-        }
-      });
+    if(index === -1) {
+      throw "Task to update not found";
     }
-  });
-  });
+
+    if(task.state === taskState.COMPLETE) {
+      task.cycleDate = currentTime.toDate();
+      task.completed.push({updatedOn: currentTime.toDate()});
+    }
+
+    // if we switched occurrence, reset other active set fields
+    if(todo.tasks[index].occurrence !== task.occurrence) {
+      resetOtherOccurrences(task);
+    }
+
+    todo.tasks.set(index, task);
+
+    await todo.save();
+
+    utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 
@@ -256,6 +230,26 @@ module.exports.activeTasksCount = (req, res) => {
 
 
 //////////////////////////// HELPER FUNCTION /////////////////////////////////
+
+function resetOtherOccurrences(task) {
+  switch(task.occurrence) {
+    case occurrence.HOURLY:
+      setToDefault(task, ["daily", "weekly", "monthly"]);
+    break;
+
+    case occurrence.DAILY:
+      setToDefault(task, ["hourly", "weekly", "monthly"]);
+    break;
+
+    case occurrence.WEEKLY:
+      setToDefault(task, ["daily", "hourly", "monthly"]);
+    break;
+
+    case occurrence.MONTHLY:
+      setToDefault(task, ["daily", "weekly", "hourly"]);
+    break;
+  }
+}
 
 function setToDefault(task, activeCycles) {
   _.forEach(activeCycles, function(cycle) {
