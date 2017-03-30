@@ -169,6 +169,26 @@ function isInActiveCycle(task, currTime) {
       daysInMonthSelected = false;
     }
 
+    let selectedWeekDaySelected = true;
+
+    if(task.selectedWeekDay) {
+      const parsedWeekDay = task.selectedWeekDay.toString().split('').map(Number);
+      let week = parsedWeekDay[0];
+      const day = parsedWeekDay[1];
+
+      const weeksInMonth = moment(moment().endOf('month') - moment().startOf('month')).weeks();
+
+      // if the month only has 4 weeks and the users selected fifth week he wanted the last week of month
+      if(weeksInMonth === 4 && week === 5) {
+        week = 4;
+      }
+
+      if(currWeek !== week || currDay !== day) {
+        selectedWeekDaySelected = false;
+      }
+
+    }
+
     if(cycle === "hours") {
       return (currHour >= task.hourStart && currHour <= task.hourEnd);
     } else if(cycle === "days") {
@@ -176,7 +196,7 @@ function isInActiveCycle(task, currTime) {
     } else if(cycle === "weeks") {
       return task.activeWeeks[currWeek - 1] && weekAvailability && weekDaySelected;
     } else if(cycle === "months") {
-      return task.activeMonths[currMonth] && daysInMonthSelected;
+      return task.activeMonths[currMonth] && daysInMonthSelected && selectedWeekDaySelected;
     }
   };
 
