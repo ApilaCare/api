@@ -157,6 +157,7 @@ module.exports.updateTask = async (req, res) => {
     utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
 
   } catch(err) {
+    console.log(err);
     utils.sendJSONresponse(res, 500, err);
   }
 
@@ -261,15 +262,22 @@ function setToDefault(task, activeCycles) {
 
       case "daily" :
         task.activeDays = [true, true, true, true, true, false, false];
+        task.startTime = "";
+        task.endTime = "";
       break;
 
       case "weekly" :
         task.everyWeek = false;
         task.activeWeeks = [false, false, false, false, false];
+        task.weekStartTime = "";
+        task.weekEndTime = "";
+        task.selectDay = "";
       break;
 
       case "monthly" :
         task.everyMonth = false;
+        task.daysInMonth = null;
+        task.selectedWeekDay = null;
         task.activeMonths = [false, false, false, false, false, false, false, false, false, false, false, false];
       break;
     }

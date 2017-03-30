@@ -15,6 +15,8 @@ const todoItemSchema = new mongoose.Schema({
   activeDays: [{type: Boolean}], //if user selected specific days
   activeWeeks: [{type: Boolean}],
   activeMonths: [{type: Boolean}],
+  startTime: {type: String},
+  endTime: {type: String},
 
   everyMonth: {type: Boolean},
   everyWeek: {type: Boolean},
@@ -22,8 +24,6 @@ const todoItemSchema = new mongoose.Schema({
   hourEnd: {type: Number, default: 23},
 
   //availability interval
-  startTime: {type: String},
-  endTime: {type: String},
   weekStartTime: {type: String},
   weekEndTime: {type: String},
   selectDay: {type: String},
