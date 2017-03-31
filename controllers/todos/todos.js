@@ -1,11 +1,11 @@
-var mongoose = require('mongoose');
-var utils = require('../../services/utils');
+const mongoose = require('mongoose');
+const utils = require('../../services/utils');
 
-var ToDo = mongoose.model('ToDo');
-var TaskService = require('./task_update');
+const ToDo = mongoose.model('ToDo');
+const TaskService = require('./task_update');
 
-var _ = require('lodash');
-var moment = require('moment');
+const _ = require('lodash');
+const moment = require('moment');
 
 const occurrence = require('../../services/constants').occurrence;
 const taskState = require('../../services/constants').taskState;
@@ -13,7 +13,6 @@ const activitiesService = require('../../services/activities');
 
 // creates an empty todo object called when a user is registered
 module.exports.createEmptyToDo = async () => {
-
 
   try {
     let task = new ToDo({
@@ -59,61 +58,59 @@ module.exports.listTasks = async (req, res) => {
 };
 
 //POST /todos/:todoid/task/:taskid - Creates a new task (todo item)
-module.exports.addTask = function(req, res) {
+module.exports.addTask = async (req, res) => {
 
-  let todoId = req.params.todoid;
+  const todoId = req.params.todoid;
 
   if (utils.checkParams(req, res, ['todoid'])) {
     return;
   }
 
-  let newTask = {
-    text: req.body.text,
-    occurrence: req.body.occurrence,
-    state: "current",
-    activeDays: req.body.activeDays,
-    activeWeeks: req.body.activeWeeks,
-    activeMonths: req.body.activeMonths,
-    hourStart: req.body.hourStart,
-    hourEnd: req.body.hourEnd,
-    everyWeek: req.body.everyWeek,
-    everyMonth: req.body.everyMonth,
-    cycleDate : new Date(),
-    selectedWeekDay: req.body.selectedWeekDay,
-    daysInMonth: req.body.daysInMonth,
-    selectDay: req.body.selectDay,
-    startTime: req.body.startTime,
-    endTime: req.body.endTime,
-    weekStartTime: req.body.weekStartTime,
-    weekEndTime: req.body.weekEndTime
-  };
+  try {
+    const newTask = {
+      text: req.body.text,
+      occurrence: req.body.occurrence,
+      state: "current",
+      activeDays: req.body.activeDays,
+      activeWeeks: req.body.activeWeeks,
+      activeMonths: req.body.activeMonths,
+      hourStart: req.body.hourStart,
+      hourEnd: req.body.hourEnd,
+      everyWeek: req.body.everyWeek,
+      everyMonth: req.body.everyMonth,
+      cycleDate : new Date(),
+      selectedWeekDay: req.body.selectedWeekDay,
+      daysInMonth: req.body.daysInMonth,
+      selectDay: req.body.selectDay,
+      startTime: req.body.startTime,
+      endTime: req.body.endTime,
+      weekStartTime: req.body.weekStartTime,
+      weekEndTime: req.body.weekEndTime
+    };
 
-  let userId = req.payload._id;
+    const userId = req.payload._id;
 
-  let todo = ToDo.findById(todoId).exec();
-
-  todo.then(todo => {
-    if(todo) {
-        todo.tasks.push(newTask);
-        return todo;
-    } else {
-      utils.sendJSONresponse(res, 500, {"message": "ToDo is not created for this user"});
+    const todo = await ToDo.findById(todoId).exec();
+    
+    if(!todo) {
+      throw "ToDo not found";
     }
-  }, err => {
-    utils.sendJSONresponse(res, 500, err);
-  })
-  .then(todo => {
-    todo.save(function(err, savedToDo) {
-      if(err) {
-        utils.sendJSONresponse(res, 500, err);
-      } else {
-        activitiesService.addActivity(" created a task " + newTask.text,
-                          userId, "task-create", req.body.communityId, "user");
 
-        utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
-      }
-    });
-  });
+    todo.tasks.push(newTask);
+
+    const savedToDo = await todo.save();
+
+    activitiesService.addActivity(" created a task " + newTask.text,
+                            userId, "task-create", req.body.communityId, "user");
+
+    utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+  
 
 };
 
@@ -164,68 +161,63 @@ module.exports.updateTask = async (req, res) => {
 };
 
 //DELETE todos/:todoid/task/:taskid - Delete a specific task
-module.exports.deleteTask = function(req, res) {
+module.exports.deleteTask = async (req, res) => {
 
-  var todoId = req.params.todoid;
-  var taskId = req.params.taskid;
+  const todoId = req.params.todoid;
+  const taskId = req.params.taskid;
 
   if (utils.checkParams(req, res, ['todoid', 'taskid'])) {
     return;
   }
 
-  ToDo.findById(todoId)
-  .exec(function(err, todo) {
-    if(err) {
-      utils.sendJSONresponse(res, 500, err);
-    } else {
+  try {
+    const todo = await ToDo.findById(todoId).exec();
 
-      let task = todo.tasks.id(taskId);
+    const task = todo.tasks.id(taskId);
 
-      if(task) {
-        task.remove();
-      } else {
-        utils.sendJSONresponse(res, 500, {message: "Invalid task id"});
-        return;
-      }
-
-      todo.save(function(err, savedToDo) {
-        if(err) {
-          utils.sendJSONresponse(res, 500, err);
-        } else {
-          utils.sendJSONresponse(res, 200, savedToDo);
-        }
-      });
+    if(!task) {
+      throw "Task for deletion not found";
     }
-  });
+
+    task.remove();
+
+    const savedToDo = await todo.save();
+
+    utils.sendJSONresponse(res, 200, savedToDo);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 
 
-//TODO: count using mongo functions
 // GET /todos/:todoid/activecount - Gets the number of active tasks
-module.exports.activeTasksCount = (req, res) => {
+module.exports.activeTasksCount = async (req, res) => {
 
-  let todoid = req.params.todoid;
+  const todoid = req.params.todoid;
 
-  let tasks = ToDo.find({'_id': todoid})
-                  .exec();
+  try {
 
-  tasks.then((todo) => {
+    const todo = await ToDo.find({'_id': todoid}).exec();
 
     if(!todo[0]) {
       utils.sendJSONresponse(res, 200, 0);
     }
 
-     let tasks = _.filter(todo[0].tasks, function(d) {
+    const tasks = _.filter(todo[0].tasks, function(d) {
       if(d.state === "current"){
         return true;
       }
     });
 
     utils.sendJSONresponse(res, 200, tasks.length);
-  }, (err) => {
+
+  } catch(err) {
     console.log(err);
-  });
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 

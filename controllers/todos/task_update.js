@@ -130,7 +130,7 @@ function checkIfCompleted(task, currTime, cycleDate, cycle) {
 }
 
 function isInNotCompleted(task, day) {
-  var isInList = _.find(task.notCompleted, (value) => {
+  let isInList = _.find(task.notCompleted, (value) => {
       if(moment(value.updatedOn).isSame(day, "day")) {
         return true;
       } else {
