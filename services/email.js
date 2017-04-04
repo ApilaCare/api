@@ -1,3 +1,4 @@
+
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const sgTransport = require('nodemailer-sendgrid-transport');
@@ -14,10 +15,6 @@ const sendgridConfig = {
 };
 
 const transporter = nodemailer.createTransport(sgTransport(sendgridConfig));
-
-// const transporter = nodemailer
-//     .createTransport("smtps://" + config.email + ":" + config.password + "@smtp.gmail.com");
-
 
 let mailOptions = {
   from: '',

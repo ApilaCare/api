@@ -123,6 +123,7 @@ module.exports.userImage = function(req, res) {
     });
 };
 
+// POST /users/forgotpassowrd/:email - Send reset email for password
 module.exports.forgotPassword = function(req, res) {
 
   if (utils.checkParams(req, res, ['email'])) {
@@ -296,8 +297,8 @@ function doSendPasswordForget(req, res, token) {
     function(error, info) {
       if (error) {
         utils.sendJSONresponse(res, 404, null);
+      } else {
+        utils.sendJSONresponse(res, 200, null);
       }
-
-      utils.sendJSONresponse(res, 200, null);
     });
 }
