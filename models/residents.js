@@ -245,6 +245,7 @@ var residentSchema = new mongoose.Schema({
     leftEar: {type: String},  // adequate, adequate with aid, poor, none
     hearingAbility: {type: Number}, // number scale 0 through 10 | just display numerical value
     wearsHearingAid: {type: Boolean, default: false},
+      helpWithHearingAid: {type: Boolean, default: false},
       helpWithHearingAidDescribe: {type: String}, // if yes | open field
     hearingNotes: {type: String},
 
