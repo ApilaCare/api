@@ -379,6 +379,7 @@ module.exports.updateUnits = async (req, res) => {
 
     community.tempUnit = req.body.tempUnit;
     community.weightUnit = req.body.weightUnit;
+    community.areaUnit = req.body.areaUnit;
 
     await community.save();
 
