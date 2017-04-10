@@ -6,10 +6,13 @@ var utils = require('../../services/utils');
 
 var async = require('async');
 
-const activitiesService = require('../../services/activities.service');
+const activitiesService = require('../../services/activities');
 const GooglePlaces = require('node-googleplaces');
 
 const places = new GooglePlaces(process.env.GOOGLE_PLACE_API);
+
+const populate = require('./populate_community');
+
 
 function createCommunity(req, res) {
   Community.create(req.body, function(err, community) {
@@ -54,19 +57,32 @@ module.exports.addRole = function(req, res) {
     return;
   }
 
+
   Community.findOne({
     _id: req.params.communityid
   }, function(err, communites) {
     if (communites) {
 
+      const isBoss = String(communites.boss) === String(req.payload._id);
+      const isCreator = String(communites.creator) === String(req.payload._id);
+
       if (req.body.type === "boss") {
-        communites.boss = req.params.userid;
-        communites.minions.pull(req.params.userid);
-        communites.directors.pull(req.params.userid);
+
+        if(isBoss || isCreator) {
+          communites.boss = req.params.userid;
+          communites.minions.pull(req.params.userid);
+          communites.directors.pull(req.params.userid);
+        }
+
       } else if (req.body.type === "directors") {
-        communites.directors.push(req.params.userid);
-        communites.minions.pull(req.params.userid);
+
+        if(isBoss) {
+          communites.directors.push(req.params.userid);
+          communites.minions.pull(req.params.userid);
+        }
+        
       } else if (req.body.type === "minions") {
+
         communites.minions.push(req.params.userid);
         communites.directors.pull(req.params.userid);
       }
@@ -141,6 +157,7 @@ module.exports.addPendingMember = function(req, res) {
 
 };
 
+//PUT /communities/decline/:communityid/ - decline a member for the community
 module.exports.declineMember = function(req, res) {
 
   if (utils.checkParams(req, res, ['communityid'])) {
@@ -169,7 +186,7 @@ module.exports.declineMember = function(req, res) {
 
 };
 
-//  PUT /communities/accept/:communityid/ - Accept a pending member to a community
+// PUT /communities/accept/:communityid/ - Accept a pending member to a community
 module.exports.acceptMember = function(req, res) {
 
   if (utils.checkParams(req, res, ['communityid'])) {
@@ -213,6 +230,7 @@ module.exports.acceptMember = function(req, res) {
 
 };
 
+//PUT /communities/update/:communityid/ - Update general community info
 module.exports.communitiesUpdateOne = function(req, res) {
 
   if (utils.checkParams(req, res, ['communityid'])) {
@@ -253,34 +271,8 @@ module.exports.communitiesUpdateOne = function(req, res) {
     );
 };
 
-module.exports.communitiesReadOne = function(req, res) {
 
-  if (req.params && req.params.communityid) {
-    Community
-      .findById(req.params.communityid)
-      .exec(function(err, community) {
-        if (!community) {
-          utils.sendJSONresponse(res, 404, {
-            "message": "communityid not found (from controller)"
-          });
-          return;
-        } else if (err) {
-          console.log(err);
-          utils.sendJSONresponse(res, 404, err);
-          return;
-        }
-
-        utils.sendJSONresponse(res, 200, community);
-      });
-  } else {
-    console.log('No communityid specified');
-    utils.sendJSONresponse(res, 404, {
-      "message": "No communityid in request"
-    });
-  }
-};
-
-
+//DELETE /communities/:communityid/user/:userid/ - removes a member for a community
 module.exports.removeMember = function(req, res) {
 
   if (utils.checkParams(req, res, ['userid', 'communityid'])) {
@@ -291,11 +283,10 @@ module.exports.removeMember = function(req, res) {
     "_id": req.params.communityid
   }, function(err, community) {
     if (community) {
+
       community.communityMembers.pull(req.params.userid);
       community.directors.pull(req.params.userid);
       community.minions.pull(req.params.userid);
-
-      //community.creator = req.params.userid;
 
       removeCommunityFromUser(res, req.params.userid, function() {
         community.save(function(err) {
@@ -343,7 +334,7 @@ module.exports.hasCanceledCommunity = function(req, res) {
     });
 };
 
-
+//PUT /communities/:communityid/roomstyle/:roomid
 module.exports.updateRoomStyle = function(req, res) {
   Community.findOne({"_id": req.params.communityid})
    .exec((err, community) => {
@@ -375,7 +366,54 @@ module.exports.updateRoomStyle = function(req, res) {
    });
 };
 
-//POST
+//PUT /communities/:communityid/units - Updates the unit selection for a community
+module.exports.updateUnits = async (req, res) => {
+
+  if (utils.checkParams(req, res, ['communityid'])) {
+    return;
+  }
+
+  try {
+
+    const community = await Community.findById(req.params.communityid).exec();
+
+    community.tempUnit = req.body.tempUnit;
+    community.weightUnit = req.body.weightUnit;
+    community.areaUnit = req.body.areaUnit;
+
+    await community.save();
+
+    utils.sendJSONresponse(res, 200, {});
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
+//DELETE /communities/:communityid/roomstyle/:roomid
+module.exports.deleteRoomStyle = async (req, res) => {
+
+  if (utils.checkParams(req, res, ['roomid', 'communityid'])) {
+    return;
+  }
+
+  try {
+
+    let community = await Community.findById(req.params.communityid).exec();
+
+    community.roomStyle.pull(req.params.roomid);
+
+    await community.save();
+
+    utils.sendJSONresponse(res, 200, req.params.roomid);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+};
+
+//POST /communities/:communityid/roomstyle
 module.exports.createRoomStyle = function(req, res) {
   Community.findOne({"_id": req.params.communityid})
    .exec((err, community) => {
@@ -522,12 +560,13 @@ module.exports.addFloor = async function(req, res) {
 };
 
 //PUT /communities/:communityid/floor - Updating floor info
-module.exports.updateFloor  = async (req, res) => {
+module.exports.updateFloor = async (req, res) => {
   let communityid = req.params.communityid;
 
   if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
+
 
   try {
     let community = await Community.findById(communityid).exec();
@@ -547,45 +586,37 @@ module.exports.updateFloor  = async (req, res) => {
 }
 
 
-module.exports.doCreateCommunity = function(communityInfo, callback) {
+module.exports.doCreateCommunity = async (communityInfo, user) => {
 
-  var members = [];
-  members.push(communityInfo.creator);
+  try {
 
-  Community.create({
-    name: communityInfo.name,
-    communityMembers: members,
-    pendingMembers: [],
-    creator: communityInfo.creator,
-    boss: communityInfo.creator,
-    testCommunity: true
+    let members = [];
+    members.push(communityInfo.creator);
 
-  }, function(err, community) {
+    let community = new Community({
+      name: communityInfo.name,
+      communityMembers: members,
+      pendingMembers: [],
+      creator: communityInfo.creator,
+      boss: communityInfo.creator,
+      testCommunity: true
+    });
 
-    if (err) {
-      console.log(err);
-      callback(false);
-    } else {
+    let savedCommunity = await community.save();
 
-      User.findById(communityInfo.creator)
-        .exec(function(err, user) {
-          if (user) {
-            user.community = community._id;
+    user.community = savedCommunity._id;
 
-            user.save(function(err) {
-              if (err) {
-                callback(false);
-              } else {
-                callback(true, community);
-              }
-            });
-          } else {
-            callback(false);
-          }
-        });
+    await user.save();
 
-    }
-  });
+    await populate.populateTestCommunity(community, user);
+
+    return savedCommunity;
+
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
+
 };
 
 //PRIVATE FUNCTIONS

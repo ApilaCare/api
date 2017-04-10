@@ -2,8 +2,11 @@ var mongoose = require('mongoose');
 var Iss = mongoose.model('Issue');
 var User = mongoose.model('User');
 var utils = require('../../services/utils');
-const activitiesService = require('../../services/activities.service');
+const activitiesService = require('../../services/activities');
 const ToDo = mongoose.model('ToDo');
+
+const Labels = mongoose.model('Labels');
+
 
 // POST /issues/new - Creates a new issue
 module.exports.issuesCreate = function(req, res) {
@@ -48,7 +51,7 @@ module.exports.addFinalPlan = function(req, res) {
     return;
   }
 
-  if(!req.body.checklist) {
+  if(req.body.checklist) {
 
     let todo = ToDo.findById(todoId).exec();
 
@@ -129,7 +132,7 @@ module.exports.issueUpdateInfo = function(req, res) {
 };
 
 // GET /issues/issuescount/:communityid - Number of open isues for a community
-module.exports.issuesCount = function(req, res) {
+module.exports.issuesCount = async (req, res) => {
 
   var communityid = req.params.communityid;
 
@@ -137,19 +140,17 @@ module.exports.issuesCount = function(req, res) {
     return;
   }
 
-  Iss.find({
-    status: "Open",
-    community: communityid
-  }, function(err, issues) {
-    if (err) {
-      utils.sendJSONresponse(res, 404, {
-        'message': err
-      });
-    } else {
-      utils.sendJSONresponse(res, 200, issues.length);
-    }
+  try {
 
-  });
+    let searchQuery = { status: "Open", community: communityid };
+
+    let issueCount = await Iss.find(searchQuery).count().exec();
+
+    utils.sendJSONresponse(res, 200, issueCount);
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+
 };
 
 // GET /issues/list/:status/id/:communityid - Gets a list of issues grouped by responsibleParty
@@ -214,25 +215,16 @@ module.exports.issuesList = function(req, res) {
         model: 'User',
         select: '_id name userImage'
       },{
-        path: 'updateInfo.updateBy',
+        path: 'issues.responsibleParty',
         model: 'User',
         select: '_id name userImage'
-      },{
-        path: 'submitBy',
-        model: 'User',
-        select: '_id name userImage'
-      },{
-        path: 'responsibleParty',
-        model: 'User',
-        select: '_id name userImage'
-      }], function(err) {
+      }], function(err, populated) {
         if (err) {
           utils.sendJSONresponse(res, 404, {
             'message': err
           });
         } else {
-          console.log(issues);
-          utils.sendJSONresponse(res, 200, issues);
+          utils.sendJSONresponse(res, 200, populated);
         }
 
       });
@@ -253,6 +245,7 @@ module.exports.issuesListByStatus = function(req, res) {
   Iss.find({status: status, community: communityid})
       .populate("submitBy", "name _id")
       .populate("responsibleParty", "name _id")
+      //.select("_id title description resolutionTimeframe submitBy responsibleParty updateInfo attachments")
       .exec(function(err, issues) {
     if (err) {
       utils.sendJSONresponse(res, 404, {
@@ -265,43 +258,48 @@ module.exports.issuesListByStatus = function(req, res) {
 };
 
 // GET /issues/due/:communityid - List of issues that are due in a community
-module.exports.dueIssuesList = function(req, res) {
+module.exports.dueIssuesList = async (req, res) => {
 
-  var communityid = req.params.communityid;
+  const communityid = req.params.communityid;
 
   if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
 
-  Iss.find({
-      "due": {
-        $exists: true
-      },
-      community: communityid
-    },
-    function(err, issues) {
-      if (issues) {
-        utils.sendJSONresponse(res, 200, issues);
-      } else {
-        utils.sendJSONresponse(res, 404, {
-          "message": "Issues with due date not found"
-        });
-      }
-    });
+  try {
+
+    const issues = await Iss.find({
+        "due": {
+          $exists: true
+        },
+        community: communityid
+      }).select("title due _id").exec();
+
+    utils.sendJSONresponse(res, 200, issues);
+  } catch(err) {
+    utils.sendJSONresponse(res, 400, err);
+  }
+
 };
 
 module.exports.issuesPopulateOne = (req, res) => {
 
   Iss.findById(req.params.issueid)
       .populate("checklists.author", "name _id")
-      .populate("finalPlan.author", "name _id")
-      .populate("responsibleParty", "name _id")
+      .populate("finalPlan.author", "name _id userImage")
+      .populate("responsibleParty", "name _id userImage")
+      .populate("submitBy", "name _id")
+    //  .populate("labels", "color name")
       .exec((err, issue) => {
 
         if(!err) {
-          console.log(issue);
 
-          utils.sendJSONresponse(res, 200, issue);
+          Labels.populate(issue, {path: "labels", model:"Labels"}, function(err, d) {
+            console.log(d);
+            utils.sendJSONresponse(res, 200, issue);
+          });
+
+
         } else {
           utils.sendJSONresponse(res, 404, err);
         }
@@ -349,12 +347,6 @@ module.exports.issuesUpdateOne = function(req, res) {
     return;
   }
 
-  var updateInfo = {
-    "updateBy": req.body.modifiedBy,
-    "updateDate": req.body.modifiedDate,
-    "updateField": req.body.updateField
-  };
-
   Iss
     .findById(req.params.issueid)
     .exec(
@@ -371,10 +363,18 @@ module.exports.issuesUpdateOne = function(req, res) {
         }
 
         if(req.body.responsibleParty) {
-          issue.responsibleParty = req.body.responsibleParty._id || req.body.responsibleParty;
+          let newResponsibleUser = req.body.responsibleParty._id || req.body.responsibleParty;
+
+          //user getting switched
+          if(newResponsibleUser !== issue.responsibleParty) {
+            activitiesService.updateIssueCount(newResponsibleUser, 'increment');
+            activitiesService.updateIssueCount(issue.responsibleParty, 'decrement');
+          }
+
+          issue.responsibleParty = newResponsibleUser;
         }
 
-        if(req.body.submitBy._id) {
+        if(req.body.submitBy && req.body.submitBy._id) {
           issue.submitBy = req.body.submitBy._id;
         }
 
@@ -382,7 +382,19 @@ module.exports.issuesUpdateOne = function(req, res) {
         issue.resolutionTimeframe = req.body.resolutionTimeframe;
 
         issue.description = req.body.description;
+
+        //if status changed
+        if(issue.status !== req.body.status) {
+          if(req.body.status === 'Open') {
+            activitiesService.updateIssueCount(req.payload._id, 'increment');
+          } else {
+            activitiesService.updateIssueCount(req.payload._id, 'decrement');
+          }
+
+        }
+
         issue.status = req.body.status;
+
         issue.due = req.body.due;
 
         issue.checklists = req.body.checklists;
@@ -398,43 +410,69 @@ module.exports.issuesUpdateOne = function(req, res) {
           issue.idMembers = req.body.idMembers;
         }
 
-
-        if (updateInfo.updateField !== undefined) {
-          if (updateInfo.updateField.length > 0) {
-            issue.updateInfo.push(updateInfo);
-          }
-
-        }
-
         issue.save(function(err, issue) {
           if (err) {
             console.log(err);
             utils.sendJSONresponse(res, 404, err);
           } else {
-            Iss.populate(issue.updateField,
-              [{'path' : 'updateBy', select: '_id name userImage'},
-               {'path' : 'submitBy', select: '_id name userImage'},
-                {'path' : 'checklists.author', select: '_id name userImage'}],
-            function(err, iss) {
-              if(err) {
-                utils.sendJSONresponse(res, 500, err);
-              } else {
-                if(req.body.addedMember) {
-                  activitiesService.addActivity(" added member " + req.body.addedMember.name + " to issue" + issue.title, req.body.responsibleParty,
-                                                  "issue-update", issue.community, 'user', req.body.addedMember._id);
-                } else {
-                  activitiesService.addActivity(" updated issue " + req.body.title, req.body.responsibleParty,
-                                                  "issue-update", issue.community, 'community');
-                }
 
-                utils.sendJSONresponse(res, 200, iss);
+              if(req.body.addedMember) {
+                console.log("added a member");
+                activitiesService.addActivity(" added member " + req.body.addedMember.name + " to issue " + issue.title, req.payload._id,
+                                                "issue-update", issue.community, 'user', req.body.addedMember._id);
+              } else if(req.body.oldResponsibleParty) {
+                activitiesService.addActivity(" changed responsible party in issue " + issue.title, req.payload._id,
+                                                "issue-update", issue.community, 'user');
+              } else {
+                activitiesService.addActivity(" updated issue " + req.body.title, req.payload._id,
+                                                "issue-update", issue.community, 'community');
               }
 
-            });
+              utils.sendJSONresponse(res, 200, issue);
           }
+
+
         });
-      }
-    );
+      });
+};
+
+//PUT /issues/:issueid/confidential 
+module.exports.updateConfidential = async (req, res) => {
+  try {
+
+    const issue = await Iss.update(
+        {_id: req.params.issueid}, 
+        {$set: { confidential: req.body.confidential}}).exec();
+
+    utils.sendJSONresponse(res, 200, {});
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 404, err);
+  }
+};
+
+//PUT /issues/:issueid/updateinfo - Adding a new update info entry
+module.exports.addUpdateInfo = async (req, res) => {
+
+  try {
+
+    if(!req.body) {
+      throw "UpdateInfo is empty";
+    }
+
+    let issue = await Iss.findById(req.params.issueid).exec();
+
+    req.body.ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+    issue.updateInfo.push(req.body);
+
+    let savedIssue = await issue.save();
+
+    utils.sendJSONresponse(res, 200, req.body);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
 };
 
 // DELETE /issues/:issueid - Delte an issue by id
@@ -465,6 +503,38 @@ module.exports.issuesDeleteOne = function(req, res) {
   }
 };
 
+//PUT /issues/:issueid/plan/:planid
+module.exports.updateFinalPlan = async (req, res) => {
+
+  let planId = req.params.planid;
+
+  if (utils.checkParams(req, res, ['issueid', 'planid'])) {
+    return;
+  }
+
+  try {
+    let issue = await Iss.findById(req.params.issueid).exec();
+
+    let index = issue.finalPlan.indexOf(issue.finalPlan.id(planId));
+    let plan = req.body;
+
+    if(index === -1) {
+      throw "No final Plan found";
+    }
+
+    issue.finalPlan.set(index, plan);
+
+    const savedIssue = await issue.save();
+
+    utils.sendJSONresponse(res, 200, savedIssue);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
 //////////////////////// HELPER FUNCTIONS ////////////////////////////
 function finalPlan(req, res, taskid) {
   Iss.findById(req.params.issueid)
@@ -491,7 +561,7 @@ function finalPlan(req, res, taskid) {
              utils.sendJSONresponse(res, 404,
                {'message' : 'Unable to save issue while adding final plan'});
            } else {
-             utils.sendJSONresponse(res, 200, finalPlan);
+             utils.sendJSONresponse(res, 200, issue.finalPlan.pop());
            }
          });
        }

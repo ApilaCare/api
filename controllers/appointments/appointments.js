@@ -4,7 +4,9 @@ var User = mongoose.model('User');
 
 var utils = require('../../services/utils');
 
-const activitiesService = require('../../services/activities.service');
+const moment = require('moment');
+
+const activitiesService = require('../../services/activities');
 
 // POST /api/appointments/new - Creates a new appointment
 module.exports.appointmentsCreate = function(req, res) {
@@ -22,6 +24,7 @@ module.exports.appointmentsCreate = function(req, res) {
     isAm: req.body.isAm,
     submitBy: req.payload._id,
     transportation: req.body.transportation,
+    currMonth: moment().format("YYYY M"),
     community: req.body.community._id
   }, function(err, appointment) {
     if (err) {
@@ -55,16 +58,17 @@ module.exports.appointmentsCreate = function(req, res) {
   });
 };
 
-// GET /appointments/:communityid - list all appointments populated with resident info
+// GET /appointments/:communityid/month/:month - list all appointments populated with resident info
 module.exports.appointmentsList = function(req, res) {
 
   if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
 
-  Appoint.find({
-    "community": req.params.communityid
-  }).populate("residentGoing")
+  let month = req.params.month;
+
+  Appoint.find({community: req.params.communityid, currMonth: month})
+    .populate("residentGoing", "_id firstName aliasName middleName lastName")
     .populate("appointmentComment.author", "name _id")
     .exec(function(err, appointments) {
     if (err) {
@@ -72,11 +76,13 @@ module.exports.appointmentsList = function(req, res) {
         'message': 'Error while listing appointements'
       });
     } else {
+
       utils.sendJSONresponse(res, 200, appointments);
     }
 
   });
 };
+
 
 // GET /appointments/today/:communityid - Number of appointments for today
 module.exports.appointmentsToday = function(req, res) {

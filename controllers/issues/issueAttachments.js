@@ -25,8 +25,24 @@ module.exports.issueAttachmentsCreate = function(req, res) {
 
 };
 
+// PUT /issues/:issueid/attachments/restore - Restores an attachment for an issue
+module.exports.restoreAttachment = async (req, res) => {
+  try {
 
-// DELETE /issues/:issueid/attachments/:attachmentid - Delte and attachment by issueid
+    const issue = await Iss.findById(req.params.issueid).exec();
+
+    issue.attachments.push(req.body);
+
+    await issue.save();
+
+    utils.sendJSONresponse(res, 200, req.body);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 400, err);
+  }
+};
+
+// DELETE /issues/:issueid/attachments/:attachmentid - Delete and attachment by issueid
 module.exports.issueAttachmentsDeleteOne = function(req, res) {
 
   if (utils.checkParams(req, res, ['issueid', 'attachmentid'])) {
@@ -50,9 +66,6 @@ module.exports.issueAttachmentsDeleteOne = function(req, res) {
           } else {
 
             var attch = issue.attachments.id(req.params.attachmentid);
-
-            var updateInfo = formatUpdateIssue(req, attch);
-            issue.updateInfo.push(updateInfo);
 
             issue.attachments.id(req.params.attachmentid).remove();
 
@@ -98,8 +111,6 @@ var doAddAttachment = function(req, res, issue) {
       type: file.type,
     });
 
-    issue.updateInfo.push(req.body.updateInfo);
-
     fs.unlinkSync(file.path);
 
     issue.save(function(err, issue) {
@@ -114,20 +125,6 @@ var doAddAttachment = function(req, res, issue) {
   });
 
 };
-
-function formatUpdateIssue(req, attch) {
-
-  var updateInfo = {};
-
-  updateInfo.updateBy = req.payload.name;
-  updateInfo.updateDate = new Date();
-  updateInfo.updateField = [];
-  updateInfo.updateField.push({
-    "field": "attachments",
-    "new": "",
-    "old": attch.name
-  });
-}
 
 function issueHasError(res, err, issue) {
 

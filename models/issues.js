@@ -27,6 +27,8 @@ var issueLabelsSchema = new mongoose.Schema({
     color: {type: String, required: true},
 });
 
+mongoose.model('Labels', issueLabelsSchema);
+
 var issueMembersSchema = new mongoose.Schema({
   name: {type: String, required: true}
 });
@@ -53,7 +55,8 @@ var memberRecoverSchema =  new mongoose.Schema({
 var updateInfoSchema = new mongoose.Schema({
   updateBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   updateDate: {type: Date, default: Date.now},
-  updateField: [mongoose.Schema.Types.Mixed]
+  updateField: [mongoose.Schema.Types.Mixed],
+  ipAddress: {type: String}
 });
 
 var issueSchema = new mongoose.Schema({
@@ -87,4 +90,5 @@ var issueSchema = new mongoose.Schema({
 });
 
 mongoose.model('Issue', issueSchema);
+
 mongoose.model('MemberRecover', memberRecoverSchema);

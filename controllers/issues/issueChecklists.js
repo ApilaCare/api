@@ -30,6 +30,8 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
     return;
   }
 
+  console.log("In Update checklist");
+
   Iss
     .findById(req.params.issueid)
     .exec(
@@ -50,22 +52,23 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
             });
           } else {
 
+            console.log(thisChecklist);
+
             thisChecklist.author = req.body.author;
             thisChecklist.checkItems = req.body.checkItems;
             thisChecklist.checkItemsChecked = req.body.checkItemsChecked;
-
-
-            if (req.body.updateInfo) {
-              issue.updateInfo.push(req.body.updateInfo);
-            }
+            thisChecklist.checklistName = req.body.checklistName;
 
             // other update items
-            issue.save(function(err, issue) {
+            issue.save(function(err, savedIssue) {
               if (err) {
                 console.log(err);
                 utils.sendJSONresponse(res, 404, err);
               } else {
-                utils.sendJSONresponse(res, 200, thisChecklist);
+
+                const savedChecklist = savedIssue.checklists;
+
+                utils.sendJSONresponse(res, 200, savedChecklist);
               }
             });
           }
@@ -105,9 +108,6 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
             let checklist = issue.checklists.id(req.params.checklistid);
 
             if(checklist) {
-              
-              var updateInfo = formatUpdateInfo(req, issue);
-              issue.updateInfo.push(updateInfo);
 
               checklist.remove();
 
@@ -142,13 +142,7 @@ var doAddChecklist = function(req, res, issue) {
   if (!issue) {
     utils.sendJSONresponse(res, 404, "issueid not found");
   } else {
-    issue.checklists.push({
-      author: req.payload._id,
-      checklistName: req.body.checklistName,
-      // needs the checkItems as the mixed mongoose schema
-    });
-
-    issue.updateInfo.push(req.body.updateInfo);
+    issue.checklists.push(req.body);
 
     issue.save(function(err, issue) {
       var thisChecklist;
@@ -175,19 +169,4 @@ function issueHasError(res, err, issue) {
   }
 
   return false;
-}
-
-function formatUpdateInfo(req, issue) {
-  var updateInfo = {};
-
-  updateInfo.updateBy = req.payload._id;
-  updateInfo.updateDate = new Date();
-  updateInfo.updateField = [];
-  updateInfo.updateField.push({
-    "field": "checkitem",
-    "new": "",
-    "old": issue.checklists.id(req.params.checklistid).checklistName
-  });
-
-  return updateInfo;
 }

@@ -11,7 +11,7 @@ var passport = require('passport');
 var cors = require('cors');
 var helmet = require('helmet');
 
-require('./services/activities.service')(io);
+require('./services/activities')(io);
 
 require('./models/db');
 require('./config/passport');

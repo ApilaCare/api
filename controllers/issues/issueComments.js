@@ -35,17 +35,19 @@ module.exports.issueCommentsUpdate = function(req, res) {
 
   let commentId = req.body._id;
 
+  console.log("IN COMMENTS UPDATE " +  commentId);
+
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
   }
-
-  console.log("ID: " + commentId);
 
   let issue = Iss.findById(req.params.issueid).exec();
 
   issue.then((issue) => {
 
     let index = issue.comments.indexOf(issue.comments.id(commentId));
+
+    console.log(index);
     let comment = req.body;
 
     if(index !== -1) {
@@ -85,6 +87,7 @@ module.exports.issueCommentsList = function(req, res) {
         if(err) {
           utils.sendJSONresponse(res, 404, {'message' : err});
         } else {
+          console.log(issue.comments);
           utils.sendJSONresponse(res, 200, issue.comments);
         }
       });

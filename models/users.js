@@ -43,10 +43,12 @@ userSchema.methods.validPassword = function(password) {
     return this.hash === hash;
 };
 
-userSchema.methods.generateJwt = function() {
+userSchema.methods.generateJwt = function(community) {
     var expiry = new Date();
     // will have the locally saved JWT expire after 7 days
     expiry.setDate(expiry.getDate() + 7);
+
+    let comm = community ? community : this.community;
 
     // call jwt.sign method and return what it returns
     return jwt.sign({
@@ -55,6 +57,7 @@ userSchema.methods.generateJwt = function() {
         email: this.email,
         name: this.name,
         todoid: this.todoid,
+        community: comm,
         // include expiration as unix time in seconds
         exp: parseInt(expiry.getTime() / 1000),
         // send secret for hashing algorithim to use

@@ -26,7 +26,13 @@ var updateInfoSchema = new mongoose.Schema({
   updateBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   communicatedWith: [String],
   updateDate: {type: Date, default: Date.now},
-  updateField: [mongoose.Schema.Types.Mixed]
+  updateField: [mongoose.Schema.Types.Mixed],
+  ipAddress: {type: String}
+});
+
+var vitalsInfoSchema = new mongoose.Schema({
+    data: {type: Number, required: true},
+    date: {type: Date, 'default': Date.now},
 });
 
 var residentSchema = new mongoose.Schema({
@@ -128,6 +134,11 @@ var residentSchema = new mongoose.Schema({
           assitanceWithDevice: {type: String}, // if walker, cane, wheelchair, electric wheelchair, other
         specialAmbulationNeeds: {type: String},
 
+        transferPole : {type: Boolean},
+        liftReclinerChair : {type: Boolean},
+        transferLift : {type: Boolean},
+        sideRails : {type: Boolean},
+
         // devices
         apartmentMobilityDevices: [String], // check all that apply:
                                             //  [transfer pole, side rails, pivot transfer, lift recliner chair, transfer lift]
@@ -203,7 +214,7 @@ var residentSchema = new mongoose.Schema({
     bedtimeSnack: {type: Boolean, default: false},
     adaptiveEquipment: {type: String}, // plate guard, built up silverware, special cups, none
     typeOfDiet: {type: String}, // BRAT, gluten free, full vegan, partial vegan, lactose free, other, regular
-    specialDiet: {type: String}, // pureed, ground, regular, soft
+    specialDiet: {type: String}, // pureed, ground, regular, soft, cut up
     foodLikes: [String],
     foodDislikes: [String],
     fingerFoods: {type: Boolean, default: false},
@@ -219,6 +230,7 @@ var residentSchema = new mongoose.Schema({
       hasWoundDescribe: {type: String}, // if yes | open field
       woundAmount: {type: Number},      // if yes | number of wounds
     skinBreakdown: {type: Boolean, default: false}, // "At risk for skin breakdown"
+    skinNotes: {type: String},
 
     // infection
     urinaryTractInfectionRisk: {type: Boolean, default: false},
@@ -233,6 +245,7 @@ var residentSchema = new mongoose.Schema({
     leftEar: {type: String},  // adequate, adequate with aid, poor, none
     hearingAbility: {type: Number}, // number scale 0 through 10 | just display numerical value
     wearsHearingAid: {type: Boolean, default: false},
+      helpWithHearingAid: {type: Boolean, default: false},
       helpWithHearingAidDescribe: {type: String}, // if yes | open field
     hearingNotes: {type: String},
 
@@ -256,13 +269,12 @@ var residentSchema = new mongoose.Schema({
 
     // oxygen
     oxygen: {type: Boolean, default: false},
-      oxygenType: {type: String}, // if true | Liquid, concentrate
+      oxygenType: {type: String}, // if true | Liquid, concentrate, canisters
       oxygenFlow: {type: String}, // if true | continuous flow, helios
 
     // medication
     medsAtBedside: {type: Boolean, default: false},
-    selfMeds: {type: Boolean, default: false},
-    meds: {type: Boolean, default: false},
+    medications: {type: String}, // Care Giver Provides, No Meds, Self Meds
     swallowAssist: {type: Boolean, default: false},
     chemotherapy: {type: Boolean, default: false},
     dialysis: {type: Boolean, default: false},
@@ -288,12 +300,13 @@ var residentSchema = new mongoose.Schema({
     lotionAssist: {type: String}, // independent, partial, full, reminder
 
     // dressing
-    layoutCloths: {type: Boolean, default: false},
-    shoesAssist: {type: Boolean, default: false},
-    topAssist: {type: Boolean, default: false},
-    bottomAssist: {type: Boolean, default: false},
-    buttonAssist: {type: Boolean, default: false},
-    zipperAssist: {type: Boolean, default: false},
+    dressingAssist: {type: Boolean, default: false},
+      layoutCloths: {type: Boolean, default: false},
+      shoesAssist: {type: Boolean, default: false},
+      topAssist: {type: Boolean, default: false},
+      bottomAssist: {type: Boolean, default: false},
+      buttonAssist: {type: Boolean, default: false},
+      zipperAssist: {type: Boolean, default: false},
     dressingNotes: {type: String},
 
     // devices
@@ -364,7 +377,6 @@ var residentSchema = new mongoose.Schema({
       painDescription: {type: String}, // if yes |
       maxPainTime: {type: String}, // if yes |
       painIncreasedBy: {type: String}, // if yes |
-      painDecreasedBy: {type: String}, // if yes |
       painManagedBy: [String], // medication, hot pack, cold pack, positioning, topicals (check all that apply)
       painLength: {type: String}, // new onset, chronic
     painNotes: {type: String},
@@ -384,11 +396,6 @@ var residentSchema = new mongoose.Schema({
       internationalNormalizedRatio: [vitalsInfoSchema], // if yes | array of values
 });
 
-
-var vitalsInfoSchema = new mongoose.Schema({
-    data: {type: Number, required: true},
-    date: {type: Date, 'default': Date.now},
-});
 
 mongoose.model('Resident', residentSchema);
 mongoose.model('Contact', residentContactSchema);

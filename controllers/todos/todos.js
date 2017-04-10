@@ -1,295 +1,247 @@
-var mongoose = require('mongoose');
-var utils = require('../../services/utils');
+const mongoose = require('mongoose');
+const utils = require('../../services/utils');
 
-var ToDo = mongoose.model('ToDo');
-var TaskService = require('./task_update');
+const ToDo = mongoose.model('ToDo');
+const TaskService = require('./task_update');
 
-var _ = require('lodash');
-var moment = require('moment');
+const _ = require('lodash');
+const moment = require('moment');
 
 const occurrence = require('../../services/constants').occurrence;
 const taskState = require('../../services/constants').taskState;
-const activitiesService = require('../../services/activities.service');
+const activitiesService = require('../../services/activities');
 
 // creates an empty todo object called when a user is registered
-module.exports.createEmptyToDo = function(callback) {
+module.exports.createEmptyToDo = async () => {
 
-  ToDo.create({
-    tasks: [],
-    completed: [],
-    overDue: [],
-    notCompleted: []
-  }, function(err, todo) {
-    if (err) {
-      callback(false);
-    } else {
-      callback(todo._id);
-    }
-  });
+  try {
+    let task = new ToDo({
+      tasks: [],
+      completed: [],
+      notCompleted: []
+    });
+
+    let savedTask = await task.save();
+
+    return savedTask.id;
+
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
 
 };
 
 //GET /todos/:todoid - List all the tasks from the todo
-module.exports.listTasks = function(req, res) {
+module.exports.listTasks = async (req, res) => {
 
-  var todoId = req.params.todoid;
+  const todoId = req.params.todoid;
 
   if (utils.checkParams(req, res, ['todoid'])) {
     return;
   }
 
-  ToDo.findById(todoId)
-  .exec(function(err, todo) {
-    if(err) {
-      utils.sendJSONresponse(res, 500, err);
-    } else {
+  try {
 
-      //before listing tasks check if any tasks are overdue/completed
-      TaskService.updateTasks(todo, function(status, err) {
-        if(status){
-          utils.sendJSONresponse(res, 200, todo.tasks);
-        } else {
-            utils.sendJSONresponse(res, 500, err);
-        }
-      });
-    }
-  });
+    const todo = await ToDo.findById(todoId).exec();
+
+    //before listing tasks check if any tasks are completed
+    await TaskService.updateTasks(todo);
+  
+    utils.sendJSONresponse(res, 200, todo.tasks);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 
 //POST /todos/:todoid/task/:taskid - Creates a new task (todo item)
-module.exports.addTask = function(req, res) {
+module.exports.addTask = async (req, res) => {
 
-  let todoId = req.params.todoid;
+  const todoId = req.params.todoid;
 
   if (utils.checkParams(req, res, ['todoid'])) {
     return;
   }
 
-  let newTask = {
-    "text" : req.body.text,
-    "occurrence" : req.body.occurrence,
-    "state" : "current",
-    "activeDays" : req.body.activeDays,
-    "activeWeeks": req.body.activeWeeks,
-    "activeMonths": req.body.activeMonths,
-    "hourStart": req.body.hourStart,
-    "hourEnd": req.body.hourEnd,
-    "everyWeek": req.body.everyWeek,
-    "everyMonth": req.body.everyMonth,
-    "cycleDate" : new Date()
-  };
+  try {
+    const newTask = {
+      text: req.body.text,
+      occurrence: req.body.occurrence,
+      state: "current",
+      activeDays: req.body.activeDays,
+      activeWeeks: req.body.activeWeeks,
+      activeMonths: req.body.activeMonths,
+      hourStart: req.body.hourStart,
+      hourEnd: req.body.hourEnd,
+      everyWeek: req.body.everyWeek,
+      everyMonth: req.body.everyMonth,
+      cycleDate : new Date(),
+      selectedWeekDay: req.body.selectedWeekDay,
+      daysInMonth: req.body.daysInMonth,
+      selectDay: req.body.selectDay,
+      startTime: req.body.startTime,
+      endTime: req.body.endTime,
+      weekStartTime: req.body.weekStartTime,
+      weekEndTime: req.body.weekEndTime
+    };
 
-  let userId = req.payload._id;
+    const userId = req.payload._id;
 
-  let todo = ToDo.findById(todoId).exec();
-
-  todo.then(todo => {
-    if(todo) {
-        todo.tasks.push(newTask);
-        return todo;
-    } else {
-      utils.sendJSONresponse(res, 500, {"message": "ToDo is not created for this user"});
+    const todo = await ToDo.findById(todoId).exec();
+    
+    if(!todo) {
+      throw "ToDo not found";
     }
-  }, err => {
-    utils.sendJSONresponse(res, 500, err);
-  })
-  .then(todo => {
-    todo.save(function(err, savedToDo) {
-      if(err) {
-        utils.sendJSONresponse(res, 500, err);
-      } else {
-        activitiesService.addActivity(" created a task " + newTask.text, 
-                          userId, "task-create", req.body.communityId, "user");
 
-        utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length-1]);
-      }
-    });
-  });
+    todo.tasks.push(newTask);
+
+    const savedToDo = await todo.save();
+
+    activitiesService.addActivity(" created a task " + newTask.text,
+                            userId, "task-create", req.body.communityId, "user");
+
+    utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+  
 
 };
 
 //PUT /todos/:todoid/task/:taskid - Update a specific task
-module.exports.updateTask = function(req, res) {
+module.exports.updateTask = async (req, res) => {
 
-  var todoId = req.params.todoid;
-  var taskId = req.params.taskid;
+  const todoId = req.params.todoid;
+  const taskId = req.params.taskid;
 
   if (utils.checkParams(req, res, ['todoid', 'taskid'])) {
     return;
   }
-  TaskService.loadMockTime(function(currentTime) {
-  ToDo.findById(todoId)
-  .exec(function(err, todo) {
-    if(err) {
-      utils.sendJSONresponse(res, 500, err);
-    } else {
 
-      let index = todo.tasks.indexOf(todo.tasks.id(taskId));
-      let task = req.body;
+  try {
 
-      if(index !== -1) {
+    const currentTime = await TaskService.loadMockTime();
 
-        if(task.state === taskState.COMPLETE) {
+    const todo = await ToDo.findById(todoId).exec();
 
-          task.cycleDate = currentTime.toDate();
+    const index = todo.tasks.indexOf(todo.tasks.id(taskId));
+    const task = req.body;
 
-          if(!isOverdue(task, currentTime)) {
-            task.completed.push({updatedOn: currentTime.toDate()});
-          } else {
-            task.overDue.push({updatedOn: currentTime.toDate()});
-          }
-
-        }
-
-        // if we switched occurrence, reset other active set fields
-        if(todo.tasks[index].occurrence !== task.occurrence) {
-          switch(task.occurrence) {
-            case occurrence.HOURLY:
-              setToDefault(task, ["daily", "weekly", "monthly"]);
-            break;
-
-            case occurrence.DAILY:
-              setToDefault(task, ["hourly", "weekly", "monthly"]);
-            break;
-
-            case occurrence.WEEKLY:
-              setToDefault(task, ["daily", "hourly", "monthly"]);
-            break;
-
-            case occurrence.MONTHLY:
-              setToDefault(task, ["daily", "weekly", "hourly"]);
-            break;
-          }
-
-        }
-
-        todo.tasks.set(index, task);
-
-      } else {
-        utils.sendJSONresponse(res, 500, {'message' : "Task with such an id not found"});
-        return;
-      }
-
-      todo.save(function(err, savedToDo) {
-        if(err) {
-          utils.sendJSONresponse(res, 500, err);
-        } else {
-          utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
-        }
-      });
+    if(index === -1) {
+      throw "Task to update not found";
     }
-  });
-  });
+
+    if(task.state === taskState.COMPLETE) {
+      task.cycleDate = currentTime.toDate();
+      task.completed.push({updatedOn: currentTime.toDate()});
+    }
+
+    // if we switched occurrence, reset other active set fields
+    if(todo.tasks[index].occurrence !== task.occurrence) {
+      resetOtherOccurrences(task);
+    }
+
+    todo.tasks.set(index, task);
+
+    await todo.save();
+
+    utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 
 //DELETE todos/:todoid/task/:taskid - Delete a specific task
-module.exports.deleteTask = function(req, res) {
+module.exports.deleteTask = async (req, res) => {
 
-  var todoId = req.params.todoid;
-  var taskId = req.params.taskid;
+  const todoId = req.params.todoid;
+  const taskId = req.params.taskid;
 
   if (utils.checkParams(req, res, ['todoid', 'taskid'])) {
     return;
   }
 
-  ToDo.findById(todoId)
-  .exec(function(err, todo) {
-    if(err) {
-      utils.sendJSONresponse(res, 500, err);
-    } else {
+  try {
+    const todo = await ToDo.findById(todoId).exec();
 
-      let task = todo.tasks.id(taskId);
+    const task = todo.tasks.id(taskId);
 
-      if(task) {
-        task.remove();
-      } else {
-        utils.sendJSONresponse(res, 500, {message: "Invalid task id"});
-        return;
-      }
-
-      todo.save(function(err, savedToDo) {
-        if(err) {
-          utils.sendJSONresponse(res, 500, err);
-        } else {
-          utils.sendJSONresponse(res, 200, savedToDo);
-        }
-      });
+    if(!task) {
+      throw "Task for deletion not found";
     }
-  });
+
+    task.remove();
+
+    const savedToDo = await todo.save();
+
+    utils.sendJSONresponse(res, 200, savedToDo);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 
 
-//TODO: count using mongo functions
 // GET /todos/:todoid/activecount - Gets the number of active tasks
-module.exports.activeTasksCount = (req, res) => {
+module.exports.activeTasksCount = async (req, res) => {
 
-  let todoid = req.params.todoid;
+  const todoid = req.params.todoid;
 
-  let tasks = ToDo.find({'_id': todoid})
-                  .exec();
+  try {
 
-  tasks.then((todo) => {
+    const todo = await ToDo.find({'_id': todoid}).exec();
 
     if(!todo[0]) {
       utils.sendJSONresponse(res, 200, 0);
     }
 
-     let tasks = _.filter(todo[0].tasks, function(d) {
+    const tasks = _.filter(todo[0].tasks, function(d) {
       if(d.state === "current"){
         return true;
       }
     });
 
     utils.sendJSONresponse(res, 200, tasks.length);
-  }, (err) => {
+
+  } catch(err) {
     console.log(err);
-  });
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 
 
 //////////////////////////// HELPER FUNCTION /////////////////////////////////
 
-function isOverdue(task, currTime) {
-  let overdue = false;
-
-  let createdOn = moment(task.createdOn);
-
+function resetOtherOccurrences(task) {
   switch(task.occurrence) {
-
     case occurrence.HOURLY:
-      if(currTime.minutes() >= 30 && !currTime.isSame(createdOn, "hour")) {
-        overdue = true;
-      }
+      setToDefault(task, ["daily", "weekly", "monthly"]);
     break;
 
     case occurrence.DAILY:
-      if(currTime.hour() >= 12 && !currTime.isSame(createdOn, "day")) {
-        overdue = true;
-      }
+      setToDefault(task, ["hourly", "weekly", "monthly"]);
     break;
 
     case occurrence.WEEKLY:
-      if(currTime.day() > 2 && !currTime.isSame(createdOn, "week")) {
-        overdue = true;
-      }
+      setToDefault(task, ["daily", "hourly", "monthly"]);
     break;
 
     case occurrence.MONTHLY:
-      if((currTime.date() > (currTime.date() / 2)) && !currTime.isSame(createdOn, "month")) {
-        overdue = true;
-      }
+      setToDefault(task, ["daily", "weekly", "hourly"]);
     break;
-
-    default:
-      overdue = false;
   }
-
-  return overdue;
-
 }
 
 function setToDefault(task, activeCycles) {
@@ -302,15 +254,22 @@ function setToDefault(task, activeCycles) {
 
       case "daily" :
         task.activeDays = [true, true, true, true, true, false, false];
+        task.startTime = "";
+        task.endTime = "";
       break;
 
       case "weekly" :
         task.everyWeek = false;
         task.activeWeeks = [false, false, false, false, false];
+        task.weekStartTime = "";
+        task.weekEndTime = "";
+        task.selectDay = "";
       break;
 
       case "monthly" :
         task.everyMonth = false;
+        task.daysInMonth = null;
+        task.selectedWeekDay = null;
         task.activeMonths = [false, false, false, false, false, false, false, false, false, false, false, false];
       break;
     }

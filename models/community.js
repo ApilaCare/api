@@ -1,6 +1,11 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var chatSchema = new mongoose.Schema({
+const issueLabelsSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    color: {type: String, required: true},
+});
+
+const chatSchema = new mongoose.Schema({
   message: {type: String, required: true},
   userSend: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   userReceived: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
@@ -8,17 +13,22 @@ var chatSchema = new mongoose.Schema({
   timeSent: {type: Date, default: Date.now()}
 });
 
-var roomStyleSchema = new mongoose.Schema({
+const roomStyleSchema = new mongoose.Schema({
     name: {type: String, required: true},
     area: {type: Number},
-    areaUnit: {type: Boolean, default: true}, // if true: feet^2 | if false: meter^2
     rooms: [String],
 
-    submitOn: {type: Date, "default": Date.now},
+    submitOn: {type: Date, default: Date.now},
     submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
 });
 
-var communitySchema = new mongoose.Schema({
+const logsSchema = new mongoose.Schema({
+  ipAddress: {type: String},
+  loggedOn: {type: Date, default: Date.now},
+  user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+});
+
+const communitySchema = new mongoose.Schema({
     name: {type: String, required: true},
     communityMembers: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     pendingMembers: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
@@ -34,7 +44,13 @@ var communitySchema = new mongoose.Schema({
     town: {type: String},
     logo: {type: String},
     fax: {type: String},
+
+    areaUnit: {type: String, default: 'Meters'},
+    tempUnit: {type: String, default: 'Celsius'},
+    weightUnit: {type: String, default: 'Kilograms'},
+
     numFloors: {type: Number},
+    labels: [issueLabelsSchema],
     floors: [{
       floorNumber: {type: Number},
       startRoom: {type: String},
@@ -42,7 +58,8 @@ var communitySchema = new mongoose.Schema({
     }],
     rooms: {type: Number},
     roomStyle: [roomStyleSchema],
-    communityChat: [chatSchema]
+    communityChat: [chatSchema],
+    logs: [logsSchema]
 });
 
 mongoose.model('Community', communitySchema);

@@ -7,7 +7,7 @@ var moment = require('moment');
 var _ = require('lodash');
 var fs = require('fs');
 var imageUploadService = require('../../services/imageUpload');
-const activitiesService = require('../../services/activities.service');
+const activitiesService = require('../../services/activities');
 const carePoints = require('./care_points');
 const sanitize = require("sanitize-filename");
 
@@ -37,7 +37,7 @@ module.exports.residentsCreate = function(req, res) {
 };
 
 // GET /residents/list/:communityid - List all residents of a community
-module.exports.residentsList = function(req, res) {
+module.exports.residentsList = async (req, res) => {
 
   var community = req.params.communityid;
 
@@ -45,43 +45,60 @@ module.exports.residentsList = function(req, res) {
     return;
   }
 
-  Resid.find({
-      'community': community
-    })
-    .populate('updateInfo.updateBy', 'email name userImage')
-    .exec(function(err, residents) {
-      if (err) {
-        utils.sendJSONresponse(res, 404, {
-          'message': 'Error listing residents'
-        });
-        console.log(err);
-      } else {
-        utils.sendJSONresponse(res, 200, residents);
-      }
+  try {
 
-    });
+    let fields = '_id firstName lastName aliasName carePoints birthDate';
+
+    let residents = await Resid.find({'community': community})
+                          .select(fields).sort({'carePoints': -1}).exec();
+
+    utils.sendJSONresponse(res, 200, residents);
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+
 };
 
-// GET /residents/count/:communityid - Number of residents in building
-module.exports.residentsCount = function(req, res) {
+// GET /residents/full-list/:communityid - Full detailed List all residents of a community
+module.exports.residentsFullList = async (req, res) => {
+
+  var community = req.params.communityid;
 
   if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
 
-  Resid.find({
-      'community': req.params.communityid,
-      'buildingStatus': 'In Building'
-    },
-    function(err, c) {
-      if (err) {
-        utils.sendJSONresponse(res, 404, {
-          'message': 'Error counting residents'
-        });
-      } else {
-        utils.sendJSONresponse(res, 200, c.length);
-      }
-    });
+  try {
+    let residents = await Resid.find({'community': community})
+                    .populate("submitBy", "_id name").sort({'carePoints': -1}).exec();
+
+    utils.sendJSONresponse(res, 200, residents);
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
+
+// GET /residents/count/:communityid - Number of residents in building
+module.exports.residentsCount = async (req, res) => {
+
+  if (utils.checkParams(req, res, ['communityid'])) {
+    return;
+  }
+
+  try {
+
+    let searchQuery = {community: req.params.communityid, buildingStatus: 'In Building'};
+
+    let numResidents = await Resid.find(searchQuery).count().exec();
+
+    utils.sendJSONresponse(res, 200, numResidents);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 500, err);
+  }
+
 };
 
 // GET /residents/average_age/:communityid - Get's average agre of residents in the building
@@ -187,24 +204,24 @@ module.exports.getLocations = function(req, res) {
 };
 
 // GET /residents/:residentid - Get resident info by id
-module.exports.residentById = function(req, res) {
+module.exports.residentById = async (req, res) => {
 
   if (utils.checkParams(req, res, ['residentid'])) {
     return;
   }
 
-  Resid
-    .findById(req.params.residentid)
-    .exec(
-      function(err, resident) {
-        if (resident) {
-          utils.sendJSONresponse(res, 200, resident);
-        } else {
-          utils.sendJSONresponse(res, 404, {
-            'message': 'resident not found'
-          });
-        }
-      });
+  try {
+    let resident  = await Resid
+                          .findById(req.params.residentid)
+                          .populate('updateInfo.updateBy', 'email name userImage')
+                          .populate('submitBy', 'name _id')
+                          .exec();
+
+    utils.sendJSONresponse(res, 200, resident);
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 };
 
 //POST /residents/:residentid/contact - Adds a new contact to the list
@@ -227,7 +244,8 @@ module.exports.addContact = function(req, res) {
         "updateField": [{
           "field" : "create-contact",
           "new" : req.body.firstName + " " + req.body.lastName,
-          "old" : ""
+          "old" : "",
+          "ipAddress" : req.headers['x-forwarded-for'] || req.connection.remoteAddress
         }],
         "updateDate" : new Date(),
         "updateBy" : req.body.submitBy
@@ -272,12 +290,14 @@ module.exports.updateListItem = function(req, res) {
           "updateField": [{
             "field" : req.body.type,
             "new" : newValue,
-            "old" : oldValue
+            "old" : oldValue,
+            "ipAddress" : req.headers['x-forwarded-for'] || req.connection.remoteAddress
           }],
           "updateDate" : new Date(),
           "updateBy" : req.body.updateBy
         });
         console.log(`UPDATE BY ${req.body.updateBy}`);
+
 
         resident.save(function(err, r) {
           if(err) {
@@ -305,8 +325,13 @@ module.exports.residentsUpdateOne = function(req, res) {
     "updateBy": req.body.modifiedBy,
     "updateDate": req.body.modifiedDate,
     "updateField": req.body.updateField,
-    "communicatedWith": communicatedWith
+    "communicatedWith": communicatedWith,
+    "ipAddress" : req.headers['x-forwarded-for'] || req.connection.remoteAddress
   };
+
+  console.log(req.body.insideApartment);
+
+  console.log(req.body.updateField);
 
   if(req.body.updateField) {
     req.body.updateInfo.push(updateInfo);
@@ -314,20 +339,19 @@ module.exports.residentsUpdateOne = function(req, res) {
 
   var isValidData = true;
 
-
   if (isValidData === false) {
     utils.sendJSONresponse(res, 404, err);
   }
 
-  addToArray(req.body.respiration, req.body.newrespiration, "Vitals");
-  addToArray(req.body.vitalsPain, req.body.newvitalsPain, "Vitals");
-  addToArray(req.body.pulse, req.body.newpulse, "Vitals");
-  addToArray(req.body.oxygenSaturation, req.body.newoxygenSaturation, "Vitals");
-  addToArray(req.body.bloodPressureDiastolic, req.body.newbloodPressureDiastolic, "Vitals");
-  addToArray(req.body.bloodPressureSystolic, req.body.newbloodPressureSystolic, "Vitals");
-  addToArray(req.body.temperature, req.body.newtemperature, "Vitals");
-  addToArray(req.body.internationalNormalizedRatio, req.body.newinternationalNormalizedRatio, "Vitals");
-  addToArray(req.body.weight, req.body.newweight, "Vitals");
+  addToArray(req.body.respiration, req.body.newrespiration);
+  addToArray(req.body.vitalsPain, req.body.newvitalsPain);
+  addToArray(req.body.pulse, req.body.newpulse);
+  addToArray(req.body.oxygenSaturation, req.body.newoxygenSaturation);
+  addToArray(req.body.bloodPressureDiastolic, req.body.newbloodPressureDiastolic);
+  addToArray(req.body.bloodPressureSystolic, req.body.newbloodPressureSystolic);
+  addToArray(req.body.temperature, req.body.newtemperature);
+  addToArray(req.body.internationalNormalizedRatio, req.body.newinternationalNormalizedRatio);
+  addToArray(req.body.weight, req.body.newweight);
 
   req.body.foodAllergies = req.body.newfoodAllergies;
   req.body.medicationAllergies = req.body.newmedicationAllergies;
@@ -340,8 +364,6 @@ module.exports.residentsUpdateOne = function(req, res) {
   req.body.foodDislikes = req.body.newfoodDislikes;
 
   req.body.carePoints = carePoints.calculateCarePoints(req.body);
-
-  console.log(`${req.body.timeOfBathing}  | ${req.body.typeOfBathing}  | ${req.body.frequencyOfBathing}`);
 
   Resid.findOneAndUpdate({
     _id: req.params.residentid
@@ -357,8 +379,6 @@ module.exports.residentsUpdateOne = function(req, res) {
 
       let text = ` updated resident  ${req.body.firstName} ${req.body.lastName}`;
       activitiesService.addActivity(text, req.payload._id, "resident-update", community, 'community');
-
-        console.log(resident);
 
       utils.sendJSONresponse(res, 200, resident);
     }
@@ -412,68 +432,42 @@ module.exports.uploadOutsideAgencyAssesment = function(req, res) {
 };
 
 // DELETE /api/residents/:residentid - delete a resident by id
-module.exports.residentsDeleteOne = function(req, res) {
-  var residentid = req.params.residentid;
+module.exports.residentsDeleteOne = async (req, res) => {
+  const residentid = req.params.residentid;
 
   if (utils.checkParams(req, res, ['residentid'])) {
     return;
   }
 
-  if (residentid) {
-    Resid
-      .findByIdAndRemove(residentid)
-      .exec(
-        function(err, resident) {
-          if (err) {
-            console.log(err);
-            utils.sendJSONresponse(res, 404, err);
-            return;
-          }
-          utils.sendJSONresponse(res, 204, null);
-        }
-      );
-  } else {
-    utils.sendJSONresponse(res, 404, {
-      "message": "No residentid"
-    });
+  try {
+    const deletedResident = Resid.findByIdAndRemove(residentid).exec();
+
+    utils.sendJSONresponse(res, 204, null);
+
+  } catch(err) {
+    utils.sendJSONresponse(res, 404, err);
   }
+
 };
 
 
 // HELPER FUNCTIONS
 
-//To check if the fields is a number
-function isNumber(obj) {
-  return !isNaN(parseFloat(obj));
-}
-
 //when pushing to array make sure we aren't adding invalid data
-function addToArray(arr, value, type) {
+function addToArray(arr, value) {
 
-  if (value != undefined) {
-
-    if (type === "Vitals") {
-      value = value.data;
-    }
-
-    if (value != "") {
-      if (type === "Vitals") {
-        var info = {};
-        info.data = value;
-        info.date = new Date();
-        arr.push(info);
-      } else {
-        arr.push(value);
-      }
-
-    }
+  if (value && value.data) {
+    arr.push({
+      data: value.data,
+      date: new Date()
+    });
   }
 
 }
 
 
 function setCommunicatedWithField(req) {
-  var communicatedWith = [];
+  let communicatedWith = [];
 
   if(req.body.communicatedWithResident === true) {
     communicatedWith.push("resident");

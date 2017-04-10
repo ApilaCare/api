@@ -13,6 +13,9 @@ if(process.env.NODE_ENV === 'test') {
 
 mongoose.connect(dbURI);
 
+//Adding es6 promises instead of mongoose stuff
+mongoose.Promise = global.Promise;
+
 // CONNECTION EVENTS
 mongoose.connection.on('connected', function() {
     console.log('Mongoose connected to ' + dbURI);
