@@ -1,5 +1,5 @@
-var mongoose = require('mongoose');
-var utils = require('../../services/utils');
+const mongoose = require('mongoose');
+const utils = require('../../services/utils');
 
 var User = mongoose.model('User');
 var Community = mongoose.model('Community');
@@ -13,21 +13,6 @@ var imageUploadService = require('../../services/imageUpload');
 const sanitize = require("sanitize-filename");
 
 
-// GET /users - Returns list of users
-module.exports.usersList = function(req, res) {
-  User.find({})
-    .populate("", "-salt -hash")
-    .exec(function(err, users) {
-      if (err) {
-        utils.sendJSONresponse(res, 404, {
-          "message": "Error while getting user list"
-        });
-      } else {
-        utils.sendJSONresponse(res, 200, users);
-      }
-    });
-};
-
 // GET /users/getuser/:userid - Get user info by userid
 module.exports.getUser = function(req, res) {
 
@@ -35,6 +20,9 @@ module.exports.getUser = function(req, res) {
     return;
   }
 
+  if(req.payload._id !== req.params.userid) {
+    utils.sendJSONresponse(res, 404, {err: "Requesting other peoples info"});
+  }
 
   User.findById(req.params.userid)
     .populate("", "-salt -hash")

@@ -1,22 +1,21 @@
-var express = require('express');
-var router = express.Router();
-var jwt = require('express-jwt');
-var sanitize = require('mongo-sanitize');
+const express = require('express');
+const router = express.Router();
+const jwt = require('express-jwt');
+const sanitize = require('mongo-sanitize');
 
 require('../controllers/issues/schedule');
 
-var multiparty = require('connect-multiparty');
-var multipartyMiddleware = multiparty({uploadDir: "./"});
+const multiparty = require('connect-multiparty');
+const multipartyMiddleware = multiparty({uploadDir: "./"});
 
 const authorization = require('../services/authorization');
 
 const onlyBoss = authorization({ boss: true });
-
 const onlyDirector = authorization({ director: true });
-
 const sameCommunity = authorization({ community: true });
+const sameUser = authorization({ user: true});
 
-var auth = jwt({
+const auth = jwt({
     // set secret using same environment variable as before
     secret: process.env.JWT_SECRET,
     // define property on req to be payload
@@ -142,16 +141,15 @@ router.put('/appointments/:appointmentid/comments/:commentid', sanitizeInput , a
 router.delete('/appointments/:appointmentid/comments/:commentid', sanitizeInput , auth, ctrlAppointmentComments.appointmentCommentsDeleteOne);
 
 // users
-router.get('/users', sanitizeInput , auth, ctrlUsers.usersList);
-router.get('/users/getuser/:userid',sanitizeInput , auth,  ctrlUsers.getUser);
+router.get('/users/getuser/:userid',sanitizeInput , auth, sameUser, ctrlUsers.getUser);
 router.get('/users/list/:community', sanitizeInput, auth, ctrlUsers.usersInCommunity);
-router.get('/users/community/:userid', sanitizeInput , auth, ctrlUsers.userCommunity);
+router.get('/users/community/:userid', sanitizeInput , auth, sameUser, ctrlUsers.userCommunity);
 router.get('/users/:userid/image', ctrlUsers.userImage);
-router.post('/users/:userid/upload', sanitizeInput , auth, multipartyMiddleware, ctrlUsers.uploadImage);
-router.post('/users/forgotpassowrd/:email', ctrlUsers.forgotPassword);
+router.post('/users/:userid/upload', sanitizeInput , auth, sameUser, multipartyMiddleware, ctrlUsers.uploadImage);
+router.post('/users/forgotpassowrd/:email', ctrlUsers.forgotPassword); //TODO is this secure?
 router.post('/users/reset/:token', ctrlUsers.resetPassword);
 router.post('/users/verify/:token', ctrlUsers.verifyEmail);
-router.put('/users/change/:userid', sanitizeInput , auth, ctrlUsers.updateUsername);
+router.put('/users/change/:userid', sanitizeInput , auth, sameUser, ctrlUsers.updateUsername);
 
 //users payment
 router.post('/users/:userid/savecard', sanitizeInput , auth, ctrlPayment.saveCreditCard);
