@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var gracefulShutdown;
 
-var dbURI = "mongodb://localhost/fucked_community";
+var dbURI = "mongodb://localhost/apila";
 
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
     dbURI = process.env.MONGODB_URI;
