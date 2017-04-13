@@ -11,20 +11,22 @@ const activitiesService = require('../../services/activities');
 // POST /api/appointments/new - Creates a new appointment
 module.exports.appointmentsCreate = function(req, res) {
 
+  let appointmentDate = moment(req.body.appointmentDate).startOf('day').toDate();
+
   //create appointment from the inputed data
   Appoint.create({
     reason: req.body.reason,
     locationName: req.body.locationName,
     locationDoctor: req.body.locationDoctor,
     residentGoing: req.body.residentId,
-    appointmentDate: req.body.appointmentDate,
+    appointmentDate: appointmentDate,
     hours: req.body.hours,
     minutes: req.body.minutes,
     timezone: req.body.timezone,
     isAm: req.body.isAm,
     submitBy: req.payload._id,
     transportation: req.body.transportation,
-    currMonth: moment(req.body.appointmentDate).format("YYYY M"),
+    currMonth: moment(appointmentDate).format("YYYY M"),
     community: req.body.community._id
   }, function(err, appointment) {
     if (err) {
