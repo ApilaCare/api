@@ -11,6 +11,8 @@ const asyncLib = require('async');
   Appoint.find({}).exec(function(err, appointments) {
     if(!err) {
 
+      console.log("started updating appointments");
+
       asyncLib.each(appointments, function(appointment) {
         appointment.currMonth = moment(appointment.appointmentDate).format("YYYY M");
 
