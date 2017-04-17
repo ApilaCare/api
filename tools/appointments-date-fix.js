@@ -1,3 +1,6 @@
+// to run script on heroku:
+// heroku run node ./app_api/tools/appointments-date-fix.js --app apilatest
+
 require('../models/db');
 
 const mongoose = require('mongoose');
