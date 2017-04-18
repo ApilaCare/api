@@ -281,7 +281,7 @@ module.exports.verifyEmail = function(req, res) {
 // HELPER FUNCTIONS
 
 function doSendPasswordForget(req, res, token) {
-  emailService.sendForgotPassword("supprot@apila.com", req.params.email, token, req.headers.host,
+  emailService.sendForgotPassword("noreply@apila.care", req.params.email, token, req.headers.host,
     function(error, info) {
       if (error) {
         utils.sendJSONresponse(res, 404, null);
