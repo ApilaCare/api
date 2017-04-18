@@ -24,7 +24,7 @@ module.exports.appointmentsCreate = function(req, res) {
     isAm: req.body.isAm,
     submitBy: req.payload._id,
     transportation: req.body.transportation,
-    currMonth: moment(appointmentDate).format("YYYY M"),
+    currMonth: moment(req.body.appointmentDate).format("YYYY M"),
     community: req.body.community._id
   }, function(err, appointment) {
     if (err) {
