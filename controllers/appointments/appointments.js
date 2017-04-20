@@ -111,69 +111,57 @@ module.exports.appointmentsToday = function(req, res) {
 
 
 /* PUT /api/appointments/:appointmentid - Updates the appointment */
-module.exports.appointmentsUpdateOne = function(req, res) {
+module.exports.appointmentsUpdateOne = async (req, res) => {
 
   if (utils.checkParams(req, res, ['appointmentid'])) {
     return;
   }
 
-  Appoint
-    .findById(req.params.appointmentid)
-    .populate("residentGoing")
-    .exec(function(err, appointment) {
-      if (!appointment) {
+  try {
 
-        utils.sendJSONresponse(res, 404, {
-          "message": "appointmentid not found"
-        });
-        return;
-      } else if (err) {
-        utils.sendJSONresponse(res, 400, err);
-        return;
-      }
+    let appointment = await Appoint
+      .findById(req.params.appointmentid)
+      .populate("residentGoing", "_id firstName lastName middleName aliasName maidenName")
+      .populate("appointmentComment.author", "name _id")
+      .exec();
 
-      var d = new Date(req.body.date);
-      var t = new Date(req.body.time);
+    let appointmentDate = new Date(req.body.date);
+    let appointmentTime = new Date(req.body.time);
 
-      d.setHours(t.getHours());
-      d.setMinutes(t.getMinutes());
-      d.setSeconds(t.getSeconds());
+    appointmentDate.setHours(appointmentTime.getHours());
+    appointmentDate.setMinutes(appointmentTime.getMinutes());
+    appointmentDate.setSeconds(appointmentTime.getSeconds());
 
-      var updateInfo = {
-        "updateBy": req.body.modifiedBy,
-        "updateDate": req.body.modifiedDate,
-        "updateField": req.body.updateField
-      };
+    var updateInfo = {
+      "updateBy": req.body.modifiedBy,
+      "updateDate": req.body.modifiedDate,
+      "updateField": req.body.updateField
+    };
 
+    appointment.reason = req.body.reason;
+    appointment.locationName = req.body.locationName;
+    appointment.locationDoctor = req.body.locationDoctor;
+    appointment.transportation = req.body.transportation;
+    appointment.cancel = req.body.cancel;
+    appointment.updateInfo.push(updateInfo);
+    appointment.hours = req.body.hours;
+    appointment.minutes = req.body.minutes;
+    appointment.isAm = req.body.isAm;
+    appointment.appointmentDate = req.body.appointmentDate;
 
-      appointment.reason = req.body.reason;
-      appointment.locationName = req.body.locationName;
-      appointment.locationDoctor = req.body.locationDoctor;
-      appointment.transportation = req.body.transportation;
-      appointment.cancel = req.body.cancel;
-      appointment.updateInfo.push(updateInfo);
-      appointment.hours = req.body.hours;
-      appointment.minutes = req.body.minutes;
-      appointment.isAm = req.body.isAm;
-      appointment.appointmentDate = req.body.appointmentDate;
+    appointment.residentGoing = req.body.residentId;
 
-      appointment.residentGoing = req.body.residentId;
+    let savedAppointment = await appointment.save();
 
-      appointment.save(function(err, appointment) {
-        if (err) {
-          utils.sendJSONresponse(res, 404, err);
-        } else {
+    let popultedAppointment = await Appoint.populate(savedAppointment, "residentGoing");
 
-          Appoint.
-          populate(appointment, "residentGoing",
-            function(err) {
-              utils.sendJSONresponse(res, 200, appointment);
-            });
+    utils.sendJSONresponse(res, 200, popultedAppointment);
 
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 
-        }
-      });
-    });
 };
 
 
