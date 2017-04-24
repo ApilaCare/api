@@ -7,7 +7,7 @@ AWS.config.update({
 });
 
 var region = "s3-us-west-2";
-var bucket = "apilatest2";
+var bucket = "apila";
 
 var s3bucket = new AWS.S3({
     params: {
