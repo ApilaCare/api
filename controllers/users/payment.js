@@ -7,6 +7,32 @@ var async = require('async');
 
 var stripeService = require('../../services/stripe');
 
+//createStripePlan("Wat community2", "58b54e33cb93860a87df099d");
+
+async function createStripePlan(name, communityId) {
+
+  try {
+
+    if(!communityId) {
+      throw "No community id specified";
+    }
+
+    const numUsers = await User.find({community: communityId}).count();
+
+    if(!numUsers) {
+      throw "Number of users empty or zero";
+    }
+
+    await stripeService.createPlan(numUsers, name, communityId);
+
+    console.log(numUsers);
+
+  } catch(err) {
+    console.log(err);
+  }
+
+}
+
 
 module.exports.saveCreditCard = function(req, res) {
   var token = req.body.id;

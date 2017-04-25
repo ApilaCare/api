@@ -1,9 +1,28 @@
 
-var stripe = require('stripe')(process.env.STRIPE_KEY);
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
-var constants = require('./constants');
+const STANDARD_PLAN_ID = require('./constants').STANDARD_PLAN_ID;
+
+const PRICE_PER_USER = 500; //$5 in cents
 
 //TODO: consistent callback params
+
+exports.createPlan = async (numUsers, name, id) => {
+
+  const plan = {
+    amount: numUsers * PRICE_PER_USER, 
+    interval: "month",
+    currency: "usd",
+    id: id,
+    name: name
+  };
+
+  const planResp = await stripe.plans.create(plan);
+
+  console.log(planResp);
+
+  return planResp;
+}
 
 //save credit card info
 exports.saveCreditCard = function(stripeToken, email, callback) {
