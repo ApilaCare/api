@@ -9,7 +9,7 @@ var stripeService = require('../../services/stripe');
 
 //createStripePlan("Wat community2", "58b54e33cb93860a87df099d");
 
-async function createStripePlan(name, communityId) {
+async function createStripeSubscription(userId, communityId) {
 
   try {
 
@@ -23,7 +23,9 @@ async function createStripePlan(name, communityId) {
       throw "Number of users empty or zero";
     }
 
-    await stripeService.createPlan(numUsers, name, communityId);
+    const user = await User.findById(userId).exec();
+
+    await stripeService.updateSubscription(user.stripeSubscription, numUsers)
 
     console.log(numUsers);
 
@@ -34,60 +36,46 @@ async function createStripePlan(name, communityId) {
 }
 
 
-module.exports.saveCreditCard = function(req, res) {
-  var token = req.body.id;
-  var user = req.params.userid;
+module.exports.saveCreditCard = async (req, res) => {
+  const token = req.body.id;
+  const userId = req.params.userid;
 
   if (utils.checkParams(req, res, ['userid'])) {
     return;
   }
 
-  //TODO: clean up call back hell
-  User.findById(user).exec(function(err, user) {
-    if (user) {
+  try {
 
-      stripeService.saveCreditCard(token, user.email, function(status, id) {
-        if (status) {
-          user.stripeCustomer = id;
+    const user = await User.findById(userId).exec();
 
-          stripeService.subscribeToPlan(id, function(subscription) {
-            if (subscription) {
-
-              user.stripeSubscription = subscription.id;
-
-              user.save(function(err) {
-                if (err) {
-                  utils.sendJSONresponse(res, 404, {
-                    message: "Error while saving user"
-                  });
-                } else {
-                  utils.sendJSONresponse(res, 200, {
-                    status: true
-                  });
-                }
-              });
-
-            } else {
-              utils.sendJSONresponse(res, 404, {
-                message: "Error while creating user stripe subscription"
-              });
-            }
-          });
-
-        } else {
-          utils.sendJSONresponse(res, 404, {
-            message: "Error while saving user card with stripe"
-          });
-        }
-      });
-
-
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Couldn't find the user"
-      });
+    if(!user) {
+      throw "User not found";
     }
-  });
+
+    const stripeUser = await stripeService.saveCreditCard(token, user.email);
+
+    if(!stripeUser) {
+      throw "Stripe user not saved";
+    }
+
+    const subscription = await stripeService.subscribeToPlan(stripeUser.id);
+
+    if(!subscription) {
+      throw "Stripe subscription not saved";
+    }
+
+    user.stripeSubscription = subscription.id;
+    user.stripeCustomer = stripeUser.id;
+
+    await user.save();
+
+    utils.sendJSONresponse(res, 200, {status: true});
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
 };
 
 module.exports.updateCustomer = function(req, res) {
@@ -120,36 +108,31 @@ module.exports.updateCustomer = function(req, res) {
   });
 };
 
-module.exports.getCustomer = function(req, res) {
-  var user = req.params.userid;
+module.exports.getCustomer = async (req, res) => {
+
+  const userId = req.params.userid;
 
   if (utils.checkParams(req, res, ['userid'])) {
     return;
   }
 
+  try {
+     
+    const user = await User.findById(userId).exec();
 
-  User.findById(user).exec(function(err, user) {
-    if (user) {
-      if (user.stripeCustomer) {
-        stripeService.getCustomer(user.stripeCustomer, function(status, customer) {
-            utils.sendJSONresponse(res, 200, {
-              status: true,
-              "customer": customer
-            });
-        });
-      } else {
-        utils.sendJSONresponse(res, 200, {
-          status: false
-        });
-      }
+    if (user.stripeCustomer) {
+      const customer = await stripeService.getCustomer(user.stripeCustomer);
 
+      utils.sendJSONresponse(res, 200, {status: true, customer: customer});
     } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Error while finding user"
-      });
+      utils.sendJSONresponse(res, 200, {status: false});
     }
 
-  });
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 404, {});
+  }
+
 };
 
 module.exports.cancelSubscription = function(req, res) {
