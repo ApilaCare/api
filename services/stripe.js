@@ -142,27 +142,28 @@ exports.getSubscription = function(subscription, callback) {
 };
 
 // cancels the description
-exports.cancelSubscription = function(subscription, callback) {
-  stripe.subscriptions.del(
-    subscription,
-    function(err, confirmation) {
-      if(!err) {
-        callback(confirmation);
-      } else {
-        callback(null);
-      }
-    }
-  );
+exports.cancelSubscription = async (subscription) => {
+
+  try {
+    return await stripe.subscriptions.del(subscription);
+
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
 };
 
-exports.updateCustomer = function(customerid, token, callback) {
-  stripe.customers.update(customerid, {
-    "source" : token
-  }, function(err, customer) {
-      if(err) {
-        callback(null);
-      } else {
-        callback(customer);
-      }
-  });
+exports.updateCustomer = async (customerid, token)  => {
+
+  try {
+    const customer = await stripe.customers.update(customerid, {
+      "source" : token
+    });
+
+    return customer;
+
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
 };

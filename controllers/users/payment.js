@@ -9,7 +9,7 @@ var stripeService = require('../../services/stripe');
 
 //createStripePlan("Wat community2", "58b54e33cb93860a87df099d");
 
-async function createStripeSubscription(userId, communityId) {
+async function updateStripeSubscription(userId, communityId) {
 
   try {
 
@@ -78,34 +78,30 @@ module.exports.saveCreditCard = async (req, res) => {
 
 };
 
-module.exports.updateCustomer = function(req, res) {
-  var userid = req.params.userid;
-  var token = req.body.id;
+module.exports.updateCustomer = async (req, res) => {
+  const userId = req.params.userid;
+  const token = req.body.id;
 
   if (utils.checkParams(req, res, ['userid'])) {
     return;
   }
 
-  User.findById(userid).exec(function(err, user) {
-    if (user) {
-      stripeService.updateCustomer(user.stripeCustomer, token, function(customer) {
-        if (customer) {
-          utils.sendJSONresponse(res, 200, {
-            "status": true,
-            "customer": customer
-          });
-        } else {
-          utils.sendJSONresponse(res, 404, {
-            "status": false
-          });
-        }
-      });
+  try {
+    const user = await User.findById(userId).exec(); 
+    
+    const customer = await stripeService.updateCustomer(user.stripeCustomer, token);
+    
+    if(customer) {
+      utils.sendJSONresponse(res, 200, {"status": true, "customer": customer});
     } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Couldn't find the user"
-      });
+      utils.sendJSONresponse(res, 404, {"status": false});
     }
-  });
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 404, err);
+  }
+
 };
 
 module.exports.getCustomer = async (req, res) => {
@@ -135,41 +131,40 @@ module.exports.getCustomer = async (req, res) => {
 
 };
 
-module.exports.cancelSubscription = function(req, res) {
-  var userid = req.params.userid;
+module.exports.cancelSubscription = async (req, res) => {
+  const userId = req.params.userid;
 
   if (utils.checkParams(req, res, ['userid'])) {
     return;
   }
 
-  User.findById(userid).exec(function(err, user) {
-    if (user) {
-      stripeService.cancelSubscription(user.stripeSubscription, function(confirmation) {
-        if (confirmation) {
+  try {
 
-          //revert all the members of the users community to their test community
-          revertToTestCommunity(res, user.community, function(status) {
-            if (status) {
-              utils.sendJSONresponse(res, 200, status);
-            } else {
-              utils.sendJSONresponse(res, 404, {
-                message: "Unable to revert users to test community"
-              });
-            }
-          });
+    const user = await User.findById(userId).exec();
+  
+    const canceled = await stripeService.cancelSubscription(user.stripeSubscription);
 
-        } else {
-          utils.sendJSONresponse(res, 404, {
-            message: "Error while canceling stripe subscription"
-          });
-        }
-      });
+    if(canceled) {
+        //revert all the members of the users community to their test community
+        revertToTestCommunity(res, user.community, status => {
+          if (status) {
+            utils.sendJSONresponse(res, 200, status);
+          } else {
+            utils.sendJSONresponse(res, 404, {
+              message: "Unable to revert users to test community"
+            });
+          }
+        });
+
     } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Error while finding user"
-      });
+      throw "Error while canceling stripe subscription";
     }
-  });
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+ 
 };
 
 // get's full plans info for the default standard plan
