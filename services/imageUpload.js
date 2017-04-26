@@ -1,15 +1,15 @@
-var fs = require('fs');
-var AWS = require('aws-sdk');
+const fs = require('fs');
+const AWS = require('aws-sdk');
 
 AWS.config.update({
     accessKeyId: process.env.ACCESS_KEY_ID,
     secretAccessKey: process.env.SECRET_ACCESS_KEY
 });
 
-var region = "s3-us-west-2";
-var bucket = "apila";
+const region = "s3-external-1";
+const bucket = "apila";
 
-var s3bucket = new AWS.S3({
+const s3bucket = new AWS.S3({
     params: {
         Bucket: bucket
     }
