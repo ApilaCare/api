@@ -13,6 +13,8 @@ const places = new GooglePlaces(process.env.GOOGLE_PLACE_API);
 
 const populate = require('./populate_community');
 
+const payment = require('../users/payment');
+
 
 function createCommunity(req, res) {
   Community.create(req.body, function(err, community) {
@@ -220,6 +222,9 @@ module.exports.acceptMember = function(req, res) {
           } else {
             activitiesService.acceptedMember({id: req.body.member, communityName: community.name});
 
+            //Update billing model
+            payment.updateStripeSubscription(community.boss, community._id);
+
             utils.sendJSONresponse(res, 200, community);
           }
         });
@@ -295,6 +300,10 @@ module.exports.removeMember = function(req, res) {
               message: "Error updating community"
             });
           } else {
+
+            //Update billing model
+            payment.updateStripeSubscription(community.boss, community._id);
+
             utils.sendJSONresponse(res, 200, {
               message: "User removed"
             });

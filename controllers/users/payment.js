@@ -1,15 +1,13 @@
-var utils = require('../../services/utils');
-var mongoose = require('mongoose');
+const utils = require('../../services/utils');
+const mongoose = require('mongoose');
 
-var User = mongoose.model('User');
-var Community = mongoose.model('Community');
-var async = require('async');
+const User = mongoose.model('User');
+const Community = mongoose.model('Community');
+const async = require('async');
 
-var stripeService = require('../../services/stripe');
+const stripeService = require('../../services/stripe');
 
-//createStripePlan("Wat community2", "58b54e33cb93860a87df099d");
-
-async function updateStripeSubscription(userId, communityId) {
+module.exports.updateStripeSubscription = async (userId, communityId) => {
 
   try {
 
@@ -165,20 +163,6 @@ module.exports.cancelSubscription = async (req, res) => {
     utils.sendJSONresponse(res, 500, err);
   }
  
-};
-
-// get's full plans info for the default standard plan
-module.exports.standardPlan = function(req, res) {
-  stripeService.getStandardPlan(function(plan) {
-    if (plan !== null) {
-      console.log(plan);
-      utils.sendJSONresponse(res, 200, plan);
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Standard plan not found"
-      });
-    }
-  });
 };
 
 // HELPER FUNCTIONS

@@ -1,12 +1,8 @@
-
 const stripe = require('stripe')(process.env.STRIPE_KEY);
-
-const STANDARD_PLAN_ID = require('./constants').STANDARD_PLAN_ID;
 
 const PLAN_PER_USER = require('./constants').PLAN_PER_USER;
 
-//TODO: consistent callback params
-
+//creates a new plan (Currently not needed)
 exports.createPlan = async (amount, name, id) => {
 
   const plan = {
@@ -18,12 +14,12 @@ exports.createPlan = async (amount, name, id) => {
   };
 
   try {
-    const planResp = await stripe.plans.create(plan);
 
-    return planResp;
+    return await stripe.plans.create(plan);
+
   } catch(err) {
     console.log(err);
-
+    return null;
   }
 }
 
@@ -36,12 +32,12 @@ exports.saveCreditCard = async (stripeToken, email) =>  {
   };
 
   try {
-    const costumer = await stripe.customers.create(data);
 
-    return costumer;
+    return await stripe.customers.create(data);
 
   } catch(err) {
     console.log(err);
+    return null;
   }
 
 };
@@ -51,9 +47,7 @@ exports.getCustomer = async (customer) => {
 
   try {
 
-    const cust = await stripe.customers.retrieve(customer);
-
-    return cust;
+    return await stripe.customers.retrieve(customer);
 
   } catch(err) {
     console.log(err);
@@ -62,33 +56,17 @@ exports.getCustomer = async (customer) => {
   
 };
 
-
-//given the stripes customerId, charge the user, specify amout in cents
-exports.chargeUser = function(customerId, amount, callback) {
-  stripe.charges.create({
-    "amount" : amount,
-    "currency" : "usd",
-    "customer" : customerId
-  })
-  .then(function(charge) {
-    callback(true);
-  })
-  .catch(function(charge) {
-    callback(false);
-  });
-};
-
-// gets customers stripe id and subscrips him to out standard plan
+// gets customers stripe id and subscription and set a 31 day trail period
 exports.subscribeToPlan = async (customerid) => {
 
   const subscription = {
     customer: customerid,
-    plan: PLAN_PER_USER
+    plan: PLAN_PER_USER,
+    trial_period_days: 31
   };
 
   try {
-    const sub = await stripe.subscriptions.create(subscription); 
-    return sub;
+    return await stripe.subscriptions.create(subscription); 
 
   } catch(err) {
     console.log(err);
@@ -97,14 +75,11 @@ exports.subscribeToPlan = async (customerid) => {
 
 };
 
+//Updates the quantity (how many plans to apply) to a subscription
 exports.updateSubscription = async (subscriptionId, quantity) => {
   
   try {
-
-    const sub = await stripe.subscriptions.update(subscriptionId, {
-                                              quantity: quantity});
-
-    return sub;
+    return await stripe.subscriptions.update(subscriptionId, {quantity: quantity});
 
   } catch(err) {
     console.log(err);
@@ -113,32 +88,18 @@ exports.updateSubscription = async (subscriptionId, quantity) => {
 
 };
 
-// returns standard plan information
-exports.getStandardPlan = function(callback) {
-  stripe.plans.retrieve(
-    STANDARD_PLAN_ID,
-    function(err, plan) {
-      if(!err) {
-        callback(plan);
-      } else {
-        callback(null);
-      }
-    }
-  );
-};
-
 // returns subscription information
-exports.getSubscription = function(subscription, callback) {
-  stripe.subscriptions.retrieve(
-    subscription,
-    function(err, subscription) {
-      if(!err) {
-        callback(subscription);
-      } else {
-        callback(null);
-      }
-    }
-  );
+exports.getSubscription = async (subscription) => {
+
+  try {
+
+    return await stripe.subscriptions.retrieve(subscription);
+
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
+
 };
 
 // cancels the description
@@ -153,6 +114,7 @@ exports.cancelSubscription = async (subscription) => {
   }
 };
 
+//Updates customers cc info
 exports.updateCustomer = async (customerid, token)  => {
 
   try {
