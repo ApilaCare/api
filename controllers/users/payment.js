@@ -144,15 +144,13 @@ module.exports.cancelSubscription = async (req, res) => {
 
     if(canceled) {
         //revert all the members of the users community to their test community
-        revertToTestCommunity(res, user.community, status => {
-          if (status) {
-            utils.sendJSONresponse(res, 200, status);
-          } else {
-            utils.sendJSONresponse(res, 404, {
-              message: "Unable to revert users to test community"
-            });
-          }
-        });
+        const success = await revertToTestCommunity(res, user.community);
+        
+        if(success) {
+          utils.sendJSONresponse(res, 200, success);
+        } else {
+          utils.sendJSONresponse(res, 404, {message: "Unable to revert users to test community"});
+        }
 
     } else {
       throw "Error while canceling stripe subscription";
@@ -167,33 +165,26 @@ module.exports.cancelSubscription = async (req, res) => {
 
 // HELPER FUNCTIONS
 
-function revertToTestCommunity(res, communityid, callback) {
+async function revertToTestCommunity(res, communityid) {
 
-  User.find({
-      "community": communityid
-    })
-    .exec(function(err, users) {
-      if (users) {
+  try {
 
-        async.each(users, function(user, cont) {
-          user.community = user.prevCommunity;
-          user.prevCommunity = communityid;
+    const users = await User.find({"community": communityid});
 
-          user.save(function(err) {
-            if (err) {
-              cont(false);
-            } else {
-              cont();
+    for(let user of users) {
 
-            }
-          });
-        }, function(err) {
-          callback(true);
-        });
-      } else {
-        utils.sendJSONresponse(res, 404, {
-          message: "Error while finding users in community"
-        });
-      }
-    });
+      //revert the communities to the old test community
+      user.community = user.prevCommunity;
+      user.prevCommunity = communityid;
+
+      await user.save();
+    }
+
+    return true;
+
+  } catch(err) {
+    console.log(err);
+    return false;
+  }
+
 }
