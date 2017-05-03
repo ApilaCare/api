@@ -3,11 +3,6 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const sgTransport = require('nodemailer-sendgrid-transport');
 
-const config = {
-  "email": process.env.EMAIL,
-  "password": process.env.EMAIL_PASSWORD
-};
-
 const sendgridConfig = {
   auth: {
         api_key: process.env.SENDGRID_API
