@@ -86,6 +86,10 @@ module.exports.login = function(req, res) {
   })(req, res);
 };
 
+(async () => {
+  await emailService.sendVerificationEmail(cons.APILA_EMAIL, "nesa993@gmail.com", "token");
+})();
+
 async function saveUser(user, todoid, res) {
 
   let tokenVerify = generateToken(user.email);
