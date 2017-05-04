@@ -149,6 +149,7 @@ router.post('/users/:userid/upload', sanitizeInput , auth, sameUser, multipartyM
 router.post('/users/forgotpassowrd/:email', ctrlUsers.forgotPassword); //TODO is this secure?
 router.post('/users/reset/:token', ctrlUsers.resetPassword);
 router.post('/users/verify/:token', ctrlUsers.verifyEmail);
+router.post('/users/:userid/verify_email', ctrlUsers.sendVerifyEmail);
 router.put('/users/change/:userid', sanitizeInput , auth, sameUser, ctrlUsers.updateUsername);
 
 //users payment
