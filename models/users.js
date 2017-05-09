@@ -26,6 +26,7 @@ var userSchema = new mongoose.Schema({
     salt: String,
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    firstLogin: {type: Boolean, default: true},
     stripeCustomer: {type: String},
     stripeSubscription: {type: String}
 });
