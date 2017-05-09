@@ -64,20 +64,24 @@ if(process.argv.length > 2) {
 function createAppointments() {
   console.log("Creating appointments...");
 
+  const month = moment().format('MM');
+
+  console.log('2017-' + month + '-01');
+
   for(let i = 0; i < NUM_APPOINTMENTS; ++i) {
     Appoint.create({
       reason: faker.lorem.sentence(),
       locationName: faker.address.streetAddress(),
       locationDoctor: faker.name.firstName() + " " + faker.name.lastName(),
       residentGoing: residentId,
-      appointmentDate: faker.date.between('2017-04-01', '2017-04-30'),
+      appointmentDate: faker.date.between('2017-' + month + '-01', '2017-' + month + '-30'),
       hours: faker.random.number(12),
       minutes: faker.random.number(60),
       isAm: Math.random() >= 0.5,
       submitBy: userId,
       transportation: faker.lorem.sentence(),
       community: community,
-      currMonth: moment('2017-04-01').format("YYYY M")
+      currMonth: moment('2017-' + month + '-01').format("YYYY M")
     });
 
   }

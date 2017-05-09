@@ -111,6 +111,8 @@ var doAddAttachment = function(req, res, issue) {
       type: file.type,
     });
 
+    console.log(issue.attachments[issue.attachments.length - 1]);
+
     fs.unlinkSync(file.path);
 
     issue.save(function(err, issue) {

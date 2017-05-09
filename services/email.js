@@ -2,11 +2,7 @@
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const sgTransport = require('nodemailer-sendgrid-transport');
-
-const config = {
-  "email": process.env.EMAIL,
-  "password": process.env.EMAIL_PASSWORD
-};
+const verifyEmail = require('./emailTemplates/verify');
 
 const sendgridConfig = {
   auth: {
@@ -72,8 +68,7 @@ module.exports.sendVerificationEmail = function(from, to, token) {
   }
 
   mailOptions.subject = "Verify email to use Apila";
-  mailOptions.text = "Thanks for registering with Apila, to create your own communities" +
-  " and continue to use the service please confirm your email by going to the following link: " + link;
+  mailOptions.html = verifyEmail(link);
 
   return transporter.sendMail(mailOptions);
 
@@ -85,7 +80,7 @@ module.exports.sendConfidentialIssues = function(from, to, recoveredUser, issues
   mailOptions.attachments = [
     {
           path: "confidential.pdf"
-      },
+    },
   ];
   mailOptions.subject = "Recovered confidetial issues for " + recoveredUser;
   mailOptions.text = 'You have recovered confidential issues for member' + recoveredUser + "\n" +

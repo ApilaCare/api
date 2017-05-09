@@ -45,6 +45,13 @@ module.exports = (options) => {
                     return;
                 }
             }
+
+            if(options.user) {
+                if(req.payload._id !== req.params.userid) {
+                    utils.sendJSONresponse(res, 404, {err: "Requesting other peoples info"});
+                }
+            }
+
         } else {
             console.log('Authorization failed must be called after the auth middleware');
         }

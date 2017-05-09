@@ -37,21 +37,21 @@ module.exports.populateTestCommunity = async (community, user) => {
 
   await resident.save();
 
-  const month = moment().format('M');
+  const month = moment().format('MM');
 
   const appoint = new Appoint({
     reason: "Pain in the arm",
     locationName: faker.address.streetAddress(),
     locationDoctor: faker.name.firstName() + " " + faker.name.lastName(),
     residentGoing: resident._id,
-    appointmentDate: faker.date.between(`2017-0${month}-01`, `2017-0${month}-28`),
+    appointmentDate: faker.date.between(`2017-${month}-01`, `2017-${month}-28`),
     hours: faker.random.number(12),
     minutes: faker.random.number(60),
     isAm: Math.random() >= 0.5,
     submitBy: user._id,
     transportation: "We provide transportation",
     community: community._id,
-    currMonth: moment(`2017-0${month}-01`).format("YYYY M")
+    currMonth: moment(`2017-${month}-01`).format("YYYY M")
   });
 
   await appoint.save();

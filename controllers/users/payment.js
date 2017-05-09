@@ -1,211 +1,190 @@
-var utils = require('../../services/utils');
-var mongoose = require('mongoose');
+const utils = require('../../services/utils');
+const mongoose = require('mongoose');
 
-var User = mongoose.model('User');
-var Community = mongoose.model('Community');
-var async = require('async');
+const User = mongoose.model('User');
+const Community = mongoose.model('Community');
+const async = require('async');
 
-var stripeService = require('../../services/stripe');
+const stripeService = require('../../services/stripe');
+
+module.exports.updateStripeSubscription = async (userId, communityId) => {
+
+  try {
+
+    if(!communityId) {
+      throw "No community id specified";
+    }
+
+    const numUsers = await User.find({community: communityId}).count();
+
+    if(!numUsers) {
+      throw "Number of users empty or zero";
+    }
+
+    const user = await User.findById(userId).exec();
+
+    await stripeService.updateSubscription(user.stripeSubscription, numUsers)
+
+    console.log(numUsers);
+
+  } catch(err) {
+    console.log(err);
+  }
+
+}
 
 
-module.exports.saveCreditCard = function(req, res) {
-  var token = req.body.id;
-  var user = req.params.userid;
+module.exports.saveCreditCard = async (req, res) => {
+  const token = req.body.id;
+  const userId = req.params.userid;
 
   if (utils.checkParams(req, res, ['userid'])) {
     return;
   }
 
-  //TODO: clean up call back hell
-  User.findById(user).exec(function(err, user) {
-    if (user) {
+  try {
 
-      stripeService.saveCreditCard(token, user.email, function(status, id) {
-        if (status) {
-          user.stripeCustomer = id;
+    const user = await User.findById(userId).exec();
 
-          stripeService.subscribeToPlan(id, function(subscription) {
-            if (subscription) {
+    if(!user) {
+      throw "User not found";
+    }
 
-              user.stripeSubscription = subscription.id;
+    const stripeUser = await stripeService.saveCreditCard(token, user.email);
 
-              user.save(function(err) {
-                if (err) {
-                  utils.sendJSONresponse(res, 404, {
-                    message: "Error while saving user"
-                  });
-                } else {
-                  utils.sendJSONresponse(res, 200, {
-                    status: true
-                  });
-                }
-              });
+    if(!stripeUser) {
+      throw "Stripe user not saved";
+    }
 
-            } else {
-              utils.sendJSONresponse(res, 404, {
-                message: "Error while creating user stripe subscription"
-              });
-            }
-          });
+    const subscription = await stripeService.subscribeToPlan(stripeUser.id);
 
+    if(!subscription) {
+      throw "Stripe subscription not saved";
+    }
+
+    user.stripeSubscription = subscription.id;
+    user.stripeCustomer = stripeUser.id;
+
+    await user.save();
+
+    utils.sendJSONresponse(res, 200, {status: true});
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
+module.exports.updateCustomer = async (req, res) => {
+  const userId = req.params.userid;
+  const token = req.body.id;
+
+  if (utils.checkParams(req, res, ['userid'])) {
+    return;
+  }
+
+  try {
+    const user = await User.findById(userId).exec(); 
+    
+    const customer = await stripeService.updateCustomer(user.stripeCustomer, token);
+    
+    if(customer) {
+      utils.sendJSONresponse(res, 200, {"status": true, "customer": customer});
+    } else {
+      utils.sendJSONresponse(res, 404, {"status": false});
+    }
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 404, err);
+  }
+
+};
+
+module.exports.getCustomer = async (req, res) => {
+
+  const userId = req.params.userid;
+
+  if (utils.checkParams(req, res, ['userid'])) {
+    return;
+  }
+
+  try {
+     
+    const user = await User.findById(userId).exec();
+
+    if (user.stripeCustomer) {
+      const customer = await stripeService.getCustomer(user.stripeCustomer);
+
+      utils.sendJSONresponse(res, 200, {status: true, customer: customer});
+    } else {
+      utils.sendJSONresponse(res, 200, {status: false});
+    }
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 404, {});
+  }
+
+};
+
+module.exports.cancelSubscription = async (req, res) => {
+  const userId = req.params.userid;
+
+  if (utils.checkParams(req, res, ['userid'])) {
+    return;
+  }
+
+  try {
+
+    const user = await User.findById(userId).exec();
+  
+    const canceled = await stripeService.cancelSubscription(user.stripeSubscription);
+
+    if(canceled) {
+        //revert all the members of the users community to their test community
+        const success = await revertToTestCommunity(res, user.community);
+        
+        if(success) {
+          utils.sendJSONresponse(res, 200, success);
         } else {
-          utils.sendJSONresponse(res, 404, {
-            message: "Error while saving user card with stripe"
-          });
+          utils.sendJSONresponse(res, 404, {message: "Unable to revert users to test community"});
         }
-      });
-
 
     } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Couldn't find the user"
-      });
+      throw "Error while canceling stripe subscription";
     }
-  });
-};
 
-module.exports.updateCustomer = function(req, res) {
-  var userid = req.params.userid;
-  var token = req.body.id;
-
-  if (utils.checkParams(req, res, ['userid'])) {
-    return;
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
   }
-
-  User.findById(userid).exec(function(err, user) {
-    if (user) {
-      stripeService.updateCustomer(user.stripeCustomer, token, function(customer) {
-        if (customer) {
-          utils.sendJSONresponse(res, 200, {
-            "status": true,
-            "customer": customer
-          });
-        } else {
-          utils.sendJSONresponse(res, 404, {
-            "status": false
-          });
-        }
-      });
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Couldn't find the user"
-      });
-    }
-  });
-};
-
-module.exports.getCustomer = function(req, res) {
-  var user = req.params.userid;
-
-  if (utils.checkParams(req, res, ['userid'])) {
-    return;
-  }
-
-
-  User.findById(user).exec(function(err, user) {
-    if (user) {
-      if (user.stripeCustomer) {
-        stripeService.getCustomer(user.stripeCustomer, function(status, customer) {
-            utils.sendJSONresponse(res, 200, {
-              status: true,
-              "customer": customer
-            });
-        });
-      } else {
-        utils.sendJSONresponse(res, 200, {
-          status: false
-        });
-      }
-
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Error while finding user"
-      });
-    }
-
-  });
-};
-
-module.exports.cancelSubscription = function(req, res) {
-  var userid = req.params.userid;
-
-  if (utils.checkParams(req, res, ['userid'])) {
-    return;
-  }
-
-  User.findById(userid).exec(function(err, user) {
-    if (user) {
-      stripeService.cancelSubscription(user.stripeSubscription, function(confirmation) {
-        if (confirmation) {
-
-          //revert all the members of the users community to their test community
-          revertToTestCommunity(res, user.community, function(status) {
-            if (status) {
-              utils.sendJSONresponse(res, 200, status);
-            } else {
-              utils.sendJSONresponse(res, 404, {
-                message: "Unable to revert users to test community"
-              });
-            }
-          });
-
-        } else {
-          utils.sendJSONresponse(res, 404, {
-            message: "Error while canceling stripe subscription"
-          });
-        }
-      });
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Error while finding user"
-      });
-    }
-  });
-};
-
-// get's full plans info for the default standard plan
-module.exports.standardPlan = function(req, res) {
-  stripeService.getStandardPlan(function(plan) {
-    if (plan !== null) {
-      console.log(plan);
-      utils.sendJSONresponse(res, 200, plan);
-    } else {
-      utils.sendJSONresponse(res, 404, {
-        message: "Standard plan not found"
-      });
-    }
-  });
+ 
 };
 
 // HELPER FUNCTIONS
 
-function revertToTestCommunity(res, communityid, callback) {
+async function revertToTestCommunity(res, communityid) {
 
-  User.find({
-      "community": communityid
-    })
-    .exec(function(err, users) {
-      if (users) {
+  try {
 
-        async.each(users, function(user, cont) {
-          user.community = user.prevCommunity;
-          user.prevCommunity = communityid;
+    const users = await User.find({"community": communityid});
 
-          user.save(function(err) {
-            if (err) {
-              cont(false);
-            } else {
-              cont();
+    for(let user of users) {
 
-            }
-          });
-        }, function(err) {
-          callback(true);
-        });
-      } else {
-        utils.sendJSONresponse(res, 404, {
-          message: "Error while finding users in community"
-        });
-      }
-    });
+      //revert the communities to the old test community
+      user.community = user.prevCommunity;
+      user.prevCommunity = communityid;
+
+      await user.save();
+    }
+
+    return true;
+
+  } catch(err) {
+    console.log(err);
+    return false;
+  }
+
 }

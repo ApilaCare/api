@@ -1,12 +1,17 @@
+const crypto = require('crypto');
 
-module.exports.sendJSONresponse = function(res, status, content) {
+module.exports.sendJSONresponse = (res, status, content) => {
     res.status(status);
     res.json(content);
 };
 
-module.exports.checkParams = function(req, res,  paramsToCheck) {
+module.exports.generateToken = (email) => {
+  return crypto.createHash('md5').update(email + process.env.JWT_SECRET).digest('hex');
+}
 
-  var i;
+module.exports.checkParams = (req, res,  paramsToCheck) => {
+
+  let i;
   for(i = 0; i < paramsToCheck.length; ++i) {
 
     if(!req.params[paramsToCheck[i]]) {

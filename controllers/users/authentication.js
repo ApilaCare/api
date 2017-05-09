@@ -46,8 +46,17 @@ module.exports.register = async (req, res) => {
 
 };
 
+async function firstLoginFinish(userId) {
+
+  const user = await User.findById(userId);
+
+  user.firstLogin = false;
+
+  await user.save();
+}
+
 // POST /login - User login
-module.exports.login = function(req, res) {
+module.exports.login = async (req, res) => {
   // validate that required fields have been supplied
   if (!req.body.email || !req.body.password) {
     utils.sendJSONresponse(res, 400, {
@@ -59,7 +68,7 @@ module.exports.login = function(req, res) {
   req.body.email = req.body.email.toLowerCase();
 
   // pass name of strategy and a callback to authenticate method
-  passport.authenticate('local', function(err, user, info) {
+  passport.authenticate('local', async (err, user, info) => {
     var token;
     // return an error if Passport returns an error
     if (err) {
@@ -74,12 +83,19 @@ module.exports.login = function(req, res) {
 
       logs.addLogEntry(user.community, user._id, usersIpAddress);
 
+      console.log(user);
+
       token = user.generateJwt();
 
+      if(user.firstLogin) {
+        firstLoginFinish(user._id);
+      }
+
       utils.sendJSONresponse(res, 200, {
-        "token": token
+        "token": token,
+        firstLogin: user.firstLogin
       });
-      // otherwise return infor message (why authentication failed)
+      // otherwise return info message (why authentication failed)
     } else {
       utils.sendJSONresponse(res, 401, info);
     }
@@ -89,7 +105,11 @@ module.exports.login = function(req, res) {
 
 async function saveUser(user, todoid, res) {
 
-  let tokenVerify = generateToken(user.email);
+  console.log(utils.generateToken(user.email));
+
+  let tokenVerify = utils.generateToken(user.email);
+
+
 
   try {
 

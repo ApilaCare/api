@@ -1,32 +1,18 @@
-var mongoose = require('mongoose');
-var utils = require('../../services/utils');
+const mongoose = require('mongoose');
+const utils = require('../../services/utils');
 
-var User = mongoose.model('User');
-var Community = mongoose.model('Community');
+const User = mongoose.model('User');
+const Community = mongoose.model('Community');
 
-var emailService = require('../../services/email');
-var async = require('async');
-var crypto = require('crypto');
+const emailService = require('../../services/email');
+const async = require('async');
+const crypto = require('crypto');
 
-var fs = require('fs');
-var imageUploadService = require('../../services/imageUpload');
+const fs = require('fs');
+const imageUploadService = require('../../services/imageUpload');
 const sanitize = require("sanitize-filename");
+const APILA_EMAIL = require('../../services/constants').APILA_EMAIL;
 
-
-// GET /users - Returns list of users
-module.exports.usersList = function(req, res) {
-  User.find({})
-    .populate("", "-salt -hash")
-    .exec(function(err, users) {
-      if (err) {
-        utils.sendJSONresponse(res, 404, {
-          "message": "Error while getting user list"
-        });
-      } else {
-        utils.sendJSONresponse(res, 200, users);
-      }
-    });
-};
 
 // GET /users/getuser/:userid - Get user info by userid
 module.exports.getUser = function(req, res) {
@@ -35,6 +21,9 @@ module.exports.getUser = function(req, res) {
     return;
   }
 
+  if(req.payload._id !== req.params.userid) {
+    utils.sendJSONresponse(res, 404, {err: "Requesting other peoples info"});
+  }
 
   User.findById(req.params.userid)
     .populate("", "-salt -hash")
@@ -152,6 +141,26 @@ module.exports.forgotPassword = function(req, res) {
     });
 
   });
+
+};
+
+//POST /users/:userid/verify_email - Sends an verify email for the specified user
+module.exports.sendVerifyEmail = async (req, res) => {
+
+  try {
+
+    const user = await User.findById(req.params.userid).exec();
+
+    const token = utils.generateToken(user.email);
+
+    await emailService.sendVerificationEmail(APILA_EMAIL, user.email, token);
+
+    utils.sendJSONresponse(res, 200, {msg: 'Verify email sent'});
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 
@@ -293,7 +302,7 @@ module.exports.verifyEmail = function(req, res) {
 // HELPER FUNCTIONS
 
 function doSendPasswordForget(req, res, token) {
-  emailService.sendForgotPassword("supprot@apila.com", req.params.email, token, req.headers.host,
+  emailService.sendForgotPassword("noreply@apila.care", req.params.email, token, req.headers.host,
     function(error, info) {
       if (error) {
         utils.sendJSONresponse(res, 404, null);
