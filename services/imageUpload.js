@@ -6,8 +6,8 @@ AWS.config.update({
     secretAccessKey: process.env.SECRET_ACCESS_KEY
 });
 
-const region = "us-west-2";
-const bucket = "apilatest2";
+const region = "s3-external-1";
+const bucket = "apila";
 
 const s3bucket = new AWS.S3({
     params: {

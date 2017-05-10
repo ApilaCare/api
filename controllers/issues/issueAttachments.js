@@ -106,7 +106,7 @@ var doAddAttachment = function(req, res, issue, communityName, testCommunity) {
   };
 
   imageUploadService.upload(params, file.path, function() {
-    var fullUrl = `https://s3-${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${fileKey}`;
+    var fullUrl = `https://${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${fileKey}`;
 
     issue.attachments.push({
       uploader: req.payload._id,

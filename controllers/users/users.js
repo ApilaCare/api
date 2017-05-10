@@ -211,7 +211,7 @@ module.exports.uploadImage = function(req, res) {
 
   imageUploadService.upload(params, file.path, function() {
 
-    const fullUrl = `https://s3-${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${filePath}`;
+    const fullUrl = `https://${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${filePath}`;
 
     fs.unlinkSync(file.path);
 
