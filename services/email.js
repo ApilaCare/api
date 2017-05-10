@@ -2,7 +2,7 @@
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const sgTransport = require('nodemailer-sendgrid-transport');
-const verifyEmail = require('./emailTemplates/verify');
+const verifyEmail = require('./emailTemplates/verifyEmail');
 
 const sendgridConfig = {
   auth: {
@@ -39,11 +39,13 @@ module.exports.sendForgotPassword = function(from, to, token, host, callback) {
     resetUrl = "https://apila.care/auth/reset-password/";
   } else if(process.env.NODE_ENV === 'staging') {
     resetUrl = "https://apila.us/auth/reset-password/";
+  } else if(process.env.NODE_ENV === 'development') {
+    resetUrl = "http://localhost:3000//auth/reset-password/";
   }
 
   mailOptions.from = from;
   mailOptions.to = to;
-  mailOptions.subject = "Password reset for Apila";
+  mailOptions.subject = "Password Reset for Apila";
   mailOptions.text = 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
         'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
         resetUrl + token + '\n\n' +
@@ -67,7 +69,7 @@ module.exports.sendVerificationEmail = function(from, to, token) {
     link = "http://localhost:3000/auth/verify/" + token;
   }
 
-  mailOptions.subject = "Verify email to use Apila";
+  mailOptions.subject = "Verify Your Email";
   mailOptions.html = verifyEmail(link);
 
   return transporter.sendMail(mailOptions);
