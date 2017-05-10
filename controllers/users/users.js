@@ -195,19 +195,23 @@ module.exports.resetPassword = function(req, res) {
 
 module.exports.uploadImage = function(req, res) {
 
-  var file = req.files.file;
+  const file = req.files.file;
 
-  var stream = fs.createReadStream(file.path);
+  const stream = fs.createReadStream(file.path);
 
-  var params = {
-    Key: sanitize(file.originalFilename),
+  const community = req.body.community;
+  const filePath = `${community}/Users/Avatars/${escape(sanitize(file.originalFilename))}`;
+
+  const params = {
+    Key: filePath,
     Body: stream
   };
 
+  console.log(filePath);
+
   imageUploadService.upload(params, file.path, function() {
 
-    var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
-      imageUploadService.getBucket() + "/" + escape(sanitize(file.originalFilename));
+    const fullUrl = `https://s3-${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${filePath}`;
 
     fs.unlinkSync(file.path);
 

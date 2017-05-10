@@ -15,10 +15,12 @@ module.exports.issueAttachmentsCreate = function(req, res) {
     return;
   }
 
+  console.log(req.body);
+
   let issue = Iss.findById(req.params.issueid).exec();
 
   issue.then((issue) => {
-    doAddAttachment(req, res, issue);
+    doAddAttachment(req, res, issue, req.body.communityName, req.body.test);
   }, (err) => {
     utils.sendJSONresponse(res, 400, err);
   });
@@ -88,20 +90,23 @@ module.exports.issueAttachmentsDeleteOne = function(req, res) {
 
 /////////////////////////// HELPER FUNCTIONS ////////////////////////////
 
-var doAddAttachment = function(req, res, issue) {
+var doAddAttachment = function(req, res, issue, communityName, testCommunity) {
 
-  var file = req.files.file;
+  const file = req.files.file;
 
-  var stream = fs.createReadStream(file.path);
+  const stream = fs.createReadStream(file.path);
 
-  var params = {
-    Key: sanitize(file.originalFilename),
+  const folderName = (testCommunity == true) ? communityName + '-test' : communityName;
+
+  const fileKey = `${folderName}/issues/${issue.title}/${sanitize(file.originalFilename)}`;
+
+  const params = {
+    Key: fileKey,
     Body: stream
   };
 
   imageUploadService.upload(params, file.path, function() {
-    var fullUrl = "https://" + imageUploadService.getRegion() + ".amazonaws.com/" +
-               imageUploadService.getBucket() + "/" + escape(sanitize(file.originalFilename));
+    var fullUrl = `https://s3-${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${fileKey}`;
 
     issue.attachments.push({
       uploader: req.payload._id,
@@ -110,8 +115,6 @@ var doAddAttachment = function(req, res, issue) {
       url: fullUrl,
       type: file.type,
     });
-
-    console.log(issue.attachments[issue.attachments.length - 1]);
 
     fs.unlinkSync(file.path);
 
