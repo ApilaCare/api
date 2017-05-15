@@ -90,7 +90,7 @@ module.exports.issueAttachmentsDeleteOne = function(req, res) {
 
 /////////////////////////// HELPER FUNCTIONS ////////////////////////////
 
-var doAddAttachment = function(req, res, issue, communityName, testCommunity) {
+const doAddAttachment = async (req, res, issue, communityName, testCommunity) => {
 
   const file = req.files.file;
 
@@ -105,8 +105,11 @@ var doAddAttachment = function(req, res, issue, communityName, testCommunity) {
     Body: stream
   };
 
-  imageUploadService.upload(params, file.path, function() {
-    var fullUrl = `https://${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${fileKey}`;
+  try {
+
+    await imageUploadService.uploadFile(params, file.path);
+
+    const fullUrl = `https://${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${fileKey}`;
 
     issue.attachments.push({
       uploader: req.payload._id,
@@ -118,16 +121,14 @@ var doAddAttachment = function(req, res, issue, communityName, testCommunity) {
 
     fs.unlinkSync(file.path);
 
-    issue.save(function(err, issue) {
-      var thisAttachment;
-      if (err) {
-        utils.sendJSONresponse(res, 400, err);
-      } else {
-        thisAttachment = issue.attachments[issue.attachments.length - 1];
-        utils.sendJSONresponse(res, 201, thisAttachment);
-      }
-    });
-  });
+    await issue.save();
+
+    utils.sendJSONresponse(res, 201, issue.attachments[issue.attachments.length - 1]);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 

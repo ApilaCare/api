@@ -15,22 +15,26 @@ const s3bucket = new AWS.S3({
     }
 });
 
-module.exports.upload = function(params, file, callback) {
-  s3bucket.upload(params, function(err, data) {
 
-      if (err) {
-          console.log("Error uploading data: ", err);
-      } else {
-          console.log("Successfully uploaded data aws");
-          callback();
-      }
-    });
+module.exports.uploadFile = async (params, file) => {
+
+    try {
+
+       const uploaded = await s3bucket.upload(params).promise();
+
+       return uploaded;
+
+    } catch(err) {
+        console.log(err);
+        throw err;
+    }
+
 };
 
-module.exports.getRegion = function() {
+module.exports.getRegion = () => {
   return region;
 };
 
-module.exports.getBucket = function() {
+module.exports.getBucket = () => {
   return bucket;
 };

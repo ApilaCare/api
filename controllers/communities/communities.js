@@ -1,10 +1,12 @@
-var mongoose = require('mongoose');
-var Community = mongoose.model('Community');
-var User = mongoose.model('User');
+const mongoose = require('mongoose');
+const Community = mongoose.model('Community');
+const User = mongoose.model('User');
 
-var utils = require('../../services/utils');
+const utils = require('../../services/utils');
 
-var async = require('async');
+const async = require('async');
+const fs = require('fs');
+const sanitize = require("sanitize-filename");
 
 const activitiesService = require('../../services/activities');
 const GooglePlaces = require('node-googleplaces');
@@ -14,7 +16,7 @@ const places = new GooglePlaces(process.env.GOOGLE_PLACE_API);
 const populate = require('./populate_community');
 
 const payment = require('../users/payment');
-
+const imageUploadService = require('../../services/imageUpload');
 
 function createCommunity(req, res) {
   Community.create(req.body, function(err, community) {
@@ -480,8 +482,54 @@ module.exports.updateContactAndRoomInfo = function(req, res) {
 
 };
 
+//POST /communities/:communityid/logo - Adding a new community logo 
+module.exports.uploadLogo = async (req, res) => {
+
+  const communityid = req.params.communityid;
+
+  try {
+
+    const community = await Community.findById(communityid).exec();
+
+    const file = req.files.file;
+
+    if(!file) {
+      throw "File content not found";
+    }
+
+    const stream = fs.createReadStream(file.path);
+
+    const folderName = (community.testCommunity == true) ? community.name + '-test' : community.name;
+
+    const filePath = `${folderName}/Logo/${sanitize(file.originalFilename)}`;
+
+    const params = {
+      Key: filePath,
+      Body: stream
+    };
+
+    await imageUploadService.uploadFile(params);
+
+    const logoUrl = `https://${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${filePath}`;
+
+    fs.unlinkSync(file.path);
+
+    community.logo = logoUrl;
+
+    await community.save();
+
+    utils.sendJSONresponse(res, 200, {url: logoUrl});
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
 module.exports.communitiesDeleteOne = function(req, res) {
-  var communityid = req.params.communityid;
+  const communityid = req.params.communityid;
+
   if (communityid) {
     Community
       .findByIdAndRemove(communityid)

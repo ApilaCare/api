@@ -60,6 +60,6 @@ const communitySchema = new mongoose.Schema({
     roomStyle: [roomStyleSchema],
     communityChat: [chatSchema],
     logs: [logsSchema]
-});
+  });
 
 mongoose.model('Community', communitySchema);
