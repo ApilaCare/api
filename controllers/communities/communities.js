@@ -505,8 +505,10 @@ module.exports.uploadLogo = async (req, res) => {
 
     const params = {
       Key: filePath,
-      Body: stream
+      Body: stream,
+      ContentType: file.type
     };
+
 
     await imageUploadService.uploadFile(params);
 
