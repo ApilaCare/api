@@ -217,6 +217,9 @@ module.exports.uploadImage = async (req, res) => {
 
     const user = await User.findById(req.params.userid).exec();
 
+    //delete old image 
+    await imageUploadService.deleteFile(user.userImage);
+
     user.userImage = fullUrl;
 
     await user.save();

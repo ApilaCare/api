@@ -509,6 +509,8 @@ module.exports.uploadLogo = async (req, res) => {
       ContentType: file.type
     };
 
+    //delete an old image
+    await imageUploadService.deleteFile(community.logo);
 
     await imageUploadService.uploadFile(params);
 

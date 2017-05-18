@@ -45,47 +45,40 @@ module.exports.restoreAttachment = async (req, res) => {
 };
 
 // DELETE /issues/:issueid/attachments/:attachmentid - Delete and attachment by issueid
-module.exports.issueAttachmentsDeleteOne = function(req, res) {
+module.exports.issueAttachmentsDeleteOne = async (req, res) => {
 
   if (utils.checkParams(req, res, ['issueid', 'attachmentid'])) {
     return;
   }
 
-  Iss
-    .findById(req.params.issueid)
-    .exec(
-      function(err, issue) {
+  try {
 
-        if(issueHasError(res, err, issue)) {
-          return;
-        }
+    const issue = await Iss.findById(req.params.issueid).exec();
 
-        if (issue.attachments && issue.attachments.length > 0) {
-          if (!issue.attachments.id(req.params.attachmentid)) {
-            utils.sendJSONresponse(res, 404, {
-              "message": "attachmentid not found"
-            });
-          } else {
+    if (issue.attachments && issue.attachments.length > 0) {
 
-            var attch = issue.attachments.id(req.params.attachmentid);
+      const attachment = issue.attachments.id(req.params.attachmentid);
 
-            issue.attachments.id(req.params.attachmentid).remove();
+      if (!attachment) {
+        throw "Attachment not found";
+      } else {
 
-            issue.save(function(err) {
-              if (err) {
-                utils.sendJSONresponse(res, 404, err);
-              } else {
-                utils.sendJSONresponse(res, 204, null);
-              }
-            });
-          }
-        } else {
-          utils.sendJSONresponse(res, 404, {
-            "message": "No attachment to delete"
-          });
-        }
+        //delete an old image
+        //await imageUploadService.deleteFile(attachment.url);
+
+        attachment.remove();
+
+        await issue.save()
+
+        utils.sendJSONresponse(res, 204, null);
       }
-    );
+    }
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
 };
 
 /////////////////////////// HELPER FUNCTIONS ////////////////////////////
