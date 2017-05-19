@@ -227,8 +227,6 @@ module.exports.residentById = async (req, res) => {
 
       const isDirector = resident.community.directors.indexOf(userid) !== -1;
 
-      console.log(isDirector, resident.community.directors, userid);
-
       if(userid === resident.community.boss.toString() || isDirector) {
         resident.socialSecurityNumber = ssn;
       } else {

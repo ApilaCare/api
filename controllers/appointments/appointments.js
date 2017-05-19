@@ -85,28 +85,30 @@ module.exports.appointmentsList = function(req, res) {
 
 
 // GET /appointments/today/:communityid - Number of appointments for today
-module.exports.appointmentsToday = function(req, res) {
-
-  var today = new Date();
+module.exports.appointmentsToday = async (req, res) => {
 
   if (utils.checkParams(req, res, ['communityid'])) {
     return;
   }
 
-  var query = 'return this.appointmentDate.getDate() === ' + today.getDate();
+  const startDay = moment().startOf('day');
+  const endDay = moment().endOf('day');
 
-  Appoint.find({
-    "community": req.params.communityid,
-    $where: query
-  }).exec(function(err, appointments) {
-    if (err) {
-      utils.sendJSONresponse(res, 404, {
-        'message': 'Error while finding appointments'
-      });
-    } else {
-      utils.sendJSONresponse(res, 200, appointments.length);
-    }
-  });
+  try {
+
+    const params = {
+      "community": req.params.communityid,
+      appointmentDate: { $gte: startDay, $lt: endDay }
+    };
+
+    const appointCount = await Appoint.find(params).count();
+
+    utils.sendJSONresponse(res, 200, appointCount);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 };
 
 
