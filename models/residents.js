@@ -50,7 +50,7 @@ var residentSchema = new mongoose.Schema({
       maidenName: {type: String}, // if female | open field
     maritalStatus: {type: String}, // single, divorced, widowed, married, single never married
     veteran: {type: Boolean, default: false},
-    socialSecurityNumber: {type: Number},
+    socialSecurityNumber: {type: String},
 
     // location
     buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out, out of building

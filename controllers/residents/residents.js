@@ -1,16 +1,17 @@
-var mongoose = require('mongoose');
-var utils = require('../../services/utils');
-var Resid = mongoose.model('Resident');
-var User = mongoose.model('User');
-var moment = require('moment');
+const mongoose = require('mongoose');
+const utils = require('../../services/utils');
+const Resid = mongoose.model('Resident');
+const User = mongoose.model('User');
+const moment = require('moment');
 
-var _ = require('lodash');
-var fs = require('fs');
-var imageUploadService = require('../../services/imageUpload');
+const _ = require('lodash');
+const fs = require('fs');
+const imageUploadService = require('../../services/imageUpload');
 const activitiesService = require('../../services/activities');
 const carePoints = require('./care_points');
 const sanitize = require("sanitize-filename");
 
+const cryptoHelper = require('../../services/crypto_helper');
 
 // POST /residents/new - Creates a new resident
 module.exports.residentsCreate = function(req, res) {
@@ -215,7 +216,29 @@ module.exports.residentById = async (req, res) => {
                           .findById(req.params.residentid)
                           .populate('updateInfo.updateBy', 'email name userImage')
                           .populate('submitBy', 'name _id')
+                          .populate('community')
                           .exec();
+
+    if(resident.socialSecurityNumber) {
+       let ssn = cryptoHelper.decrypt(resident.socialSecurityNumber);
+
+      //if we are boss or director show full ssn
+      const userid = req.payload._id;
+
+      const isDirector = resident.community.directors.indexOf(userid) !== -1;
+
+      console.log(isDirector, resident.community.directors, userid);
+
+      if(userid === resident.community.boss.toString() || isDirector) {
+        resident.socialSecurityNumber = ssn;
+      } else {
+        resident.socialSecurityNumber = ssn.substr(ssn.length - 4);
+      }
+
+      //remove community 
+      resident.community = {};
+    }
+   
 
     utils.sendJSONresponse(res, 200, resident);
   } catch(err) {
@@ -328,10 +351,6 @@ module.exports.residentsUpdateOne = function(req, res) {
     "ipAddress" : req.headers['x-forwarded-for'] || req.connection.remoteAddress
   };
 
-  console.log(req.body.insideApartment);
-
-  console.log(req.body.updateField);
-
   if(req.body.updateField) {
     req.body.updateInfo.push(updateInfo);
   }
@@ -363,6 +382,10 @@ module.exports.residentsUpdateOne = function(req, res) {
   req.body.foodDislikes = req.body.newfoodDislikes;
 
   req.body.carePoints = carePoints.calculateCarePoints(req.body);
+
+  if(req.body.socialSecurityNumber) {
+    req.body.socialSecurityNumber = cryptoHelper.encrypt(req.body.socialSecurityNumber);
+  }
 
   Resid.findOneAndUpdate({
     _id: req.params.residentid
