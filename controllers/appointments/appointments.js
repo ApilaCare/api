@@ -83,6 +83,33 @@ module.exports.appointmentsList = function(req, res) {
   });
 };
 
+//GET /appointments/locations/:communityid - Get's all appointments location for current week
+module.exports.appointmentsLocations = async (req, res) => {
+
+  if (utils.checkParams(req, res, ['communityid'])) {
+    return;
+  }
+
+  const startWeek = moment().startOf('isoweek');
+  const endWeek = moment().endOf('isoweek');
+
+  try {
+
+    const params = {
+      "community": req.params.communityid,
+      appointmentDate: { $gte: startWeek, $lt: endWeek }
+    };
+
+    const locations = await Appoint.find(params).select('locationName appointmentDate');
+
+    utils.sendJSONresponse(res, 200, locations);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
 
 // GET /appointments/today/:communityid - Number of appointments for today
 module.exports.appointmentsToday = async (req, res) => {

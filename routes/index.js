@@ -131,6 +131,7 @@ router.post('/issues/recovery/verify/:userid', sanitizeInput , auth, ctrlIssueRe
 // appointments
 router.get('/appointments/:communityid/month/:month', sanitizeInput , auth, ctrlAppointments.appointmentsList);
 router.get('/appointments/today/:communityid', sanitizeInput , auth, ctrlAppointments.appointmentsToday);
+router.get('/appointments/locations/:communityid', sanitizeInput, auth, ctrlAppointments.appointmentsLocations);
 router.post('/appointments/new', sanitizeInput , auth, ctrlAppointments.appointmentsCreate);
 router.put('/appointments/update/:appointmentid', sanitizeInput , auth, ctrlAppointments.appointmentsUpdateOne);
 router.delete('/appointments/:appointmentid', sanitizeInput , auth, ctrlAppointments.appointmentsDeleteOne);
