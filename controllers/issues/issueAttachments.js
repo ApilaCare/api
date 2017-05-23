@@ -15,8 +15,6 @@ module.exports.issueAttachmentsCreate = function(req, res) {
     return;
   }
 
-  console.log(req.body);
-
   let issue = Iss.findById(req.params.issueid).exec();
 
   issue.then((issue) => {

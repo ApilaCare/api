@@ -509,10 +509,10 @@ module.exports.uploadLogo = async (req, res) => {
       ContentType: file.type
     };
 
+    await imageUploadService.uploadFile(params);
+
     //delete an old image
     await imageUploadService.deleteFile(community.logo);
-
-    await imageUploadService.uploadFile(params);
 
     const logoUrl = `https://${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${filePath}`;
 
