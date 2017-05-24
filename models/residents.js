@@ -51,6 +51,7 @@ var residentSchema = new mongoose.Schema({
     maritalStatus: {type: String}, // single, divorced, widowed, married, single never married
     veteran: {type: Boolean, default: false},
     socialSecurityNumber: {type: String},
+    residentImage: {type: String},
 
     // location
     buildingStatus: {type: String, required: true}, // in the building, hospital, rehad, dead, moved out, out of building

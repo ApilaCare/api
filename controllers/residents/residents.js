@@ -407,6 +407,52 @@ module.exports.residentsUpdateOne = function(req, res) {
 
 };
 
+//POST - /residents/:residentid/image - Upload the residents profile/image
+module.exports.uploadResidentImage = async (req, res) => {
+
+  if (utils.checkParams(req, res, ['residentid'])) {
+    return;
+  }
+
+
+  const file = req.files.file;
+
+  const stream = fs.createReadStream(file.path);
+
+  const community = req.body.community;
+  const filePath = `${community}/Residents/${sanitize(file.originalFilename)}`;
+
+  const params = {
+    Key: filePath,
+    Body: stream
+  };
+
+  try {
+
+    await imageUploadService.uploadFile(params, file.path);
+
+    const fullUrl = `https://${imageUploadService.getRegion()}.amazonaws.com/${imageUploadService.getBucket()}/${filePath}`;
+
+    fs.unlinkSync(file.path);
+
+    const resident = await Resid.findById(req.params.residentid).exec();
+
+    //delete old image 
+    await imageUploadService.deleteFile(resident.residentImage);
+
+    resident.residentImage = fullUrl;
+
+    await resident.save();
+
+    utils.sendJSONresponse(res, 200, fullUrl);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
 //POST /residents/:residentid/upload - uploads assessment files to aws
 module.exports.uploadOutsideAgencyAssesment = function(req, res) {
   var residentid = req.params.residentid;
