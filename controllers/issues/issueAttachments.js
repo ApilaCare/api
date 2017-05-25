@@ -93,7 +93,8 @@ const doAddAttachment = async (req, res, issue, communityName, testCommunity) =>
 
   const params = {
     Key: fileKey,
-    Body: stream
+    Body: stream,
+    ContentType: file.type
   };
 
   try {

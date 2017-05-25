@@ -204,7 +204,8 @@ module.exports.uploadImage = async (req, res) => {
 
   const params = {
     Key: filePath,
-    Body: stream
+    Body: stream,
+    ContentType: file.type
   };
 
   try {
