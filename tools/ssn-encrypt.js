@@ -13,16 +13,18 @@ const moment = require('moment');
 const asyncLib = require('async');
 
 (() => {
-  Resid.find({community: '58b40605e254ca288fcad8f5'}).exec(function(err, residents) {
+  Resid.find({community: '583b1dcf4f3ab50400c3e00a'}).exec(function(err, residents) {
     if(!err) {
 
       console.log("started updating residents");
 
       asyncLib.each(residents, function(resident) {
 
-        resident.socialSecurityNumber = cryptoHelper.encrypt(resident.socialSecurityNumber);
+        if(resident.socialSecurityNumber) {
+            resident.socialSecurityNumber = cryptoHelper.encrypt(resident.socialSecurityNumber);
 
-         resident.save();
+            resident.save();
+        }
       });
 
       console.log("residents updated");
