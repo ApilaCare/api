@@ -391,6 +391,7 @@ module.exports.updateUnits = async (req, res) => {
     community.tempUnit = req.body.tempUnit;
     community.weightUnit = req.body.weightUnit;
     community.areaUnit = req.body.areaUnit;
+    community.timezone = req.body.timezone;
 
     await community.save();
 
@@ -631,8 +632,6 @@ module.exports.updateFloor = async (req, res) => {
 
   try {
     let community = await Community.findById(communityid).exec();
-
-    console.log(req.body);
 
     community.floors = req.body;
 

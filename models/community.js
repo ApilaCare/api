@@ -59,7 +59,8 @@ const communitySchema = new mongoose.Schema({
     rooms: {type: Number},
     roomStyle: [roomStyleSchema],
     communityChat: [chatSchema],
-    logs: [logsSchema]
+    logs: [logsSchema],
+    timezone: {type: Number}
   });
 
 mongoose.model('Community', communitySchema);
