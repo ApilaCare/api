@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
-var Iss = mongoose.model('Issue');
-var User = mongoose.model('User');
-var utils = require('../../services/utils');
+const mongoose = require('mongoose');
+const Iss = mongoose.model('Issue');
+const User = mongoose.model('User');
+const utils = require('../../services/utils');
 const activitiesService = require('../../services/activities');
 const ToDo = mongoose.model('ToDo');
 

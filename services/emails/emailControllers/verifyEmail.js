@@ -6,6 +6,8 @@ module.exports.sendVerificationEmail = (from, to, token, username) => {
 
   let mailOptions = {};
 
+
+
   mailOptions.from = from;
   mailOptions.to = to;
 

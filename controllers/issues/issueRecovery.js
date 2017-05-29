@@ -1,14 +1,16 @@
-var mongoose = require('mongoose');
-var utils = require('../../services/utils');
+const mongoose = require('mongoose');
+const utils = require('../../services/utils');
 
-var IssRecovery = mongoose.model('MemberRecover');
-var User = mongoose.model('User');
-var emailService = require('../../services/email');
-var Iss = mongoose.model('Issue');
-var Community = mongoose.model('Community');
-var issueExport = require('./../../services/exports/issueRecovery');
+const IssRecovery = mongoose.model('MemberRecover');
+const User = mongoose.model('User');
+const sendConfidentialIssues = require('../../services/emails/emailControllers/issueRecover').sendConfidentialIssues;
+const Iss = mongoose.model('Issue');
+const Community = mongoose.model('Community');
+const issueExport = require('./../../services/exports/issueRecovery');
 
-var _ = require('lodash');
+const APILA_EMAIL = require('../../services/constants').APILA_EMAIL;
+
+const _ = require('lodash');
 
 //TODO: Split this up so we dont have callback hell
 
@@ -259,22 +261,17 @@ function unlockCondifentialIssues(recovery) {
   console.log("In unlocking process");
 
   //getting issues
-  getConfidentialIssues(recovery.recoveredMember, function(issues) {
+  getConfidentialIssues(recovery.recoveredMember, (issues) => {
 
-    var attachement = issueExport(issues, 'confidential.pdf');
-
-    /*
-    emailService.sendConfidentialIssues("support@apila.care", recovery.recoveredMember.email,
-    recovery.recoveredMember.name, issues, function(err, info) {
-
-      if(err) {
-        console.log("Unable to send confidential issue recovery email");
-      }
-
-      console.log("email sent");
-
+    let attachement = issueExport(issues, 'confidential.pdf');
+    
+    sendConfidentialIssues(APILA_EMAIL, recovery.recoveredMember.email, recovery.recoveredMember.name, issues)
+    .then((info) => {
+      console.log(info);
+    })
+    .error((err) => {
+      console.log(err);
     });
-    */
 
   });
 }

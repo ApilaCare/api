@@ -30,8 +30,6 @@ var sanitizeInput = function(req, res, next) {
 
 // control variables
 
-var nodemailer = require('../services/email');
-
 // issues
 var ctrlIssues = require('../controllers/issues/issues');
 var ctrlIssueRecovery = require('../controllers/issues/issueRecovery');

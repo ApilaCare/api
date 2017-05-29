@@ -5,7 +5,7 @@ const User = mongoose.model('User');
 const communityCtrl = require('../communities/communities');
 const todoCtrl = require('../todos/todos');
 const utils = require('../../services/utils');
-const emailService = require('../../services/email');
+const sendVerificationEmail = require('../../services/emails/emailControllers/verifyEmail').sendVerificationEmail;
 const logs = require('../communities/logs');
 
 const crypto = require('crypto');
@@ -104,11 +104,7 @@ module.exports.login = async (req, res) => {
 
 async function saveUser(user, todoid, res) {
 
-  console.log(utils.generateToken(user.email));
-
   let tokenVerify = utils.generateToken(user.email);
-
-
 
   try {
 
@@ -116,7 +112,7 @@ async function saveUser(user, todoid, res) {
 
     let savedUser = await user.save();
 
-    await emailService.sendVerificationEmail(cons.APILA_EMAIL, user.email, tokenVerify);
+    await sendVerificationEmail(cons.APILA_EMAIL, user.email, tokenVerify);
 
     let data = {
       "creator": savedUser._id,
