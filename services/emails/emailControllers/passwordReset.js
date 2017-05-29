@@ -1,6 +1,10 @@
-const passwordReset = require('./emailTemplates/passwordReset');
+const passwordReset = require('./../emailTemplates/passwordReset');
 
-module.exports.sendForgotPassword = function(from, to, token, host, callback) {
+const transporter = require('./email').transporter;
+
+module.exports.sendForgotPassword = (from, to, token, username) => {
+
+  let mailOptions = {};
 
   let resetUrl = "https://apilatest.herokuapp.com/auth/reset-password/";
 
@@ -15,10 +19,15 @@ module.exports.sendForgotPassword = function(from, to, token, host, callback) {
   mailOptions.from = from;
   mailOptions.to = to;
   mailOptions.subject = "Password Reset for Apila";
-  mailOptions.text = 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-        'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-        resetUrl + token + '\n\n' +
-        'If you did not request this, please ignore this email and your password will remain unchanged.\n';
 
-  transporter.sendMail(mailOptions, callback);
+  const link = resetUrl + token;
+
+  mailOptions.html = passwordReset(link, username);
+
+  // mailOptions.text = 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+  //       'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+  //       resetUrl + token + '\n\n' +
+  //       'If you did not request this, please ignore this email and your password will remain unchanged.\n';
+
+  return transporter.sendMail(mailOptions);
 };

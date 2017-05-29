@@ -4,7 +4,10 @@ const utils = require('../../services/utils');
 const User = mongoose.model('User');
 const Community = mongoose.model('Community');
 
-const emailService = require('../../services/email');
+const sendVerificationEmail = 
+      require('../../services/emails/emailControllers/verifyEmail').sendVerificationEmail;
+const sendForgotPassword = require('../../services/emails/emailControllers/passwordReset').sendForgotPassword;
+
 const async = require('async');
 const crypto = require('crypto');
 
@@ -113,34 +116,35 @@ module.exports.userImage = function(req, res) {
 };
 
 // POST /users/forgotpassowrd/:email - Send reset email for password
-module.exports.forgotPassword = function(req, res) {
+module.exports.forgotPassword = async (req, res) => {
 
   if (utils.checkParams(req, res, ['email'])) {
     return;
   }
 
-  crypto.randomBytes(20, function(err, buf) {
-    var token = buf.toString('hex');
+  try {
 
-    User.findOne({
-      "email": req.params.email
-    }, function(err, user) {
+    const token = crypto.randomBytes(20).toString('hex');
 
-      if (user) {
-        user.resetPasswordToken = token;
-        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    const user = await User.findOne({email: req.params.email}).exec();
 
-        user.save(function(err) {
-          doSendPasswordForget(req, res, token);
-        });
-      } else {
-        utils.sendJSONresponse(res, 404, null);
-      }
+    if(!user) {
+      throw "User not found";
+    }
 
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + (3600000*24); // 1 day
 
-    });
+    await user.save();
 
-  });
+    await sendForgotPassword(APILA_EMAIL, req.params.email, token, user.name);
+
+    utils.sendJSONresponse(res, 200, token);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
 
 };
 
@@ -153,7 +157,7 @@ module.exports.sendVerifyEmail = async (req, res) => {
 
     const token = utils.generateToken(user.email);
 
-    await emailService.sendVerificationEmail(APILA_EMAIL, user.email, token);
+    await sendVerificationEmail(APILA_EMAIL, user.email, token, user.name);
 
     utils.sendJSONresponse(res, 200, {msg: 'Verify email sent'});
 
@@ -301,7 +305,7 @@ module.exports.verifyEmail = function(req, res) {
 // HELPER FUNCTIONS
 
 function doSendPasswordForget(req, res, token) {
-  emailService.sendForgotPassword("noreply@apila.care", req.params.email, token, req.headers.host,
+  emailService.sendForgotPassword(APILA_EMAIL, req.params.email, token, req.headers.host,
     function(error, info) {
       if (error) {
         utils.sendJSONresponse(res, 404, null);

@@ -1,12 +1,15 @@
-const verifyEmail = require('./emailTemplates/verifyEmail');
+const verifyEmail = require('./../emailTemplates/verifyEmail');
 
-module.exports.sendVerificationEmail = function(from, to, token) {
+const transporter = require('./email').transporter;
+
+module.exports.sendVerificationEmail = (from, to, token, username) => {
+
+  let mailOptions = {};
 
   mailOptions.from = from;
   mailOptions.to = to;
 
-  var link = "https://apilatest.herokuapp.com/auth/verify/" + token;
-  var username; // username of the person who is verifing their email
+  let link = "https://apilatest.herokuapp.com/auth/verify/" + token;
 
   if(process.env.NODE_ENV === 'production') {
     link = "https://apila.care/auth/verify/" + token;

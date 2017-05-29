@@ -269,7 +269,7 @@ module.exports = (link, username) => {
                                 <table border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
                                     <tr>
-                                      <td> <a href="http://htmlemail.io" target="_blank">Call To Action</a> </td>
+                                      <td> <a href="${link}" target="_blank">${username}</a> </td>
                                     </tr>
                                   </tbody>
                                 </table>
