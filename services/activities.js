@@ -11,6 +11,8 @@ let connectedUsers = {};
 
 module.exports = (socketConn) => {
   io = socketConn;
+  
+  io.setMaxListeners(0); 
 
   io.on('connection', socketioJwt.authorize({
     secret: process.env.JWT_SECRET,
