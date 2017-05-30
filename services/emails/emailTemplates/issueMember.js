@@ -2,7 +2,9 @@
 
 const style = require('./emailStyle').style;
 
-module.exports = (link, username, issueTitle, issueSubmitBy, issueDesc, issueResParty) => {
+module.exports = (username, issueTitle, issuesOfMembers, issueDesc, issueResParty) => {
+
+  console.log(username, issueTitle, issuesOfMembers, issueDesc, issueResParty);
 
   return `<!doctype html>
   <html>
@@ -40,7 +42,7 @@ module.exports = (link, username, issueTitle, issueSubmitBy, issueDesc, issueRes
                                   <table border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
                                       <tr>
-                                        <td> <a href="${link}" target="_blank">Verify</a> </td>
+                                        <td> <a href="" target="_blank">Verify</a> </td>
                                       </tr>
                                     </tbody>
                                   </table>
