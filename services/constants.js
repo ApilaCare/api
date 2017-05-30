@@ -1,6 +1,6 @@
 module.exports.PLAN_PER_USER = "plan_per_user";
 
-module.exports.APILA_EMAIL = "support@apila.care";
+module.exports.APILA_EMAIL = "Apila@apila.care";
 
 const taskState = {
   "CURRENT" : "current",
