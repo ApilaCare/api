@@ -358,11 +358,21 @@ module.exports.sendMemberNotification = async (req, res) => {
     const memberName = req.body.memberName;
     const memberId = req.body.memberId;
 
-    const issuesOfMember = await Iss.find({idMembers: new mongoose.Types.ObjectId(memberId)}).exec();
+    const issuesOfMember = [];
+    const currIssue = await Iss.findById(req.params.issueid).exec();
 
-    await sendIssueMemberEmail(APILA_EMAIL, memberEmail, issue, memberName, issuesOfMember);
+    if(currIssue.emailsSentTo.indexOf(memberEmail) === -1) {
 
-    utils.sendJSONresponse(res, 200, true);
+      currIssue.emailsSentTo.push(memberEmail);
+      await sendIssueMemberEmail(APILA_EMAIL, memberEmail, issue, memberName, issuesOfMember);
+
+      await currIssue.save();
+
+      utils.sendJSONresponse(res, 200, true);
+    } else {
+        utils.sendJSONresponse(res, 200, true);
+    }
+
 
   } catch(err) {
     console.log(err);

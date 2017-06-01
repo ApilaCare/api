@@ -83,6 +83,7 @@ var issueSchema = new mongoose.Schema({
     idLabels: [String],
     finalPlan: [finalPlanSchema],
     updateInfo: [updateInfoSchema],
+    emailsSentTo: [String],
     community: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Community'
