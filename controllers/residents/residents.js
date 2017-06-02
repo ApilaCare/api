@@ -225,13 +225,15 @@ module.exports.residentById = async (req, res) => {
       //if we are boss or director show full ssn
       const userid = req.payload._id;
 
-      const isDirector = resident.community.directors.indexOf(userid) !== -1;
+      const isDirector = true; //resident.community.directors.indexOf(userid) !== -1;
 
-      if(userid === resident.community.boss.toString() || isDirector) {
-        resident.socialSecurityNumber = ssn;
-      } else {
-        resident.socialSecurityNumber = ssn.substr(ssn.length - 4);
-      }
+      // if(userid === resident.community.boss.toString() || isDirector) {
+      //   resident.socialSecurityNumber = ssn;
+      // } else {
+      //   resident.socialSecurityNumber = ssn.substr(ssn.length - 4);
+      // }
+
+      resident.socialSecurityNumber = ssn;
 
       //remove community 
       resident.community = {};
