@@ -2,7 +2,7 @@
 
 const style = require('./emailStyle').style;
 
-module.exports = (link, username, issueTitle, issueSubmitBy, issueDesc) => {
+module.exports = (username, issueTitle, issueDesc, issuesOfMember) => {
 
   return `<!doctype html>
 <html>

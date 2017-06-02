@@ -10,6 +10,7 @@ const Labels = mongoose.model('Labels');
 const APILA_EMAIL = require('../../services/constants').APILA_EMAIL;
 
 const sendIssueMemberEmail = require('../../services/emails/emailControllers/issueMember').sendIssueMemberEmail;
+const sendResponsibleMemberEmail = require('../../services/emails/emailControllers/issueResParty').sendResponsibleMemberEmail;
 
 // POST /issues/new - Creates a new issue
 module.exports.issuesCreate = function(req, res) {
@@ -373,6 +374,35 @@ module.exports.sendMemberNotification = async (req, res) => {
         utils.sendJSONresponse(res, 200, true);
     }
 
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
+
+//POST issues/:issueid/responsible_party_notification - Send email notification when the user assigned as a responsible party
+module.exports.sendResponsiblePartyNotification = async (req, res) => {
+
+   if (utils.checkParams(req, res, ['issueid'])) {
+    return;
+  }
+
+  try {
+
+    const responsiblePartyId = req.body.responsibleParty;
+    const issue = req.body.issue;
+
+    const responsibleParty = await User.findById(responsiblePartyId).exec();
+
+    const issuesOfMember = await Iss.find({responsibleParty: responsiblePartyId}).
+                                 select('_id title').exec();
+
+    await sendResponsibleMemberEmail(APILA_EMAIL, responsibleParty.email, issue, responsibleParty.name, issuesOfMember);
+
+    utils.sendJSONresponse(res, 200, true);
 
   } catch(err) {
     console.log(err);
