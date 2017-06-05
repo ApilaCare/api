@@ -31,25 +31,25 @@ module.exports = (username, issueTitle, issueDesc, issuesOfMember) => {
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <p>Hi there,</p>
-                        <p>Sometimes you just want to send a simple HTML email with a simple design and clear call to action. This is it.</p>
+                        <p>Hi there ${username},</p>
+                        <p>You've been added as a responsible party to ${issueTitle} issue.</p>
+                        
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
                             <tr>
                               <td align="left">
                                 <table border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
-                                    <tr>
-                                      <td> <a href="http://htmlemail.io" target="_blank">Call To Action</a> </td>
-                                    </tr>
                                   </tbody>
                                 </table>
                               </td>
                             </tr>
                           </tbody>
                         </table>
-                        <p>This is a really simple email template. Its sole purpose is to get the recipient to click the button with no distractions.</p>
-                        <p>Good luck! Hope it works.</p>
+                        <p>Issue description: ${issueDesc}</p>
+                        <br />
+                        <div>Other Issues where you are a responsible party: </div>
+                        <p>${issuesOfMember.map(iss => iss.title).toString()}</p>
                       </td>
                     </tr>
                   </table>

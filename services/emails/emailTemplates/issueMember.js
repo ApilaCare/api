@@ -33,8 +33,10 @@ module.exports = (username, issueTitle, issuesOfMembers, issueDesc, issueResPart
                     <table border="0" cellpadding="0" cellspacing="0">
                       <tr>
                         <td>
-                          <p>Hi there,</p>
-                          <p>Verify this email to be able to join or create a community.</p>
+                          <p>Hi there ${username},</p>
+                          <p>You have been added as a member to ${issueTitle} issue</p>
+                          <p>Issue description: ${issueDesc}</p>
+                          <p>Responsible party ${issueResParty.name}</p>
                           <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                             <tbody>
                               <tr>

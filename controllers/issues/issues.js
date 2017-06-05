@@ -13,7 +13,7 @@ const sendIssueMemberEmail = require('../../services/emails/emailControllers/iss
 const sendResponsibleMemberEmail = require('../../services/emails/emailControllers/issueResParty').sendResponsibleMemberEmail;
 
 // POST /issues/new - Creates a new issue
-module.exports.issuesCreate = function(req, res) {
+module.exports.issuesCreate = async (req, res) => {
 
   Iss.create({
     title: req.body.title,
@@ -23,7 +23,7 @@ module.exports.issuesCreate = function(req, res) {
     confidential: req.body.confidential,
     submitBy: req.payload._id,
     community: req.body.community._id
-  }, function(err, issue) {
+  }, async (err, issue) => {
     if (err) {
       console.log(err);
       utils.sendJSONresponse(res, 400, err);
@@ -32,7 +32,11 @@ module.exports.issuesCreate = function(req, res) {
       User.populate(issue, {
         path: 'responsibleParty submitBy',
         select: '_id name userImage'
-      }, function(err, populatedIssue) {
+      }, async (err, populatedIssue) => {
+
+        if(req.body.notifyUser) {
+          await responsibleEmail(populatedIssue, populatedIssue.responsibleParty._id);
+        }
 
         activitiesService.addActivity(" created issue " + req.body.title, req.body.responsibleParty,
                                         "issue-create", req.body.community._id, 'community');
@@ -395,12 +399,7 @@ module.exports.sendResponsiblePartyNotification = async (req, res) => {
     const responsiblePartyId = req.body.responsibleParty;
     const issue = req.body.issue;
 
-    const responsibleParty = await User.findById(responsiblePartyId).exec();
-
-    const issuesOfMember = await Iss.find({responsibleParty: responsiblePartyId}).
-                                 select('_id title').exec();
-
-    await sendResponsibleMemberEmail(APILA_EMAIL, responsibleParty.email, issue, responsibleParty.name, issuesOfMember);
+    await responsibleEmail(issue, responsiblePartyId);
 
     utils.sendJSONresponse(res, 200, true);
 
@@ -639,3 +638,20 @@ function finalPlan(req, res, taskid) {
 
      });
 }
+
+async function responsibleEmail(issue, responsiblePartyId) {
+  
+  try {
+    const responsibleParty = await User.findById(responsiblePartyId).exec();
+
+    const issuesOfMember = await Iss.find({responsibleParty: responsiblePartyId}).
+                                 select('_id title').exec();
+
+    await sendResponsibleMemberEmail(APILA_EMAIL, responsibleParty.email, issue, responsibleParty.name, issuesOfMember);
+
+  } catch(err) {
+    console.log(err);
+    throw err;
+  }
+}
+
