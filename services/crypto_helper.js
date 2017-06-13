@@ -11,12 +11,17 @@ module.exports.encrypt = (text) => {
 }
  
 module.exports.decrypt = (text) => {
-  const decipher = crypto.createDecipher(aes, process.env.SSN_SECRET);
+  try {
+      const decipher = crypto.createDecipher(aes, process.env.SSN_SECRET);
 
-  console.log(text);
+      let dec = decipher.update(text.toString() ,'hex','utf8');
+      dec += decipher.final('utf8');
 
-  let dec = decipher.update(text.toString() ,'hex','utf8');
-  dec += decipher.final('utf8');
+      return dec;
 
-  return dec;
+  } catch(err) {
+    console.log(err);
+    return text;
+  }
+
 }
