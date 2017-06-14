@@ -532,31 +532,6 @@ module.exports.uploadLogo = async (req, res) => {
 
 };
 
-module.exports.communitiesDeleteOne = function(req, res) {
-  const communityid = req.params.communityid;
-
-  if (communityid) {
-    Community
-      .findByIdAndRemove(communityid)
-      .exec(
-        function(err, community) {
-          if (err) {
-            console.log(err);
-            utils.sendJSONresponse(res, 404, err);
-            return;
-          }
-
-          utils.sendJSONresponse(res, 204, null);
-        }
-      );
-  } else {
-    utils.sendJSONresponse(res, 404, {
-      "message": "No residentid"
-    });
-  }
-};
-
-
 module.exports.restoreCommunity = function(req, res) {
 
   var communityid = req.params.communityid;
@@ -645,6 +620,7 @@ module.exports.updateFloor = async (req, res) => {
 
 }
 
+//PRIVATE FUNCTIONS
 
 module.exports.doCreateCommunity = async (communityInfo, user) => {
 
@@ -678,8 +654,6 @@ module.exports.doCreateCommunity = async (communityInfo, user) => {
   }
 
 };
-
-//PRIVATE FUNCTIONS
 
 function addUserToCommunity(req, res, community) {
   var username = req.body.username;

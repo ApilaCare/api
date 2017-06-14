@@ -81,7 +81,6 @@ router.put('/communities/update/:communityid/', sanitizeInput , auth, ctrlCommun
 router.put('/communities/:communityid/units', sanitizeInput , auth, ctrlCommunities.updateUnits);
 router.delete('/communities/:communityid/roomstyle/:roomid', sanitizeInput, auth, ctrlCommunities.deleteRoomStyle);
 router.delete('/communities/:communityid/user/:userid/', sanitizeInput , auth, ctrlCommunities.removeMember);
-router.delete('/communities/:communityid/', sanitizeInput , auth, ctrlCommunities.communitiesDeleteOne);
 
 // issues
 router.get('/issues/list/:status/id/:communityid', sanitizeInput , auth, ctrlIssues.issuesList);

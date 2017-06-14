@@ -225,8 +225,7 @@ module.exports.residentById = async (req, res) => {
       } else {
         resident.socialSecurityNumber = cryptoHelper.decrypt(resident.socialSecurityNumber);
       }
-    } 
-    
+    }     
 
     utils.sendJSONresponse(res, 200, resident);
   } catch(err) {
