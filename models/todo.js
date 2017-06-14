@@ -36,6 +36,10 @@ const todoItemSchema = new mongoose.Schema({
 
   completed: [counterSchema], // completed before certain amount of time
   notCompleted: [counterSchema],
+
+  submitBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+  responsibleParty: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+
 });
 
 const todoSchema = new mongoose.Schema({

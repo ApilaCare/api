@@ -67,6 +67,9 @@ module.exports.addTask = async (req, res) => {
   }
 
   try {
+
+    const userId = req.payload._id;
+
     const newTask = {
       text: req.body.text,
       occurrence: req.body.occurrence,
@@ -85,10 +88,10 @@ module.exports.addTask = async (req, res) => {
       startTime: req.body.startTime,
       endTime: req.body.endTime,
       weekStartTime: req.body.weekStartTime,
-      weekEndTime: req.body.weekEndTime
+      weekEndTime: req.body.weekEndTime,
+      submitBy: userId,
+      responsibleParty: req.body.responsibleParty
     };
-
-    const userId = req.payload._id;
 
     const todo = await ToDo.findById(todoId).exec();
     
