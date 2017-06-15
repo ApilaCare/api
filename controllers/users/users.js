@@ -52,7 +52,7 @@ module.exports.usersInCommunity = function(req, res) {
       community: req.params.community
     })
     .populate("recovery", "-salt -hash")
-    .select("name _id email")
+    .select("name _id email todoid")
     .exec(function(err, users) {
       if (err) {
         utils.sendJSONresponse(res, 404, {

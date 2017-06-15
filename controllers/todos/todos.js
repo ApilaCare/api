@@ -94,6 +94,16 @@ module.exports.addTask = async (req, res) => {
       responsibleParty: req.body.responsibleParty
     };
 
+    // Adding the task to the responsible party todo
+    if(userId !== req.body.responsibleParty) {
+
+      const responsibleTodo = await ToDo.findById(req.body.responsibleTodoid).exec();
+
+      responsibleTodo.tasks.push(newTask);
+
+      await responsibleTodo.save();
+    }
+
     const todo = await ToDo.findById(todoId).exec();
     
     if(!todo) {
