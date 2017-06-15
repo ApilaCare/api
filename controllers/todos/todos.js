@@ -243,6 +243,16 @@ module.exports.activeTasksCount = async (req, res) => {
 
 //////////////////////////// HELPER FUNCTION /////////////////////////////////
 
+async function addTaskForResponsibleParty(responsibleid, task) {
+   if(responsibleid) {
+      const responsibleTodo = await ToDo.findById(responsibleid).exec();
+
+      responsibleTodo.tasks.push(newTask);
+
+      return await responsibleTodo.save();
+    }
+}
+
 function resetOtherOccurrences(task) {
   switch(task.occurrence) {
     case occurrence.HOURLY:
