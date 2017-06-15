@@ -44,7 +44,9 @@ module.exports.listTasks = async (req, res) => {
   try {
 
     const todo = await ToDo.findById(todoId)
-                       .populate("tasks.responsibleParty", "_id name").exec();
+                       .populate("tasks.responsibleParty", "_id name")
+                       .populate("tasks.submitBy", "_id name")
+                       .exec();
 
     //before listing tasks check if any tasks are completed
     await TaskService.updateTasks(todo);
