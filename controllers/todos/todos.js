@@ -170,6 +170,15 @@ module.exports.updateTask = async (req, res) => {
 
     await todo.save();
 
+    //responsible party has been changed
+    if(req.body.oldResponsibleTodoid) {
+      //remove the task from oldResponsibleParty
+      //await removeTaskForResponsibleParty(req.body.oldResponsibleTodoid);
+
+      //add the task to newResponsibleParty
+      await addTaskForResponsibleParty(req.body.responsibleTodoid, task);
+    }
+
     utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
 
   } catch(err) {
@@ -247,7 +256,19 @@ async function addTaskForResponsibleParty(responsibleid, task) {
    if(responsibleid) {
       const responsibleTodo = await ToDo.findById(responsibleid).exec();
 
-      responsibleTodo.tasks.push(newTask);
+      responsibleTodo.tasks.push(task);
+
+      return await responsibleTodo.save();
+    }
+}
+
+async function removeTaskForResponsibleParty(responsibleid) {
+   if(responsibleid) {
+      const responsibleTodo = await ToDo.findById(responsibleid).exec();
+
+      // const task = responsibleTodo.tasks.id(taskId);
+
+      // task.remove();
 
       return await responsibleTodo.save();
     }
