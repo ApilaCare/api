@@ -161,11 +161,16 @@ module.exports.updateTask = async (req, res) => {
 
     //different responsibleParty? Update the other task as well
 
-    console.log(req.body);
-
     if(req.body.submitBy._id !== req.body.responsibleParty) {
-      console.log("Se menja ovo??");
-      await updateTask(req.body, req.body.responsibleTodoid, taskId);
+
+      let currtodoid = req.body.responsibleTodoid;
+
+      if(userId === req.body.responsibleParty) {
+        currtodoid = req.body.creatorsTodoid;
+      }
+
+
+      await updateTask(req.body, currtodoid, taskId);
     }
 
     utils.sendJSONresponse(res, 200, updatedTask);
