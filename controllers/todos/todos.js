@@ -146,30 +146,9 @@ module.exports.updateTask = async (req, res) => {
 
   try {
 
-    const currentTime = await TaskService.loadMockTime();
+    const updatedTask = await updateTask(req.body, todoId, taskId);
 
-    const todo = await ToDo.findById(todoId).exec();
-
-    const index = todo.tasks.indexOf(todo.tasks.id(taskId));
-    const task = req.body;
-
-    if(index === -1) {
-      throw "Task to update not found";
-    }
-
-    if(task.state === taskState.COMPLETE) {
-      task.cycleDate = currentTime.toDate();
-      task.completed.push({updatedOn: currentTime.toDate()});
-    }
-
-    // if we switched occurrence, reset other active set fields
-    if(todo.tasks[index].occurrence !== task.occurrence) {
-      resetOtherOccurrences(task);
-    }
-
-    todo.tasks.set(index, task);
-
-    await todo.save();
+    const userId = req.payload._id;
 
     //responsible party has been changed
     if(req.body.oldResponsibleTodoid) {
@@ -180,7 +159,16 @@ module.exports.updateTask = async (req, res) => {
       await addTaskForResponsibleParty(req.body.responsibleTodoid, task);
     }
 
-    utils.sendJSONresponse(res, 200, todo.tasks[todo.tasks.length - 1]);
+    //different responsibleParty? Update the other task as well
+
+    console.log(req.body);
+
+    if(req.body.submitBy._id !== req.body.responsibleParty) {
+      console.log("Se menja ovo??");
+      await updateTask(req.body, req.body.responsibleTodoid, taskId);
+    }
+
+    utils.sendJSONresponse(res, 200, updatedTask);
 
   } catch(err) {
     console.log(err);
@@ -252,6 +240,42 @@ module.exports.activeTasksCount = async (req, res) => {
 
 
 //////////////////////////// HELPER FUNCTION /////////////////////////////////
+
+async function updateTask(updateTask, todoId, taskId) {
+  try {
+
+    const currentTime = await TaskService.loadMockTime();
+
+    const todo = await ToDo.findById(todoId).exec();
+
+    const index = todo.tasks.indexOf(todo.tasks.id(taskId));
+    const task = updateTask;
+
+    if(index === -1) {
+      throw "Task to update not found";
+    }
+
+    if(task.state === taskState.COMPLETE) {
+      task.cycleDate = currentTime.toDate();
+      task.completed.push({updatedOn: currentTime.toDate()});
+    }
+
+    // if we switched occurrence, reset other active set fields
+    if(todo.tasks[index].occurrence !== task.occurrence) {
+      resetOtherOccurrences(task);
+    }
+
+    todo.tasks.set(index, task);
+
+    await todo.save();
+
+    return todo.tasks[todo.tasks.length - 1];
+
+  } catch(err) {
+    console.log(err);
+    throw err;
+  }
+}
 
 async function addTaskForResponsibleParty(responsibleid, task) {
    if(responsibleid) {
