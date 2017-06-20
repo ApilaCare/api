@@ -188,6 +188,7 @@ router.get('/residents/average_stay/:communityid', sanitizeInput , auth, ctrlRes
 router.post('/residents/new', sanitizeInput , auth, ctrlResidents.residentsCreate);
 router.post('/residents/:residentid/contact', sanitizeInput, auth, ctrlResidents.addContact);
 router.post('/residents/:residentid/image', sanitizeInput, auth, multipartyMiddleware, ctrlResidents.uploadResidentImage);
+router.post('/communities/resurrect/resident', sanitizeInput, auth, ctrlResidents.resurrectResident);
 router.post('/residents/:residentid/upload', sanitizeInput, auth, multipartyMiddleware, ctrlResidents.uploadOutsideAgencyAssesment);
 router.put('/residents/update/:residentid', sanitizeInput , auth,  ctrlResidents.residentsUpdateOne);
 router.put('/residents/:residentid/listitem', sanitizeInput , auth, ctrlResidents.updateListItem);

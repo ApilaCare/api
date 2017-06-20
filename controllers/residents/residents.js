@@ -506,6 +506,24 @@ module.exports.residentsDeleteOne = async (req, res) => {
 
 };
 
+//POST /api/residents/resurrect - Bring back a resident which the user undo (the delete operation)
+module.exports.resurrectResident = async (req, res) => {
+
+  try {
+
+    const resident = new Resid(req.body);
+
+    await resident.save();
+
+    utils.sendJSONresponse(res, 200, resident);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
 
 // HELPER FUNCTIONS
 
