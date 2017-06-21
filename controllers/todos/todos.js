@@ -159,9 +159,13 @@ module.exports.updateTask = async (req, res) => {
       await addTaskForResponsibleParty(req.body.responsibleTodoid, task);
     }
 
-    //different responsibleParty? Update the other task as well
+    const responsible = req.body.responsibleParty._id ? req.body.responsibleParty._id : req.body.responsibleParty;
+    const submitBy = req.body.submitBy._id ? req.body.submitBy._id : req.body.submitBy;
 
-    if(req.body.submitBy._id !== req.body.responsibleParty) {
+    console.log(responsible, submitBy);
+
+    //different responsibleParty? Update the other task as well
+    if(submitBy !== responsible) {
 
       let currtodoid = req.body.responsibleTodoid;
 
@@ -169,7 +173,7 @@ module.exports.updateTask = async (req, res) => {
         currtodoid = req.body.creatorsTodoid;
       }
 
-
+      console.log("different responsibleParty?");
       await updateTask(req.body, currtodoid, taskId);
     }
 
@@ -252,6 +256,8 @@ async function updateTask(updateTask, todoId, taskId) {
     const currentTime = await TaskService.loadMockTime();
 
     const todo = await ToDo.findById(todoId).exec();
+
+    //console.log(todoId, todo);
 
     const index = todo.tasks.indexOf(todo.tasks.id(taskId));
     const task = updateTask;
