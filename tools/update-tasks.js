@@ -1,5 +1,5 @@
 // to run script on heroku:
-// heroku run node ./app_api/tools/ssn-encrypt.js --app apilatest
+// heroku run node ./app_api/tools/update-tasks.js --app apilatest
 
 require('../models/db');
 
