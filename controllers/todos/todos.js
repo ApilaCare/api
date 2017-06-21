@@ -162,8 +162,6 @@ module.exports.updateTask = async (req, res) => {
     const responsible = req.body.responsibleParty._id ? req.body.responsibleParty._id : req.body.responsibleParty;
     const submitBy = req.body.submitBy._id ? req.body.submitBy._id : req.body.submitBy;
 
-    console.log(responsible, submitBy);
-
     //different responsibleParty? Update the other task as well
     if(submitBy !== responsible) {
 
@@ -173,7 +171,6 @@ module.exports.updateTask = async (req, res) => {
         currtodoid = req.body.creatorsTodoid;
       }
 
-      console.log("different responsibleParty?");
       await updateTask(req.body, currtodoid, taskId);
     }
 
