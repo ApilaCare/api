@@ -123,7 +123,7 @@ describe('Issues', function() {
           if (err) {
             done(err);
           } else {
-            assert.equal(res.body[0].count, 1, "We have one issue for the first resident");
+            assert.equal(res.body[0].count, 2, "We have two issues for the first resident");
             done();
           }
 
