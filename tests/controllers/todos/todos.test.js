@@ -17,7 +17,9 @@ describe('Todos', function() {
         "cycleDate" : new Date(),
         "completed": [],
         "overDue": [],
-        "notCompleted": []
+        "notCompleted": [],
+        "submitBy": user.id,
+        "responsibleParty": user.id
       };
 
       var todoid = utils.getToDoId();
@@ -92,7 +94,9 @@ describe('Todos', function() {
       var taskData = {
         "text" : "Go walk the dog and the cat, dont forget the cat",
         "occurrence" : 1,
-        "state" : "current"
+        "state" : "current",
+        "submitBy": user.id,
+        "responsibleParty": user.id
       };
 
       utils.server
@@ -125,7 +129,9 @@ describe('Todos', function() {
         "state" : "complete",
         "completed": [],
         "overDue": [],
-        "notCompleted": []
+        "notCompleted": [],
+        "submitBy": user.id,
+        "responsibleParty": user.id
       };
 
       utils.server
@@ -160,7 +166,7 @@ describe('Todos', function() {
           if(err) {
             done(err);
           } else {
-            assert.equal(res.body.message, 'Invalid task id');
+            assert.equal(res.body, 'Task for deletion not found');
             done();
           }
       });

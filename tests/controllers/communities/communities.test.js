@@ -154,11 +154,12 @@ describe('Communities', function() {
         .set('Accept', 'application/json')
         .set('Authorization', 'Bearer ' + utils.getTestUser().token)
         .send(data)
-        .expect(200)
-        .end(function(err,res){
+        .expect(404)
+        .end(function(err, res){
           if(err) {
             done(err);
           } else {
+            console.log(res.body);
             done();
           }
         });
@@ -179,7 +180,7 @@ describe('Communities', function() {
         .set('Accept', 'application/json')
         .set('Authorization', 'Bearer ' + utils.getTestUser().token)
         .send(data)
-        .expect(200)
+        .expect(404)
         .end(function(err,res){
           if(err) {
             done(err);

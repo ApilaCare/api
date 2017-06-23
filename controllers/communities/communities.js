@@ -57,10 +57,12 @@ module.exports.communitiesCreate = function(req, res) {
 // POST - /communites/:communityid/role/:userid - Switches or adds a user role
 module.exports.addRole = function(req, res) {
 
+    console.log("LEEEEEEEEEEEEEEEEEEEEEEEROY JENKINS");
+
+
   if (utils.checkParams(req, res, ['communityid', 'userid'])) {
     return;
   }
-
 
   Community.findOne({
     _id: req.params.communityid

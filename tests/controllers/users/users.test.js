@@ -20,7 +20,7 @@ describe('Users', function() {
           if(err) {
             done(err);
           } else {
-            assert.equal(res.body.length, 3, 'Has three users, one from auth test another at setup');
+            assert.equal(res.body.length, 0, '');
             done();
           }
       });
