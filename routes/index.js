@@ -31,33 +31,34 @@ var sanitizeInput = function(req, res, next) {
 // control variables
 
 // issues
-var ctrlIssues = require('../controllers/issues/issues');
-var ctrlIssueRecovery = require('../controllers/issues/issueRecovery');
-var ctrlIssueComments = require('../controllers/issues/issueComments');
-var ctrlIssueChecklists = require('../controllers/issues/issueChecklists');
-var ctrlIssueLabels = require('../controllers/issues/issueLabels');
-var ctrlIssueAttachments = require('../controllers/issues/issueAttachments');
+const ctrlIssues = require('../controllers/issues/issues');
+const ctrlIssueRecovery = require('../controllers/issues/issueRecovery');
+const ctrlIssueComments = require('../controllers/issues/issueComments');
+const ctrlIssueChecklists = require('../controllers/issues/issueChecklists');
+const ctrlIssueLabels = require('../controllers/issues/issueLabels');
+const ctrlIssueAttachments = require('../controllers/issues/issueAttachments');
+const ctrlIssueStats = require('../controllers/issues/issuesStats');
 
 // residents
-var ctrlResidents = require('../controllers/residents/residents');
+const ctrlResidents = require('../controllers/residents/residents');
 
 // users
-var ctrlUsers = require('../controllers/users/users');
-var ctrlAuth = require('../controllers/users/authentication');
-var ctrlPayment = require('../controllers/users/payment');
+const ctrlUsers = require('../controllers/users/users');
+const ctrlAuth = require('../controllers/users/authentication');
+const ctrlPayment = require('../controllers/users/payment');
 
 // appointments
-var ctrlAppointments = require('../controllers/appointments/appointments');
-var ctrlAppointmentComments = require('../controllers/appointments/appointmentComments');
+const ctrlAppointments = require('../controllers/appointments/appointments');
+const ctrlAppointmentComments = require('../controllers/appointments/appointmentComments');
 
 // communities
-var ctrlCommunities = require('../controllers/communities/communities');
+const ctrlCommunities = require('../controllers/communities/communities');
 
 // todos
-var ctrlToDos = require('../controllers/todos/todos');
+const ctrlToDos = require('../controllers/todos/todos');
 
 // activity
-var ctrlActivity = require('../controllers/activities/activities');
+const ctrlActivity = require('../controllers/activities/activities');
 
 // logs
 const ctrlLogs = require('../controllers/communities/logs');
@@ -85,8 +86,6 @@ router.delete('/communities/:communityid/user/:userid/', sanitizeInput , auth, c
 // issues
 router.get('/issues/list/:status/id/:communityid', sanitizeInput , auth, ctrlIssues.issuesList);
 router.get('/issues/:username/s/:status/id/:communityid', sanitizeInput , auth, ctrlIssues.issuesListByStatus);
-router.get('/issues/count/:userid/id/:communityid', sanitizeInput , auth, ctrlIssues.issuesOpenCount);
-router.get('/issues/issuescount/:communityid', sanitizeInput , auth, ctrlIssues.issuesCount);
 router.get('/issues/due/:communityid', sanitizeInput , auth, ctrlIssues.dueIssuesList);
 router.get('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesReadOne);
 router.get('/issues/:issueid/populate', sanitizeInput, auth, ctrlIssues.issuesPopulateOne);
@@ -100,6 +99,11 @@ router.put('/issues/:issueid/finalplan', sanitizeInput, auth, ctrlIssues.addFina
 router.put('/issues/:issueid/plan/:planid', sanitizeInput, auth, ctrlIssues.updateFinalPlan);
 router.put('/issues/:issueid/confidential', sanitizeInput, auth, ctrlIssues.updateConfidential);
 router.delete('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesDeleteOne);
+
+//issue stats
+router.get('/issues/issuescount/:communityid', sanitizeInput , auth, ctrlIssueStats.issuesCount);
+router.get('/issues/count/:userid/id/:communityid', sanitizeInput , auth, ctrlIssueStats.issuesOpenCount);
+
 
 // issue comments
 router.post('/issues/:issueid/comments/new', sanitizeInput , auth, ctrlIssueComments.issueCommentsCreate);
