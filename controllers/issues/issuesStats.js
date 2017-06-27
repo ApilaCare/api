@@ -49,3 +49,56 @@ module.exports.issuesCount = async (req, res) => {
   }
 
 };
+
+//POST /issues/:userid/activityrate - Adds a new activity score for the user
+module.exports.addActivityRate = async (req, res) => {
+
+  try {
+
+    const userid = req.params.userid;
+
+    const user = await User.findById(userid).exec();
+
+    if(!user) {
+      throw "User not found";
+    }
+
+    if(!user.activityRates) {
+      user.activityRates = [];
+    }
+
+    user.activityRates.push(req.body);
+
+    await user.save();
+
+    utils.sendJSONresponse(res, 200, user.activityRates[user.activityRates.length - 1]);
+
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
+//GET /issues/:userid/activityrate - Gets all the activity rates for the user
+module.exports.getActivityRates = async (req, res) => {
+
+  try {
+
+    const userid = req.params.userid;
+
+    const user = await User.findById(userid).exec();
+
+    if(!user) {
+      throw "User not found";
+    }
+
+    utils.sendJSONresponse(res, 200, user.activityRates);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};

@@ -57,22 +57,22 @@ const everyDayRule = new schedule.RecurrenceRule();
 //just for testing
 everyDayRule.minute = 1;
 
-schedule.scheduleJob(" */5 * * * *", async () => {
+// schedule.scheduleJob(" */5 * * * *", async () => {
 
-  let users = {};
+//   let users = {};
 
-  const allIssues = await Iss.find({}).exec();
+//   const allIssues = await Iss.find({}).exec();
 
-  allIssues.forEach((issue) => {
-    const activeIssue = isIssueActive(issue);
+//   allIssues.forEach((issue) => {
+//     const activeIssue = isIssueActive(issue);
 
-    trackUserActivity(users, issue, activeIssue);
-  });
+//     trackUserActivity(users, issue, activeIssue);
+//   });
 
-  console.log(users);
+//   console.log(users);
 
  
-});
+// });
 
 function trackUserActivity(users, issue, activeIssue) {
   if(!users[issue.responsibleParty]) {
