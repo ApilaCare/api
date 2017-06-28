@@ -29,10 +29,10 @@ var userSchema = new mongoose.Schema({
     firstLogin: {type: Boolean, default: true},
     stripeCustomer: {type: String},
     stripeSubscription: {type: String},
-    activityRates: {
+    activityRates: [{
         date: {type: Date},
         issueActivityRate: {type: Number}
-    }
+    }]
 });
 
 userSchema.methods.setPassword = function(password) {
