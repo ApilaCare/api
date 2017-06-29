@@ -5,6 +5,8 @@ const Iss = mongoose.model('Issue');
 const User = mongoose.model('User');
 const Community = mongoose.model('Community');
 
+const _ = require('lodash');
+
 //GET /issues/count/:userid/id/:communityid - Number of open issues asigned to an user
 module.exports.issuesOpenCount = function(req, res) {
 
@@ -118,7 +120,11 @@ module.exports.userActivityRankings = async (req, res) => {
       throw "Community not found";
     }
 
-    utils.sendJSONresponse(res, 200, community.activityRates);
+    const sortedActivities = _.sortBy(community.activityRates, "issueActivityRate");
+
+    const groupedActivities = _.groupBy(sortedActivities, "name");
+
+    utils.sendJSONresponse(res, 200, groupedActivities);
 
   } catch(err) {
     console.log(err);

@@ -104,6 +104,7 @@ router.delete('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesDeleteO
 router.get('/issues/issuescount/:communityid', sanitizeInput , auth, ctrlIssueStats.issuesCount);
 router.get('/issues/count/:userid/id/:communityid', sanitizeInput , auth, ctrlIssueStats.issuesOpenCount);
 router.get('/issues/:communityid/activityrate/:userid', sanitizeInput , auth, ctrlIssueStats.getActivityRates);
+router.get('/issues/:communityid/rankings', sanitizeInput , auth, ctrlIssueStats.userActivityRankings);
 router.post('/issues/:communityid/activityrate', sanitizeInput, auth, ctrlIssueStats.addActivityRate);
 
 // issue comments

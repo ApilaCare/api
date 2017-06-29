@@ -62,7 +62,8 @@ const communitySchema = new mongoose.Schema({
     logs: [logsSchema],
     timezone: {type: Number},
     activityRates: [{
-        user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+        user: {type: String},
+        name: {type: String},
         date: {type: Date},
         issueActivityRate: {type: Number}
     }]
