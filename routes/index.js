@@ -103,8 +103,8 @@ router.delete('/issues/:issueid', sanitizeInput , auth, ctrlIssues.issuesDeleteO
 //issue stats
 router.get('/issues/issuescount/:communityid', sanitizeInput , auth, ctrlIssueStats.issuesCount);
 router.get('/issues/count/:userid/id/:communityid', sanitizeInput , auth, ctrlIssueStats.issuesOpenCount);
-router.get('/issues/:userid/activityrate', sanitizeInput , auth, ctrlIssueStats.getActivityRates);
-router.post('/issues/:userid/activityrate', sanitizeInput, auth, ctrlIssueStats.addActivityRate);
+router.get('/issues/:communityid/activityrate/:userid', sanitizeInput , auth, ctrlIssueStats.getActivityRates);
+router.post('/issues/:communityid/activityrate', sanitizeInput, auth, ctrlIssueStats.addActivityRate);
 
 // issue comments
 router.post('/issues/:issueid/comments/new', sanitizeInput , auth, ctrlIssueComments.issueCommentsCreate);

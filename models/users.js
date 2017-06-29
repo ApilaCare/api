@@ -28,11 +28,7 @@ var userSchema = new mongoose.Schema({
     resetPasswordExpires: Date,
     firstLogin: {type: Boolean, default: true},
     stripeCustomer: {type: String},
-    stripeSubscription: {type: String},
-    activityRates: [{
-        date: {type: Date},
-        issueActivityRate: {type: Number}
-    }]
+    stripeSubscription: {type: String}
 });
 
 userSchema.methods.setPassword = function(password) {

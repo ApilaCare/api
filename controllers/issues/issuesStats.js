@@ -3,6 +3,7 @@ const utils = require('../../services/utils');
 
 const Iss = mongoose.model('Issue');
 const User = mongoose.model('User');
+const Community = mongoose.model('Community');
 
 //GET /issues/count/:userid/id/:communityid - Number of open issues asigned to an user
 module.exports.issuesOpenCount = function(req, res) {
@@ -50,28 +51,28 @@ module.exports.issuesCount = async (req, res) => {
 
 };
 
-//POST /issues/:userid/activityrate - Adds a new activity score for the user
+//POST /issues/:communityid/activityrate - Adds a new activity score for the user
 module.exports.addActivityRate = async (req, res) => {
 
   try {
 
-    const userid = req.params.userid;
+    const communityid = req.params.communityid;
 
-    const user = await User.findById(userid).exec();
+    const community = await Community.findById(communityid).exec();
 
-    if(!user) {
-      throw "User not found";
+    if(!community) {
+      throw "Community not found";
     }
 
-    if(!user.activityRates) {
-      user.activityRates = [];
+    if(!community.activityRates) {
+      community.activityRates = [];
     }
 
-    user.activityRates.push(req.body);
+    community.activityRates.push(req.body);
 
-    await user.save();
+    await community.save();
 
-    utils.sendJSONresponse(res, 200, user.activityRates[user.activityRates.length - 1]);
+    utils.sendJSONresponse(res, 200, community.activityRates[community.activityRates.length - 1]);
 
 
   } catch(err) {
@@ -81,20 +82,43 @@ module.exports.addActivityRate = async (req, res) => {
 
 };
 
-//GET /issues/:userid/activityrate - Gets all the activity rates for the user
+//GET /issues/:communityid/activityrate/:userid - Gets all the activity rates for the user
 module.exports.getActivityRates = async (req, res) => {
 
   try {
 
+    const communityid = req.params.communityid;
     const userid = req.params.userid;
 
-    const user = await User.findById(userid).exec();
+    const community = await Community.findById(communityid).exec();
 
-    if(!user) {
-      throw "User not found";
+    if(!community) {
+      throw "Community not found";
     }
 
-    utils.sendJSONresponse(res, 200, user.activityRates);
+    utils.sendJSONresponse(res, 200, community.activityRates.filter(rate => rate.user == userid));
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
+//GET /issues/:communityid/rankings - Get a list of user rankings for a community
+module.exports.userActivityRankings = async (req, res) => {
+
+  try {
+
+    const communityid = req.params.communityid;
+
+    const community = await Community.findById(communityid).exec();
+
+    if(!community) {
+      throw "Community not found";
+    }
+
+    utils.sendJSONresponse(res, 200, community.activityRates);
 
   } catch(err) {
     console.log(err);

@@ -60,7 +60,12 @@ const communitySchema = new mongoose.Schema({
     roomStyle: [roomStyleSchema],
     communityChat: [chatSchema],
     logs: [logsSchema],
-    timezone: {type: Number}
+    timezone: {type: Number},
+    activityRates: [{
+        user: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+        date: {type: Date},
+        issueActivityRate: {type: Number}
+    }]
   });
 
 mongoose.model('Community', communitySchema);
