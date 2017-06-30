@@ -250,10 +250,12 @@ module.exports.addContact = function(req, res) {
     } else {
       resident.residentContacts.push(req.body);
 
+      var lastName = req.body.lastName || "";
+
       resident.updateInfo.push({
         "updateField": [{
           "field" : "create-contact",
-          "new" : req.body.firstName + " " + req.body.lastName,
+          "new" : req.body.firstName + " " + lastName,
           "old" : "",
           "ipAddress" : req.headers['x-forwarded-for'] || req.connection.remoteAddress
         }],
