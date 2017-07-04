@@ -8,27 +8,32 @@ const Community = mongoose.model('Community');
 const _ = require('lodash');
 
 //GET /issues/count/:userid/id/:communityid - Number of open issues asigned to an user
-module.exports.issuesOpenCount = function(req, res) {
+module.exports.issuesOpenCount = async (req, res) => {
 
-  var userid = req.params.userid;
-  var community = req.params.communityid;
+  const userid = req.params.userid;
+  const community = req.params.communityid;
 
   if (utils.checkParams(req, res, ['userid', 'communityid'])) {
     return;
   }
 
-  Iss.find({
-    status: "Open",
-    responsibleParty: userid,
-    community: community
-  }, function(err, issues) {
-    if (issues) {
-      utils.sendJSONresponse(res, 200, issues.length);
-    } else {
-      utils.sendJSONresponse(res, 404, 0);
-    }
+  const conditions = {
+      status: "Open",
+      responsibleParty: userid,
+      community: community
+  };
 
-  });
+  try {
+
+    const issuesCount = await Iss.find(conditions).count().exec();
+
+    utils.sendJSONresponse(res, 200, issuesCount);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 404, 0);
+  }
+
 };
 
 // GET /issues/issuescount/:communityid - Number of open isues for a community
