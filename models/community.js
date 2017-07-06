@@ -66,6 +66,11 @@ const communitySchema = new mongoose.Schema({
         name: {type: String},
         date: {type: Date},
         issueActivityRate: {type: Number}
+    }],
+    labelStats: [{
+      name: {type: String},
+      date: {type: Date},
+      score: {type: Number}
     }]
   });
 

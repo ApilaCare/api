@@ -105,7 +105,9 @@ router.get('/issues/issuescount/:communityid', sanitizeInput , auth, ctrlIssueSt
 router.get('/issues/count/:userid/id/:communityid', sanitizeInput , auth, ctrlIssueStats.issuesOpenCount);
 router.get('/issues/:communityid/activityrate/:userid', sanitizeInput , auth, ctrlIssueStats.getActivityRates);
 router.get('/issues/:communityid/rankings', sanitizeInput , auth, ctrlIssueStats.userActivityRankings);
+router.get('/issues/:communityid/labelstats', sanitizeInput , auth, ctrlIssueStats.getLabelStats);
 router.post('/issues/:communityid/activityrate', sanitizeInput, auth, ctrlIssueStats.addActivityRate);
+router.post('/issues/:communityid/labelstats', sanitizeInput, auth, ctrlIssueStats.addLabelStats);
 
 // issue comments
 router.post('/issues/:issueid/comments/new', sanitizeInput , auth, ctrlIssueComments.issueCommentsCreate);

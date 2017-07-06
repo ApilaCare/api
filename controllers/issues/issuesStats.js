@@ -137,3 +137,66 @@ module.exports.userActivityRankings = async (req, res) => {
   }
 
 };
+
+//POST /issues/:communityid/labelstats - Adds a new label stats info
+module.exports.addLabelStats = async (req, res) => {
+
+  try {
+
+    const communityid = req.params.communityid;
+
+    const community = await Community.findById(communityid).exec();
+
+    if(!community) {
+      throw "Community not found";
+    }
+
+    if(!community.labelStats) {
+      community.labelStats = [];
+    }
+
+    const newStats = [];
+
+    Object.keys(req.body).forEach((elem, key) => {
+      newStats.push({
+        name: elem,
+        date: new Date(),
+        score: key
+      });
+    });
+
+    community.labelStats.push(...newStats);
+
+    console.log(community.labelStats);
+
+    await community.save();
+
+    utils.sendJSONresponse(res, 200, community.labelStats[community.labelStats.length - 1]);
+
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+
+};
+
+//GET /issues/:communityid/labelstats - Returns a list of label stats for a community
+module.exports.getLabelStats = async (req, res) => {
+    try {
+
+    const communityid = req.params.communityid;
+
+    const community = await Community.findById(communityid).exec();
+
+    if(!community) {
+      throw "Community not found";
+    }
+
+    utils.sendJSONresponse(res, 200, community.labelStats);
+
+  } catch(err) {
+    console.log(err);
+    utils.sendJSONresponse(res, 500, err);
+  }
+};
