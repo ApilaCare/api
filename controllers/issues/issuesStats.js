@@ -158,16 +158,17 @@ module.exports.addLabelStats = async (req, res) => {
     const newStats = [];
 
     Object.keys(req.body).forEach((elem, key) => {
+
       newStats.push({
         name: elem,
         date: new Date(),
-        score: key
+        score: req.body[elem]
       });
     });
 
     community.labelStats.push(...newStats);
 
-    console.log(community.labelStats);
+    console.log(newStats);
 
     await community.save();
 
