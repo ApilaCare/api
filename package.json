@@ -14,7 +14,7 @@
     "test": "mocha tests --compilers js:babel-core --recursive -R spec --ui bdd --timeout 5000"
   },
   "engines": {
-    "node": "~7.10.0",
+    "node": "~7.10.1",
     "npm": "~3.9.0"
   },
   "dependencies": {
