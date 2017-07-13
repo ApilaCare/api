@@ -57,36 +57,6 @@ const everyDayRule = new schedule.RecurrenceRule();
 //just for testing
 everyDayRule.minute = 1;
 
-// schedule.scheduleJob(" */5 * * * *", async () => {
-
-//   let users = {};
-
-//   const allIssues = await Iss.find({}).exec();
-
-//   allIssues.forEach((issue) => {
-//     const activeIssue = isIssueActive(issue);
-
-//     trackUserActivity(users, issue, activeIssue);
-//   });
-
-//   console.log(users);
-
- 
-// });
-
-function trackUserActivity(users, issue, activeIssue) {
-  if(!users[issue.responsibleParty]) {
-    users[issue.responsibleParty] = {inactiveIssues: 0, activeIssues: 0};
-  }
-
-  if(activeIssue) {
-    users[issue.responsibleParty].activeIssues++;
-  } else {
-    users[issue.responsibleParty].inactiveIssues++;
-  }
-
-}
-
 //given an issues Id it changes its status to Open
 function changeIssueStatus(id) {
   Iss.findById(id).exec(function(err, issue) {

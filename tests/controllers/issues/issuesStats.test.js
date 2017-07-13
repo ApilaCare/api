@@ -131,4 +131,56 @@ describe('#users Activity Rankings', function() {
     })
   });
 
+  describe('#post Adds a new label stats info', function() {
+    it('Adds a new entry for the label stats', function(done) {
+
+      const user = utils.getTestUser();
+
+      const labelData = {
+        "firstLabel" : 3,
+        "secondLabel": 4
+      };
+
+       utils.server
+        .post('/api/issues/' + user.community._id + '/labelstats')
+        .set('Accept', 'application/json')
+        .set('Authorization', 'Bearer ' + user.token)
+        .send(labelData)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            done(err);
+          } else {
+            assert.equal(res.body.name, 'secondLabel', "Label stats added");
+            done();
+          }
+
+        });
+
+    })
+  });
+
+   describe('#get list of label stats', function() {
+    it('Returns a list of label stats for a community', function(done) {
+
+      const user = utils.getTestUser();
+
+       utils.server
+        .get('/api/issues/' + user.community._id + '/labelstats')
+        .set('Accept', 'application/json')
+        .set('Authorization', 'Bearer ' + user.token)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            done(err);
+          } else {
+            assert.equal(res.body.length, 2, "Returns a list of label stats");
+            done();
+          }
+
+        });
+
+    })
+  });
+
 });

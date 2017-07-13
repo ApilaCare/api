@@ -168,8 +168,6 @@ module.exports.addLabelStats = async (req, res) => {
 
     community.labelStats.push(...newStats);
 
-    console.log(newStats);
-
     await community.save();
 
     utils.sendJSONresponse(res, 200, community.labelStats[community.labelStats.length - 1]);

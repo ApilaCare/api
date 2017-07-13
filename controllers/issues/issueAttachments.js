@@ -1,11 +1,11 @@
-var mongoose = require('mongoose');
-var utils = require('../../services/utils');
+const mongoose = require('mongoose');
+const utils = require('../../services/utils');
 
-var Iss = mongoose.model('Issue');
-var User = mongoose.model('User');
+const Iss = mongoose.model('Issue');
+const User = mongoose.model('User');
 
-var fs = require('fs');
-var imageUploadService = require('../../services/imageUpload');
+const fs = require('fs');
+const imageUploadService = require('../../services/imageUpload');
 const sanitize = require("sanitize-filename");
 
 // POST /issues/:issueid/attachments/new - Create a new attachement
