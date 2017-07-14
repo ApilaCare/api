@@ -443,7 +443,6 @@ module.exports.issuesUpdateOne = function(req, res) {
           } else {
 
               if(req.body.addedMember) {
-                console.log("added a member");
                 activitiesService.addActivity(" added member " + req.body.addedMember.name + " to issue " + issue.title, req.payload._id,
                                                 "issue-update", issue.community, 'user', req.body.addedMember._id);
               } else if(req.body.oldResponsibleParty) {
@@ -503,7 +502,7 @@ module.exports.addUpdateInfo = async (req, res) => {
 
 // DELETE /issues/:issueid - Delte an issue by id
 module.exports.issuesDeleteOne = function(req, res) {
-  var issueid = req.params.issueid;
+  const issueid = req.params.issueid;
 
   if (utils.checkParams(req, res, ['issueid'])) {
     return;

@@ -1,11 +1,11 @@
-var mongoose = require('mongoose');
-var utils = require('../../services/utils');
+const mongoose = require('mongoose');
+const utils = require('../../services/utils');
 
-var Iss = mongoose.model('Issue');
-var User = mongoose.model('User');
+const Iss = mongoose.model('Issue');
+const User = mongoose.model('User');
 
 //POST /issues/:issueid/checklists/new - creates a new checklist, providing a issueid
-module.exports.issueChecklistsCreate = function(req, res) {
+module.exports.issueChecklistsCreate = (req, res) => {
 
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
@@ -24,13 +24,11 @@ module.exports.issueChecklistsCreate = function(req, res) {
 };
 
 // PUT /issues/:issueid/checklists/:checklistid - Update a checklist
-module.exports.issueChecklistsUpdateOne = function(req, res) {
+module.exports.issueChecklistsUpdateOne = (req, res) => {
 
   if (utils.checkParams(req, res, ['issueid', 'checklistid'])) {
     return;
   }
-
-  console.log("In Update checklist");
 
   Iss
     .findById(req.params.issueid)
@@ -51,8 +49,6 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
               "message": "checklistid not found"
             });
           } else {
-
-            console.log(thisChecklist);
 
             thisChecklist.author = req.body.author;
             thisChecklist.checkItems = req.body.checkItems;
@@ -82,7 +78,7 @@ module.exports.issueChecklistsUpdateOne = function(req, res) {
 };
 
 //DELETE /issues/:issueid/labels/:labelid - Delete an checklist
-module.exports.issueChecklistsDeleteOne = function(req, res) {
+module.exports.issueChecklistsDeleteOne = (req, res) => {
 
   if (utils.checkParams(req, res, ['issueid', 'checklistid'])) {
     return;
@@ -137,7 +133,7 @@ module.exports.issueChecklistsDeleteOne = function(req, res) {
 
 //////////////////////// HELPER FUNCTIONS //////////////////////////////
 
-var doAddChecklist = function(req, res, issue) {
+var doAddChecklist = (req, res, issue) => {
 
   if (!issue) {
     utils.sendJSONresponse(res, 404, "issueid not found");

@@ -1,10 +1,10 @@
-var mongoose = require('mongoose');
-var utils = require('../../services/utils');
-var Iss = mongoose.model('Issue');
-var User = mongoose.model('User');
+const mongoose = require('mongoose');
+const utils = require('../../services/utils');
+const Iss = mongoose.model('Issue');
+const User = mongoose.model('User');
 
 // POST /issues/:issueid/comments/new - Create a new community
-module.exports.issueCommentsCreate = function(req, res) {
+module.exports.issueCommentsCreate = (req, res) => {
 
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
@@ -31,11 +31,9 @@ module.exports.issueCommentsCreate = function(req, res) {
   }
 };
 
-module.exports.issueCommentsUpdate = function(req, res) {
+module.exports.issueCommentsUpdate = (req, res)  => {
 
   let commentId = req.body._id;
-
-  console.log("IN COMMENTS UPDATE " +  commentId);
 
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
@@ -47,7 +45,6 @@ module.exports.issueCommentsUpdate = function(req, res) {
 
     let index = issue.comments.indexOf(issue.comments.id(commentId));
 
-    console.log(index);
     let comment = req.body;
 
     if(index !== -1) {
@@ -73,7 +70,7 @@ module.exports.issueCommentsUpdate = function(req, res) {
 };
 
 // GET /issues/:issueid/comments - Lists all the comments for an issue
-module.exports.issueCommentsList = function(req, res) {
+module.exports.issueCommentsList = (req, res) => {
 
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
@@ -97,7 +94,7 @@ module.exports.issueCommentsList = function(req, res) {
 
 //////////////////////// HELPER FUNCTIONS ///////////////////////////////
 
-var doAddComment = function(req, res, issue) {
+var doAddComment = (req, res, issue) => {
 
   if (!issue) {
     utils.sendJSONresponse(res, 404, "issueid not found");

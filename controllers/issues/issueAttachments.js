@@ -9,7 +9,7 @@ const imageUploadService = require('../../services/imageUpload');
 const sanitize = require("sanitize-filename");
 
 // POST /issues/:issueid/attachments/new - Create a new attachement
-module.exports.issueAttachmentsCreate = function(req, res) {
+module.exports.issueAttachmentsCreate = (req, res) => {
 
   if (utils.checkParams(req, res, ['issueid'])) {
     return;
