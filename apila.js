@@ -31,7 +31,12 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 
+//error logging
+app.use((err, req, res, next) => {
+    console.log(err);
 
+    res.status(500).send({err: err});
+});
 
 //so we can call our api from another server
 // Add headers
