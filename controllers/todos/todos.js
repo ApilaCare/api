@@ -172,9 +172,13 @@ module.exports.updateTask = async (req, res) => {
       }
 
       await updateTask(req.body, currtodoid, taskId);
+
+      utils.sendJSONresponse(res, 200, updatedTask);
+    } else {
+      utils.sendJSONresponse(res, 200, updatedTask);
     }
 
-    utils.sendJSONresponse(res, 200, updatedTask);
+    
 
   } catch(err) {
     console.log(err);
